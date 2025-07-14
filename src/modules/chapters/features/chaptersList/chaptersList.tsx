@@ -1,0 +1,268 @@
+"use client"
+
+import type React from "react"
+import { useEffect, useState } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import "./index.scss"
+import { getChaptersBySubject } from "../../utils/axios"
+
+// Define the Chapter interface
+interface Chapter {
+  id: string
+  title: string
+  description: string
+  exerciseCount: number
+  progress?: number
+  estimatedTime?: string
+  difficulty?: "Beginner" | "Intermediate" | "Advanced"
+  type?: "Theory" | "Practical" | "Assessment"
+}
+
+const ChaptersList: React.FC = () => {
+  const { subjectId } = useParams<{ subjectId: string }>()
+  const navigate = useNavigate()
+  const [chapters, setChapters] = useState<Chapter[]>([])
+  const [subjectName, setSubjectName] = useState<string>("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (subjectId) {
+      setLoading(true)
+      setError(null)
+      getChaptersBySubject(subjectId)
+        .then((data) => {
+          setChapters(data)
+        })
+        .catch((err) => setError(err.message || "Failed to fetch chapters"))
+        .finally(() => setLoading(false))
+
+      const subjectNames: Record<string, string> = {
+        "1": "Data Structures & Algorithms",
+        "2": "Software Engineering Principles",
+        "3": "Database Management Systems",
+        "4": "Network Security & Protocols",
+        "5": "Machine Learning Fundamentals",
+      }
+      setSubjectName(subjectNames[subjectId] || "Professional Course")
+    }
+  }, [subjectId])
+
+  const handleChapterClick = (chapterId: string) => {
+    navigate(`/subjects/${subjectId}/chapters/${chapterId}/exercises`)
+  }
+
+  const getDifficultyClass = (difficulty?: string) => {
+    switch (difficulty) {
+      case "Beginner":
+        return "difficulty-beginner"
+      case "Intermediate":
+        return "difficulty-intermediate"
+      case "Advanced":
+        return "difficulty-advanced"
+      default:
+        return "difficulty-default"
+    }
+  }
+
+  const getTypeClass = (type?: string) => {
+    switch (type) {
+      case "Theory":
+        return "type-theory"
+      case "Practical":
+        return "type-practical"
+      case "Assessment":
+        return "type-assessment"
+      default:
+        return "type-default"
+    }
+  }
+
+  const getStatusInfo = (progress?: number) => {
+    if (!progress) return { text: "Not Started", class: "status-not-started" }
+    if (progress === 100) return { text: "Completed", class: "status-completed" }
+    return { text: "In Progress", class: "status-in-progress" }
+  }
+
+  const totalExercises = chapters.reduce((sum, chapter) => sum + chapter.exerciseCount, 0)
+  const completedChapters = chapters.filter((c) => c.progress === 100).length
+
+  return (
+    <div className="chapters-container">
+      <div className="chapters-header">
+        <button className="back-btn" onClick={() => navigate("/subjects")}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Back to Courses
+        </button>
+
+        <div className="header-content">
+          <h1 className="course-title">{subjectName}</h1>
+          <p className="course-subtitle">
+            Comprehensive curriculum designed for professional development and skill advancement
+          </p>
+        </div>
+
+        {/* Course Statistics */}
+        <div className="course-stats">
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <div className="stat-content">
+              <span className="stat-label">Total Chapters</span>
+              <span className="stat-value">{chapters.length}</span>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14,2 14,8 20,8" />
+              </svg>
+            </div>
+            <div className="stat-content">
+              <span className="stat-label">Total Exercises</span>
+              <span className="stat-value">{totalExercises}</span>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12,6 12,12 16,14" />
+              </svg>
+            </div>
+            <div className="stat-content">
+              <span className="stat-label">Est. Duration</span>
+              <span className="stat-value">16h</span>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22,4 12,14.01 9,11.01" />
+              </svg>
+            </div>
+            <div className="stat-content">
+              <span className="stat-label">Completed</span>
+              <span className="stat-value">
+                {completedChapters}/{chapters.length}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Loading course content...</p>
+        </div>
+      ) : error ? (
+        <div className="error-state">
+          <div className="error-icon">⚠️</div>
+          <p>Error: {error}</p>
+        </div>
+      ) : (
+        <div className="chapters-list">
+          {chapters.map((chapter, index) => {
+            const status = getStatusInfo(chapter.progress)
+
+            return (
+              <div className="chapter-card" key={chapter.id} onClick={() => handleChapterClick(chapter.id)}>
+                <div className="chapter-header">
+                  <div className="chapter-number">{String(index + 1).padStart(2, "0")}</div>
+
+                  <div className="chapter-main">
+                    <div className="chapter-title-row">
+                      <h2 className="chapter-title">{chapter.title}</h2>
+                      <div className="chapter-badges">
+                        {chapter.type && (
+                          <span className={`type-badge ${getTypeClass(chapter.type)}`}>{chapter.type}</span>
+                        )}
+                        {chapter.difficulty && (
+                          <span className={`difficulty-badge ${getDifficultyClass(chapter.difficulty)}`}>
+                            {chapter.difficulty}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="chapter-description">{chapter.description}</p>
+
+                    <div className="chapter-meta">
+                      <div className="meta-item">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                          <polyline points="14,2 14,8 20,8" />
+                        </svg>
+                        <span>{chapter.exerciseCount} exercises</span>
+                      </div>
+
+                      {chapter.estimatedTime && (
+                        <div className="meta-item">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12,6 12,12 16,14" />
+                          </svg>
+                          <span>{chapter.estimatedTime}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="chapter-actions">
+                    <div className={`status-badge ${status.class}`}>{status.text}</div>
+                    <button className="action-btn">
+                      {chapter.progress === 100 ? "Review" : chapter.progress ? "Continue" : "Start"}
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {chapter.progress !== undefined && (
+                  <div className="chapter-progress">
+                    <div className="progress-header">
+                      <span className="progress-label">Progress</span>
+                      <span className="progress-value">{chapter.progress}%</span>
+                    </div>
+                    <div className="progress-track">
+                      <div className="progress-bar" style={{ width: `${chapter.progress}%` }}></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default ChaptersList

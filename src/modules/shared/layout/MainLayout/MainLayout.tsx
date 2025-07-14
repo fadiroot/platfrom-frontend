@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Sidebar from '../../components/Sidebar/Sidebar'
 import Navbar from '../../components/Navbar/Navbar'
+import Header from '../../components/Header/Header'
 
 interface MainLayoutProps {
   children: React.ReactNode
@@ -37,6 +38,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {showSidebar ? <span className="main-layout-shadow"></span> : null}
 
       <div className={`main-layout-content ${showSidebar ? 'main-layout-disable-events' : ''}`}>
+        <Header title="ALGORITHMS" />
         <div className="main-layout-navbar">
           <Navbar
             setShowSidebar={setShowSidebar}

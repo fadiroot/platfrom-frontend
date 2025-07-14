@@ -1,0 +1,865 @@
+// Professional Light Theme Variables
+$light-bg-primary: #ffffff;
+$light-bg-secondary: #f8fafc;
+$light-bg-tertiary: #e2e8f0;
+$light-border: #e2e8f0;
+$light-border-light: #e2e8f0;
+$text-primary: #0f172a;
+$text-secondary: #475569;
+$text-muted: #64748b;
+$accent-primary: #3b82f6;
+$accent-secondary: #6366f1;
+$accent-success: #10b981;
+$accent-warning: #f59e0b;
+$accent-danger: #ef4444;
+
+// Professional shadows
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+$radius: 8px;
+$radius-lg: 12px;
+$transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+$sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+.exercise-viewer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 1000;
+  background: $light-bg-secondary;
+  display: flex;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: $text-primary;
+  
+  // Ensure content area takes full width when sidebar is collapsed
+  &:not(.sidebar-open) .exercise-content {
+    flex: 1;
+    width: 100%;
+  }
+
+  // Sidebar Toggle Button - Always Visible
+  .sidebar-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: $light-bg-primary;
+    border: 1px solid $light-border;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: $transition;
+    color: $text-secondary;
+    box-shadow: $shadow-md;
+
+    &:hover {
+      background: $accent-primary;
+      color: $light-bg-primary;
+      border-color: $accent-primary;
+      transform: scale(1.05);
+      box-shadow: $shadow-lg;
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    svg {
+      transition: $transition;
+    }
+  }
+
+  // Overlay for mobile when sidebar is open
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition: $sidebar-transition;
+    z-index: 998;
+  }
+
+  &.sidebar-open::before {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  // Left Sidebar Navigation
+  .exercise-sidebar {
+    width: 320px;
+    background: $light-bg-primary;
+    border-right: 1px solid $light-border;
+    box-shadow: $shadow-lg;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: $sidebar-transition;
+    z-index: 999;
+    transform: translateX(0);
+
+    &.collapsed {
+      transform: translateX(-100%);
+      width: 0; // Ensure no space is taken when collapsed
+    }
+
+    .sidebar-header {
+      padding: 80px 24px 24px 24px; // Extra top padding for toggle button
+      border-bottom: 1px solid $light-border;
+      background: $light-bg-tertiary;
+
+      .back-button {
+        background: none;
+        border: none;
+        color: $accent-primary;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 8px 0;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: $transition;
+
+        &:hover {
+          color: $text-primary;
+          transform: translateX(-2px);
+        }
+
+        svg {
+          transition: $transition;
+        }
+      }
+
+      .exercise-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: $text-primary;
+        line-height: 1.3;
+        margin: 0;
+      }
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px;
+
+      .nav-tab {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        margin-bottom: 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: $radius;
+        cursor: pointer;
+        transition: $transition;
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-secondary;
+        text-align: left;
+
+        .nav-content {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          svg {
+            color: $text-muted;
+            transition: $transition;
+          }
+
+          .nav-label {
+            font-weight: 500;
+          }
+        }
+
+        .nav-count {
+          background: $light-bg-tertiary;
+          color: $text-muted;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 600;
+          min-width: 24px;
+          text-align: center;
+          transition: $transition;
+        }
+
+        &:hover {
+          background: rgba($accent-primary, 0.05);
+          border-color: rgba($accent-primary, 0.1);
+          color: $text-primary;
+          transform: translateY(-1px);
+
+          .nav-content svg {
+            color: $accent-primary;
+          }
+
+          .nav-count {
+            background: rgba($accent-primary, 0.1);
+            color: $accent-primary;
+          }
+        }
+
+        &.active {
+          background: rgba($accent-primary, 0.1);
+          border-color: $accent-primary;
+          color: $text-primary;
+          box-shadow: $shadow-sm;
+
+          .nav-content svg {
+            color: $accent-primary;
+          }
+
+          .nav-count {
+            background: $accent-primary;
+            color: $light-bg-primary;
+          }
+        }
+      }
+    }
+  }
+
+  // Main Content Area
+  .exercise-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    background: $light-bg-secondary;
+    transition: $sidebar-transition;
+    margin-left: 0; // Start with no margin
+    
+    // When sidebar is collapsed, content takes full width
+    .exercise-viewer:not(.sidebar-open) & {
+      margin-left: 0;
+      width: 100%;
+    }
+    
+    // When sidebar is open on desktop, add margin
+    @media (min-width: 769px) {
+      .exercise-viewer:not(.sidebar-open) & {
+        margin-left: 0;
+      }
+    }
+
+    .no-files {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: $text-muted;
+      text-align: center;
+      padding: 2rem;
+
+      .no-files-icon {
+        margin-bottom: 24px;
+        opacity: 0.6;
+
+        svg {
+          color: $text-muted;
+        }
+      }
+
+      h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: $text-secondary;
+        margin: 0 0 8px 0;
+      }
+
+      p {
+        font-size: 14px;
+        margin: 0;
+        color: $text-muted;
+      }
+    }
+
+    .file-viewer-container {
+      display: flex;
+      flex-direction: row;
+      gap: 24px;
+      padding: 24px;
+      height: 100%;
+
+      .file-navigation {
+        width: 280px;
+        background: $light-bg-primary;
+        border-radius: $radius-lg;
+        box-shadow: $shadow-md;
+        border: 1px solid $light-border;
+        padding: 20px;
+        overflow-y: auto;
+
+        h3 {
+          font-size: 16px;
+          font-weight: 600;
+          color: $text-primary;
+          margin: 0 0 20px 0;
+        }
+
+        .file-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+
+          .file-grid-item {
+            display: flex;
+            flex-direction: column;
+            background: $light-bg-secondary;
+            border: 1px solid $light-border;
+            border-radius: $radius;
+            cursor: pointer;
+            transition: $transition;
+            overflow: hidden;
+            padding: 0;
+
+            .file-preview {
+              height: 80px;
+              background: $light-bg-tertiary;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-bottom: 1px solid $light-border;
+
+              .grid-pdf-viewer, .grid-image-viewer {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                border: none;
+              }
+            }
+
+            .file-grid-info {
+              padding: 12px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+
+              .file-icon {
+                color: $accent-primary;
+                display: flex;
+                align-items: center;
+              }
+
+              .file-details {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+
+                .file-name {
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: $text-primary;
+                }
+
+                .file-type {
+                  font-size: 10px;
+                  color: $text-muted;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                }
+              }
+            }
+
+            &:hover:not(.active) {
+              border-color: $accent-primary;
+              box-shadow: $shadow-md;
+              transform: translateY(-2px);
+            }
+
+            &.active {
+              border-color: $accent-primary;
+              box-shadow: $shadow-lg;
+              background: rgba($accent-primary, 0.05);
+
+              .file-grid-info .file-details .file-name {
+                color: $accent-primary;
+              }
+
+              .file-preview {
+                background: rgba($accent-primary, 0.05);
+              }
+            }
+          }
+        }
+      }
+
+      .file-preview-card {
+        flex: 1;
+        background: $light-bg-primary;
+        border-radius: $radius-lg;
+        box-shadow: $shadow-md;
+        overflow: hidden;
+        border: 1px solid $light-border;
+
+        .file-preview-header {
+          padding: 20px 24px;
+          background: $light-bg-tertiary;
+          border-bottom: 1px solid $light-border;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0;
+          }
+
+          .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            .file-type-badge {
+              display: inline-flex;
+              align-items: center;
+              padding: 6px 12px;
+              border-radius: 6px;
+              font-size: 11px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+
+              &.pdf {
+                background: rgba($accent-danger, 0.1);
+                color: $accent-danger;
+              }
+
+              &.svg, &.png, &.jpg {
+                background: rgba($accent-success, 0.1);
+                color: $accent-success;
+              }
+
+              &.file {
+                background: rgba($text-muted, 0.1);
+                color: $text-muted;
+              }
+            }
+
+            .file-counter {
+              color: $text-muted;
+              font-size: 14px;
+              font-weight: 500;
+            }
+          }
+        }
+
+        .file-preview-area {
+          padding: 24px;
+          height: calc(100% - 80px);
+
+          .file-display {
+            background: $light-bg-secondary;
+            border-radius: $radius;
+            border: 1px solid $light-border;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .pdf-viewer, .image-viewer {
+              width: 100%;
+              height: 100%;
+              border: none;
+              border-radius: $radius;
+              object-fit: contain;
+            }
+          }
+        }
+      }
+    }
+
+    // Enhanced Side by Side View
+    .side-by-side-view {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      height: 100%;
+      padding: 24px;
+
+      .column {
+        background: $light-bg-primary;
+        border-radius: $radius-lg;
+        box-shadow: $shadow-md;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid $light-border;
+
+        .column-header {
+          padding: 20px 24px;
+          background: $light-bg-tertiary;
+          border-bottom: 1px solid $light-border;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .column-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            svg {
+              color: $accent-primary;
+            }
+
+            h2 {
+              font-size: 18px;
+              font-weight: 600;
+              color: $text-primary;
+              margin: 0;
+            }
+          }
+
+          .file-count {
+            background: $accent-primary;
+            color: $light-bg-primary;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+          }
+        }
+
+        &.exercise-column {
+          .column-header {
+            .column-title svg {
+              color: $accent-primary;
+            }
+          }
+
+          .file-card {
+            border-color: rgba($accent-primary, 0.2);
+
+            &:hover {
+              border-color: $accent-primary;
+              box-shadow: $shadow-lg;
+              transform: translateY(-2px);
+            }
+          }
+        }
+
+        &.solution-column {
+          .column-header {
+            .column-title svg {
+              color: $accent-success;
+            }
+
+            .file-count {
+              background: $accent-success;
+            }
+          }
+
+          .file-card {
+            border-color: rgba($accent-success, 0.2);
+
+            &:hover {
+              border-color: $accent-success;
+              box-shadow: $shadow-lg;
+              transform: translateY(-2px);
+            }
+          }
+        }
+
+        .column-content {
+          flex: 1;
+          padding: 20px;
+          overflow-y: auto;
+
+          .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: $text-muted;
+            text-align: center;
+
+            svg {
+              margin-bottom: 16px;
+              opacity: 0.6;
+            }
+
+            p {
+              font-size: 14px;
+              margin: 0;
+            }
+          }
+
+          .files-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+
+            .file-card {
+              border: 1px solid $light-border;
+              border-radius: $radius;
+              background: $light-bg-secondary;
+              box-shadow: $shadow-sm;
+              overflow: hidden;
+              transition: $transition;
+
+              .file-card-header {
+                padding: 16px;
+                background: $light-bg-tertiary;
+                border-bottom: 1px solid $light-border;
+
+                .file-info {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+
+                  .file-number {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $text-primary;
+                  }
+
+                  .file-badge {
+                    font-size: 11px;
+                    font-weight: 600;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    text-transform: uppercase;
+
+                    &.pdf {
+                      background: rgba($accent-danger, 0.1);
+                      color: $accent-danger;
+                    }
+
+                    &.svg, &.png, &.jpg {
+                      background: rgba($accent-success, 0.1);
+                      color: $accent-success;
+                    }
+
+                    &.file {
+                      background: rgba($text-muted, 0.1);
+                      color: $text-muted;
+                    }
+                  }
+                }
+              }
+
+              .file-card-content {
+                padding: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: $light-bg-primary;
+                min-height: 300px;
+
+                .card-viewer {
+                  width: 100%;
+                  height: 300px;
+                  border: none;
+                  border-radius: $radius;
+                  object-fit: contain;
+                  background: $light-bg-secondary;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .exercise-viewer {
+    .exercise-sidebar {
+      width: 280px;
+    }
+
+    .exercise-content {
+      .file-viewer-container {
+        padding: 16px;
+        gap: 16px;
+
+        .file-navigation {
+          width: 240px;
+        }
+      }
+
+      .side-by-side-view {
+        padding: 16px;
+        gap: 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .exercise-viewer {
+    .sidebar-toggle {
+      top: 16px;
+      left: 16px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .exercise-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 999;
+      box-shadow: $shadow-xl;
+
+      &.collapsed {
+        transform: translateX(-100%);
+        width: 0; // Ensure no space is taken when collapsed
+      }
+
+      .sidebar-header {
+        padding: 70px 20px 20px 20px;
+      }
+    }
+
+    .exercise-content {
+      .file-viewer-container {
+        flex-direction: column;
+        padding: 12px;
+
+        .file-navigation {
+          width: 100%;
+          max-width: none;
+
+          .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+          }
+        }
+      }
+
+      .side-by-side-view {
+        grid-template-columns: 1fr;
+        padding: 12px;
+
+        .column .column-content .files-grid .file-card .file-card-content {
+          min-height: 200px;
+
+          .card-viewer {
+            height: 200px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .exercise-viewer {
+    .sidebar-toggle {
+      top: 12px;
+      left: 12px;
+      width: 36px;
+      height: 36px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .exercise-sidebar {
+      .sidebar-header {
+        padding: 60px 16px 16px 16px;
+
+        .exercise-title {
+          font-size: 16px;
+        }
+      }
+
+      .sidebar-nav {
+        padding: 12px;
+
+        .nav-tab {
+          padding: 12px;
+          font-size: 13px;
+        }
+      }
+    }
+
+    .exercise-content {
+      .file-viewer-container {
+        padding: 8px;
+
+        .file-navigation {
+          padding: 12px;
+
+          .file-grid {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+          }
+        }
+
+        .file-preview-card {
+          .file-preview-header {
+            padding: 16px;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch;
+          }
+
+          .file-preview-area {
+            padding: 12px;
+          }
+        }
+      }
+
+      .side-by-side-view {
+        padding: 8px;
+
+        .column {
+          .column-header {
+            padding: 16px;
+
+            .column-title h2 {
+              font-size: 16px;
+            }
+          }
+
+          .column-content {
+            padding: 12px;
+
+            .files-grid .file-card {
+              .file-card-content {
+                min-height: 150px;
+                padding: 8px;
+
+                .card-viewer {
+                  height: 150px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

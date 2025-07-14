@@ -1,0 +1,132 @@
+// THEME COLORS (shared for chapters, subjects, exercises)
+$theme-primary: #6366f1;
+$theme-primary-light: #818cf8;
+$theme-primary-dark: #4f46e5;
+$theme-accent: #10b981;
+$theme-secondary: #f1f5f9;
+$theme-background: #ffffff;
+$theme-text-primary: #0f172a;
+$theme-text-secondary: #64748b;
+$theme-text-muted: #94a3b8;
+$theme-border: #e2e8f0;
+
+// Use $theme-* variables for all colors below
+// Add your subject list styles here, using the shared theme colors.
+
+// Subject List Container
+.subject-list-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.subject-list-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: $theme-text-primary;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.subject-list-subtitle {
+  font-size: 1.2rem;
+  color: $theme-text-secondary;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+// Subject Grid
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+// Subject Card
+.subject-card {
+  background-color: #f8fbff;
+  border-radius: 14px;
+  border: 2px solid #e0e7ef;
+  box-shadow: 0 4px 16px rgba(22, 151, 214, 0.06);
+  padding: 2.2rem 1.5rem 1.5rem 1.5rem;
+  transition: transform 0.22s, box-shadow 0.22s, border 0.22s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 260px;
+
+  &:hover {
+    transform: translateY(-7px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(22, 151, 214, 0.13);
+    border-color: #1697d6;
+  }
+}
+
+.subject-icon {
+  font-size: 2.7rem;
+  margin-bottom: 1rem;
+  color: #1697d6;
+}
+
+.subject-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1697d6;
+  letter-spacing: 0.01em;
+}
+
+.subject-description {
+  color: $theme-text-secondary;
+  margin-bottom: 1.2rem;
+  line-height: 1.5;
+  font-size: 1rem;
+}
+
+.subject-meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: auto;
+  width: 100%;
+}
+
+.chapter-count {
+  color: $theme-text-secondary;
+  font-size: 0.9rem;
+}
+
+.explore-button {
+  background: #fff;
+  color: #1697d6;
+  border: 1.5px solid #1697d6;
+  border-radius: 6px;
+  padding: 0.45rem 1.1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  box-shadow: 0 1px 4px rgba(22, 151, 214, 0.04);
+  &:hover {
+    background: #e0f2fe;
+    color: #127bb5;
+    border-color: #127bb5;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .subject-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .subject-list-title {
+    font-size: 2rem;
+  }
+  
+  .subject-list-subtitle {
+    font-size: 1rem;
+  }
+}

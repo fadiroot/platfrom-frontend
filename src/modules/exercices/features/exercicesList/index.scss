@@ -1,0 +1,60 @@
+.exercises-list-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  .exercises-list-header {
+    margin-bottom: 2rem;
+    text-align: center;
+    
+    .back-button {
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.3s;
+      
+      &:hover {
+        color: #333;
+      }
+    }
+    
+    .exercises-list-title {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    .exercises-list-subtitle {
+      font-size: 1.2rem;
+      color: #666;
+    }
+  }
+  
+  .exercises-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .exercises-list-container {
+    padding: 1rem;
+    
+    .exercises-list-header {
+      .exercises-list-title {
+        font-size: 2rem;
+      }
+    }
+    
+    .exercises-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
