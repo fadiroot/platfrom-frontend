@@ -1,29 +1,99 @@
-import Button from '@src/modules/shared/components/Button/Button'
-import { useAppDispatch } from '@src/modules/shared/store'
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import { login } from '../../data/authThunk'
-import Input from '@src/modules/shared/components/Input/Input'
-import { getChangedValues } from '@src/modules/shared/utils/getChangedValuesFormik'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { PATH } from '../../routes/paths'
+"use client"
 
-const initialValues = {
-  username: '',
-  password: '',
+import type React from "react"
+
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { useFormik } from "formik"
+import * as Yup from "yup"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { useAppDispatch } from "../../../../modules/shared/store"
+import { login } from "../../data/authThunk"
+import { getChangedValues } from "../../../../modules/shared/utils/getChangedValuesFormik"
+import { PATH } from "../../routes/paths"
+import "./_Login.scss"
+
+// Custom Input Component to match your original styling
+interface InputProps {
+  name: string
+  formik: any
+  placeholder?: string
+  label: string
+  type?: string
+  required?: boolean
+  autoComplete?: string
 }
 
-const Login = () => {
-  const dispatch = useAppDispatch()
+const Input = ({ name, formik, placeholder, label, type = "text", required, autoComplete }: InputProps) => {
+  const [showPassword, setShowPassword] = useState(false)
+  const isPassword = type === "password"
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type
 
+  return (
+    <div className="Input-component-wrapper">
+      <label htmlFor={name} className="label">
+        {label} {required && "*"}
+      </label>
+      <div className="input-container">
+        <input
+          id={name}
+          name={name}
+          type={inputType}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          value={formik.values[name]}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className="input"
+        />
+        {isPassword && (
+          <button type="button" onClick={() => setShowPassword(!showPassword)} className="password-toggle">
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Custom Button Component to match your original styling
+interface ButtonProps {
+  type?: "button" | "submit"
+  label?: string
+  loading?: boolean
+  children?: React.ReactNode
+}
+
+const Button = ({ type = "button", label, loading, children }: ButtonProps) => {
+  return (
+    <button type={type} className="Button-component" disabled={loading}>
+      {loading ? (
+        <>
+          <Loader2 size={18} className="spinner" />
+          {label || children}
+        </>
+      ) : (
+        label || children
+      )}
+    </button>
+  )
+}
+
+const initialValues = {
+  email: "",
+  password: "",
+}
+
+const LoginComponent = () => {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
 
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object().shape({
-      username: Yup.string().required('Username is required'),
-      password: Yup.string().required('Password is required').min(6, 'Password is too short!'),
+      email: Yup.string().email("Invalid email address").required("Email is required"),
+      password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters"),
     }),
     onSubmit: (values) => {
       setSubmitting(true)
@@ -31,10 +101,10 @@ const Login = () => {
       dispatch(login(changedValues))
         .unwrap()
         .then(() => {
-          console.log('welcome')
+          console.log("Login successful")
         })
         .catch((err) => {
-          alert(err?.message || 'something-went-wrong')
+          alert(err?.message || "Login failed")
         })
         .finally(() => {
           setSubmitting(false)
@@ -44,36 +114,45 @@ const Login = () => {
 
   return (
     <div className="login-module">
-      <form className="login-card-container" onSubmit={formik.handleSubmit}>
-        <h1 className="title">Login</h1>
+      <div className="login-card-container">
+        <h1 className="title">Welcome Back</h1>
+        <p className="subtitle">Please sign in to your account</p>
 
-        <Input
-          name="username"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your username"
-          label="Username"
-          required={true}
-        />
+        <form onSubmit={formik.handleSubmit} noValidate>
+          <Input
+            name="email"
+            formik={formik}
+            placeholder="Your email"
+            label="Email"
+            required
+            autoComplete="email"
+          />
+          {formik.touched.email && formik.errors.email && (
+            <div className="error-text">{formik.errors.email}</div>
+          )}
 
-        <Input
-          name="password"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your password"
-          label="Password"
-          type="password"
-          required={true}
-        />
+          <Input
+            name="password"
+            formik={formik}
+            type="password"
+            placeholder="••••••••"
+            label="Password"
+            required
+            autoComplete="current-password"
+          />
+          {formik.touched.password && formik.errors.password && (
+            <div className="error-text">{formik.errors.password}</div>
+          )}
 
-        <Button label={'Login'} type={'submit'} loading={submitting} />
+          <Button type="submit" label="Sign In" loading={submitting} />
+        </form>
 
         <Link to={PATH.REGISTER} className="link">
-          Create Account?
+          Don't have an account? Sign Up
         </Link>
-      </form>
+      </div>
     </div>
   )
 }
 
-export default Login
+export default LoginComponent

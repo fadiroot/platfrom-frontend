@@ -5,8 +5,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { clearTokens, getTokens } from '../utils/token'
 import useIsMountedRef from '../hook/useIsMountedRef'
 import { initialise } from '../data/authSlice'
-import { RootState } from '@src/modules/shared/store'
-import LazyLoad from '@src/modules/shared/components/LazyLoad/LazyLoad'
+import { RootState } from '../../../modules/shared/store'
+import LazyLoad from '../../shared/components/LazyLoad/LazyLoad'
 
 interface AuthProviderProps {
   children: React.ReactNode
@@ -22,10 +22,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const { isInitialised } = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
 
-  const isValidToken = (token: string) => {
-    const decoded: JwtPayload = jwtDecode(token)
-    const currentTime = Date.now() / 1000
-    return decoded.exp > currentTime
+  const isValidToken = (token: string | undefined | null) => {
+    if (!token || typeof token !== 'string') return false;
+    try {
+      const decoded: JwtPayload = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decoded.exp > currentTime;
+    } catch (e) {
+      return false;
+    }
   }
 
   useEffect(() => {
@@ -34,9 +39,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     async function fetchUser() {
+
       const { refresh_token } = getTokens()
+      console.log(refresh_token )
       if (refresh_token && isValidToken(refresh_token)) {
         const response = await axiosInstance.get('/api/auth/me')
+        console.log({response})
         const user = response.data.payload
         dispatch(initialise({ isAuthenticated: true, user }))
       } else {

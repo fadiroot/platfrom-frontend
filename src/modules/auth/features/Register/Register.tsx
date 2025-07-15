@@ -1,66 +1,141 @@
-import Button from '@src/modules/shared/components/Button/Button'
-import { useAppDispatch } from '@src/modules/shared/store'
-import { useFormik } from 'formik'
-import * as Yup from 'yup'
-import { register } from '../../data/authThunk'
-import Input from '@src/modules/shared/components/Input/Input'
-import { getChangedValues } from '@src/modules/shared/utils/getChangedValuesFormik'
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { PATH } from '../../routes/paths'
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { useFormik } from "formik"
+import * as Yup from "yup"
+import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { useAppDispatch } from "../../../../modules/shared/store"
+import { register } from "../../data/authThunk"
+import { getChangedValues } from "../../../../modules/shared/utils/getChangedValuesFormik"
+import { PATH } from "../../routes/paths"
+import "./_Register.scss"
+
+// Custom Input Component to match your original styling
+interface InputProps {
+  name: string
+  formik: any
+  placeholder?: string
+  label: string
+  type?: string
+  required?: boolean
+  autoComplete?: string
+  variant?: string
+  className?: string
+}
+
+const Input = ({ name, formik, placeholder, label, type = "text", required, autoComplete, className }: InputProps) => {
+  const [showPassword, setShowPassword] = useState(false)
+  const isPassword = type === "password"
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type
+
+  return (
+    <div className="Input-component-wrapper">
+      <label htmlFor={name} className="label">
+        {label} {required && "*"}
+      </label>
+      <div className="input-container">
+        <input
+          id={name}
+          name={name}
+          type={inputType}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          value={formik.values[name] || ""}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={`input ${className || ""}`}
+        />
+        {isPassword && (
+          <button type="button" onClick={() => setShowPassword(!showPassword)} className="password-toggle">
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Custom Button Component to match your original styling
+interface ButtonProps {
+  type?: "button" | "submit"
+  label?: string
+  loading?: boolean
+  children?: React.ReactNode
+  className?: string
+}
+
+const Button = ({ type = "button", label, loading, children, className }: ButtonProps) => {
+  return (
+    <button type={type} className={`Button-component ${className || ""}`} disabled={loading}>
+      {loading ? (
+        <>
+          <Loader2 size={18} className="spinner" />
+          {label || children}
+        </>
+      ) : (
+        label || children
+      )}
+    </button>
+  )
+}
 
 const initialValues = {
-  firstName: '',
-  lastName: '',
-  username: '',
-  email: '',
-  password: '',
-  verify_password: '',
-  phone: null,
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  phoneNumber: "",
   age: null,
   birthDate: null,
 }
 
-const Register = () => {
+const RegisterComponent = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-
   const [submitting, setSubmitting] = useState(false)
 
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object().shape({
-      firstName: Yup.string().required('FirstName is required'),
-      lastName: Yup.string().required('LastName is required'),
-      username: Yup.string().required('Username is required'),
+      username: Yup.string().required("Username is required"),
       email: Yup.string()
-        .email('Invalid email address')
-        .matches(
-          /^([a-zA-Z0-9._%+-]+)@((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/,
-          'Invalid email address'
-        )
+        .email("Invalid email address")
+        .matches(/^([a-zA-Z0-9._%+-]+)@((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/, "Invalid email address")
         .test(
-          'no-special-chars',
-          'Email contains disallowed characters',
-          (value: string | undefined) => !value || /^[^<>()\\/[\]{}\s]+@[^\s]+$/.test(value)
+          "no-special-chars",
+          "Email contains disallowed characters",
+          (value: string | undefined) => !value || /^[^<>()\\/\[\]{}\s]+@[^\s]+$/.test(value),
         )
-        .required('Email is required'),
-      password: Yup.string().required('Password is required').min(6, 'Password is too short!'),
-      verify_password: Yup.string()
-        .required('Confirm password is required')
-        .oneOf([Yup.ref('password')], 'Passwords must match'),
+        .required("Email is required"),
+      password: Yup.string().required("Password is required").min(6, "Password is too short!"),
+      confirmPassword: Yup.string()
+        .required("Confirm password is required")
+        .oneOf([Yup.ref("password")], "Passwords must match"),
+      phoneNumber: Yup.string()
+        .required("Phone number is required")
+        .matches(/^[2459]\d{7}$/, "Phone number must be 8 digits and start with 2, 4, 5, or 9"),
     }),
     onSubmit: (values) => {
       setSubmitting(true)
-      const changedValues = getChangedValues(values, initialValues)
-      dispatch(register(changedValues))
+      // Map form values to API DTO
+      const payload = {
+        Email: values.email,
+        PhoneNumber: values.phoneNumber,
+        UserName: values.username,
+        Password: values.password,
+        ConfirmPassword: values.confirmPassword,
+      }
+      dispatch(register(payload))
         .unwrap()
         .then(() => {
-          console.log('Account created successfully')
+          console.log("Account created successfully")
           navigate(PATH.LOGIN)
         })
-        .catch((err) => {
-          alert(err?.message || 'something-went-wrong')
+        .catch((err: { message: any }) => {
+          alert(err?.message || "Something went wrong")
         })
         .finally(() => {
           setSubmitting(false)
@@ -70,74 +145,104 @@ const Register = () => {
 
   return (
     <div className="register-module">
-      <form className="register-card-container" onSubmit={formik.handleSubmit}>
-        <h1 className="title">Register</h1>
+      <div className="register-card-container">
+        <h1 className="title">Create Account</h1>
+        <p className="subtitle">Join us today and get started</p>
 
-        <Input
-          name="firstName"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your firstname"
-          label="Firstname"
-          required={true}
-        />
+        <form onSubmit={formik.handleSubmit} noValidate>
+          {/* Row 1: Email */}
+          <div className="form-row single">
+            <div className="form-field">
+              <Input
+                name="email"
+                formik={formik}
+                type="email"
+                placeholder="Enter your email"
+                label="Email"
+                required
+                autoComplete="email"
+              />
+              {formik.touched.email && formik.errors.email && <div className="error-text">{formik.errors.email}</div>}
+            </div>
+          </div>
 
-        <Input
-          name="lastName"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your lastname"
-          label="Lastname"
-          required={true}
-        />
+          {/* Row 2: Username */}
+          <div className="form-row single">
+            <div className="form-field">
+              <Input
+                name="username"
+                formik={formik}
+                placeholder="Enter your username"
+                label="Username"
+                required
+                autoComplete="username"
+              />
+              {formik.touched.username && formik.errors.username && (
+                <div className="error-text">{formik.errors.username}</div>
+              )}
+            </div>
+          </div>
 
-        <Input
-          name="username"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your username"
-          label="Username"
-          required={true}
-        />
+          {/* Row 3: Phone Number */}
+          <div className="form-row single">
+            <div className="form-field">
+              <Input
+                name="phoneNumber"
+                formik={formik}
+                type="text"
+                placeholder="Enter your phone number"
+                label="Phone Number"
+                required
+                autoComplete="tel"
+              />
+              {formik.touched.phoneNumber && formik.errors.phoneNumber && (
+                <div className="error-text">{formik.errors.phoneNumber}</div>
+              )}
+            </div>
+          </div>
 
-        <Input
-          name="email"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your email"
-          label="Email"
-          type="email"
-          required={true}
-        />
+          {/* Row 4: Password & Confirm Password */}
+          <div className="form-row">
+            <div className="form-field">
+              <Input
+                name="password"
+                formik={formik}
+                type="password"
+                placeholder="Enter your password"
+                label="Password"
+                required
+                autoComplete="new-password"
+              />
+              {formik.touched.password && formik.errors.password && (
+                <div className="error-text">{formik.errors.password}</div>
+              )}
+            </div>
 
-        <Input
-          name="password"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your password"
-          label="Password"
-          type="password"
-          required={true}
-        />
+            <div className="form-field">
+              <Input
+                name="confirmPassword"
+                formik={formik}
+                type="password"
+                placeholder="Confirm your password"
+                label="Confirm Password"
+                required
+                autoComplete="new-password"
+              />
+              {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                <div className="error-text">{formik.errors.confirmPassword}</div>
+              )}
+            </div>
+          </div>
 
-        <Input
-          name="verify_password"
-          formik={formik}
-          variant="secondary"
-          placeholder="Enter your confirm password"
-          label="Confirm Password"
-          type="password"
-          required={true}
-        />
-
-        <Button label={'Register'} type={'submit'} loading={submitting} />
+          <Button type="submit" label="Create Account" loading={submitting} />
+        </form>
 
         <Link to={PATH.LOGIN} className="link">
-          Already a member?
+          Already have an account? Sign In
         </Link>
-      </form>
+      </div>
     </div>
   )
 }
 
-export default Register
+export default RegisterComponent

@@ -4,7 +4,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import "./index.scss"
-import { getChaptersBySubject } from "../../utils/axios"
+import { getChaptersBySubject, getChaptersByLevel } from '../../utils/axios'
 
 // Define the Chapter interface
 interface Chapter {
@@ -16,10 +16,11 @@ interface Chapter {
   estimatedTime?: string
   difficulty?: "Beginner" | "Intermediate" | "Advanced"
   type?: "Theory" | "Practical" | "Assessment"
+  name?: string
 }
 
 const ChaptersList: React.FC = () => {
-  const { subjectId } = useParams<{ subjectId: string }>()
+  const { subjectId, levelId } = useParams<{ subjectId?: string; levelId?: string }>()
   const navigate = useNavigate()
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [subjectName, setSubjectName] = useState<string>("")
@@ -27,26 +28,35 @@ const ChaptersList: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (subjectId) {
+    if (levelId) {
+      setLoading(true)
+      setError(null)
+      getChaptersBySubject(levelId)
+        .then((data) => {
+          setChapters(data)
+        })
+        .catch((err) => setError(err.message || 'Failed to fetch chapters'))
+        .finally(() => setLoading(false))
+      setSubjectName('Level Chapters')
+    } else if (subjectId) {
       setLoading(true)
       setError(null)
       getChaptersBySubject(subjectId)
         .then((data) => {
           setChapters(data)
         })
-        .catch((err) => setError(err.message || "Failed to fetch chapters"))
+        .catch((err) => setError(err.message || 'Failed to fetch chapters'))
         .finally(() => setLoading(false))
-
       const subjectNames: Record<string, string> = {
-        "1": "Data Structures & Algorithms",
-        "2": "Software Engineering Principles",
-        "3": "Database Management Systems",
-        "4": "Network Security & Protocols",
-        "5": "Machine Learning Fundamentals",
+        '1': 'Data Structures & Algorithms',
+        '2': 'Software Engineering Principles',
+        '3': 'Database Management Systems',
+        '4': 'Network Security & Protocols',
+        '5': 'Machine Learning Fundamentals',
       }
-      setSubjectName(subjectNames[subjectId] || "Professional Course")
+      setSubjectName(subjectNames[subjectId] || 'Professional Course')
     }
-  }, [subjectId])
+  }, [subjectId, levelId])
 
   const handleChapterClick = (chapterId: string) => {
     navigate(`/subjects/${subjectId}/chapters/${chapterId}/exercises`)
@@ -184,7 +194,7 @@ const ChaptersList: React.FC = () => {
 
                   <div className="chapter-main">
                     <div className="chapter-title-row">
-                      <h2 className="chapter-title">{chapter.title}</h2>
+                      <h2 className="chapter-title">{chapter.name || chapter.title}</h2>
                       <div className="chapter-badges">
                         {chapter.type && (
                           <span className={`type-badge ${getTypeClass(chapter.type)}`}>{chapter.type}</span>

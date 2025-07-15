@@ -1,7 +1,7 @@
 import { clearTokens, getTokens, setTokens } from './token'
 import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_APP_BASE_URL as string
+const baseURL = 'http://localhost:5234/';
 const headers = {
   Accept: 'application/json',
   'Content-Type': 'application/json',

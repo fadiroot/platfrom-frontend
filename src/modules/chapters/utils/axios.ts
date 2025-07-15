@@ -7,4 +7,10 @@ const API_BASE_URL = 'http://localhost:5234/api/chapters';
 export const getChaptersBySubject = async (subjectId: string) => {
   const response = await axios.get(`${API_BASE_URL}/by-subject/${subjectId}`);
   return response.data;
+};
+
+// GET /api/chapters/by-level/{levelId} - Get chapters by levelId
+export const getChaptersByLevel = async (levelId: string) => {
+  const response = await axios.get(`${API_BASE_URL}/by-level/${levelId}`);
+  return response.data;
 }; 

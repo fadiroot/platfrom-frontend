@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RouteProps } from 'react-router-dom'
 import { Fragment, lazy } from 'react'
-import GuestGuard from '@src/modules/shared/guards/GuestGuard'
+import AuthGuard from '../../shared/guards/AuthGuard'
 
 type RouteConfig = {
   exact: boolean | null
@@ -15,7 +15,7 @@ const routes: RouteConfig[] = [
   // AuthGuard Routes
   {
     exact: true,
-    guard: GuestGuard,
+    guard: AuthGuard,
     path: '/subjects/:subjectId/chapters',
     component: lazy(() => import('../features/chaptersList/chaptersList')),
   }

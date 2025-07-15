@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './index.scss';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 // Define the Subject interface
@@ -12,14 +12,9 @@ interface Subject {
   levelId?: string;
 }
 
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
-
 const SubjectList: React.FC = () => {
   const navigate = useNavigate();
-  const query = useQuery();
-  const levelId = query.get('levelId');
+  const { levelId } = useParams();
 
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(false);

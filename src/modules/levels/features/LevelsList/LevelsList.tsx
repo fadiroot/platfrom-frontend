@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './index.scss';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@src/modules/shared/store';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../../../modules/shared/store';
 import { fetchLevels } from '../../data/levelThunk';
 import axiosInstance from '../../utils/axios';
 
@@ -32,7 +32,13 @@ const LevelsList: React.FC = () => {
   }, [dispatch]);
 
   const handleLevelClick = (levelId: string) => {
-    navigate(`/subjects?levelId=${levelId}`);
+    setSelectedLevelId(levelId);
+  };
+
+  const handleContinue = () => {
+    if (selectedLevelId) {
+      navigate(`/levels/${selectedLevelId}/subjects`);
+    }
   };
 
   if (loading) {
@@ -47,26 +53,26 @@ const LevelsList: React.FC = () => {
     <div className="level-list-container-vertical">
       <h1 className="level-list-title">Select Your Class</h1>
       <p className="level-list-subtitle">Choose your current grade to get started.</p>
-      
-      <div className="level-list-vertical">
-        {levels.map((level) => (
-          <div key={level.id}>
-            <div
-              className="level-card-vertical"
-              onClick={() => handleLevelClick(level.id)}
-              style={{ border: selectedLevelId === level.id ? '2px solid #4a6bff' : undefined }}
-            >
-              <div className="level-info">
-                <h2 className="level-name">{level.title}</h2>
-                <p className="level-description">{level.description}</p>
-              </div>
-              <div className="level-meta">
-                <button className="explore-button">Select</button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      <form className="level-list-radio-form" onSubmit={e => { e.preventDefault(); handleContinue(); }}>
+        <div className="level-list-radio-group">
+          {levels.map((level) => (
+            <label key={level.id} className="level-radio-label">
+              <input
+                type="radio"
+                name="level"
+                value={level.id}
+                checked={selectedLevelId === level.id}
+                onChange={() => handleLevelClick(level.id)}
+              />
+              <span className="level-radio-title">{level.title}</span>
+              <span className="level-radio-description">{level.description}</span>
+            </label>
+          ))}
+        </div>
+        <button type="submit" className="explore-button" disabled={!selectedLevelId}>
+          Continue
+        </button>
+      </form>
     </div>
   );
 };
