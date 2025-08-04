@@ -1,0 +1,177 @@
+// CSS Variables for AdminHeader
+:root {
+  --admin-header-bg: #ffffff;
+  --admin-header-border: #e5e7eb;
+  --admin-header-text-primary: #1f2937;
+  --admin-header-text-secondary: #6b7280;
+  --admin-header-button-hover: #f3f4f6;
+  --admin-header-primary: #3b82f6;
+  --admin-header-error: #ef4444;
+  --admin-header-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#dark {
+  --admin-header-bg: #1f2937;
+  --admin-header-border: #374151;
+  --admin-header-text-primary: #f9fafb;
+  --admin-header-text-secondary: #d1d5db;
+  --admin-header-button-hover: #374151;
+  --admin-header-primary: #60a5fa;
+  --admin-header-error: #f87171;
+  --admin-header-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  background: var(--admin-header-bg);
+  border-bottom: 1px solid var(--admin-header-border);
+  height: 64px;
+  box-shadow: var(--admin-header-shadow);
+  transition: all 0.2s ease;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--admin-header-text-primary);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    &:hover {
+      background-color: var(--admin-header-button-hover);
+    }
+
+    @media (max-width: 768px) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &__collapse-btn {
+    background: none;
+    border: none;
+    color: var(--admin-header-text-secondary);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+    font-weight: 500;
+
+    &:hover {
+      background-color: var(--admin-header-button-hover);
+      color: var(--admin-header-text-primary);
+    }
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--admin-header-text-primary);
+    margin: 0;
+    letter-spacing: -0.025em;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__student-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    background-color: var(--admin-header-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      span {
+        display: none;
+      }
+      padding: 8px 12px;
+    }
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--admin-header-button-hover);
+    }
+  }
+
+  &__username {
+    font-weight: 500;
+    color: var(--admin-header-text-primary);
+    font-size: 0.875rem;
+
+    @media (max-width: 640px) {
+      display: none;
+    }
+  }
+
+  &__logout-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    background-color: var(--admin-header-error);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}

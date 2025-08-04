@@ -1,0 +1,328 @@
+.level-management {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .loading {
+    text-align: center;
+    padding: 3rem;
+    font-size: 1.2rem;
+    color: #666;
+  }
+
+  .management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin: 0;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      }
+    }
+  }
+
+  // Modal Styles
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+
+        h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          color: #333;
+        }
+
+        .close-btn {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 50%;
+          transition: background 0.2s;
+
+          &:hover {
+            background: #f3f4f6;
+          }
+        }
+      }
+
+      .level-form {
+        padding: 1.5rem;
+
+        .form-group {
+          margin-bottom: 1.5rem;
+
+          label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+          }
+
+          input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+
+            &:focus {
+              outline: none;
+              border-color: #3b82f6;
+              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+          }
+
+          textarea {
+            resize: vertical;
+            min-height: 100px;
+          }
+        }
+
+        .form-actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-end;
+
+          .btn-secondary {
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+              background: #f1f5f9;
+            }
+          }
+
+          .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover:not(:disabled) {
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            }
+
+            &:disabled {
+              opacity: 0.6;
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Grid and Cards
+  .levels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+      .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        color: #666;
+        margin-bottom: 2rem;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+      }
+    }
+
+    .level-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 1.5rem 0;
+
+        h3 {
+          margin: 0;
+          color: #333;
+          font-size: 1.25rem;
+        }
+
+        .card-actions {
+          display: flex;
+          gap: 0.5rem;
+
+          .btn-edit, .btn-delete {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+
+            &:hover {
+              background: #f3f4f6;
+            }
+          }
+
+          .btn-delete:hover {
+            background: #fee2e2;
+          }
+        }
+      }
+
+      .card-content {
+        padding: 1rem 1.5rem;
+
+        .description {
+          color: #666;
+          margin-bottom: 1rem;
+          line-height: 1.5;
+        }
+
+        .card-meta {
+          .date {
+            font-size: 0.875rem;
+            color: #9ca3af;
+          }
+        }
+      }
+
+      .card-footer {
+        padding: 1rem 1.5rem;
+        background: #f9fafb;
+        border-top: 1px solid #f3f4f6;
+
+        .level-id {
+          font-size: 0.75rem;
+          color: #6b7280;
+          font-family: monospace;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .management-header {
+      flex-direction: column;
+      align-items: stretch;
+
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .levels-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .modal-overlay {
+      padding: 0.5rem;
+
+      .modal-content {
+        .level-form .form-actions {
+          flex-direction: column;
+
+          .btn-secondary,
+          .btn-primary {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

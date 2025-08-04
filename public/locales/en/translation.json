@@ -3,5 +3,93 @@
     "en": "English",
     "fr": "French",
     "ar": "Arabic"
+  },
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "start": "Start",
+    "continue": "Continue",
+    "review": "Review"
+  },
+  "subjects": {
+    "title": "All Subjects",
+    "subtitle": "Select a subject to start your learning journey",
+    "explore": "Explore",
+    "noSubjects": "No subjects available currently",
+    "noDescription": "No description available",
+    "loading": "Loading subjects..."
+  },
+  "chapters": {
+    "title": "Chapters",
+    "subtitle": "Choose the chapter you want to study",
+    "courseSubtitle": "Comprehensive curriculum designed for professional development and skill advancement",
+    "backToSubjects": "Back to Subjects",
+    "exercises": "Exercise",
+    "minutes": "minutes",
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "type": {
+      "theory": "Theory",
+      "practical": "Practical",
+      "mixed": "Mixed"
+    },
+    "status": {
+      "not_started": "Not Started",
+      "in_progress": "In Progress",
+      "completed": "Completed"
+    },
+    "start": "Start Study",
+    "continue": "Continue",
+    "review": "Review"
+  },
+  "exercises": {
+    "title": "Exercises",
+    "subtitle": "Solve exercises to improve your skills",
+    "backToChapters": "Back to Chapters",
+    "start": "Start Exercise",
+    "review": "Review Exercise",
+    "complete": "Complete",
+    "completed": "Completed",
+    "difficulty": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate", 
+      "advanced": "Advanced",
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "type": {
+      "theory": "Theory",
+      "practical": "Practical",
+      "quiz": "Quiz"
+    },
+    "duration": "Duration",
+    "points": "Points",
+    "questions": "Questions",
+    "noExercises": "No exercises available in this chapter",
+    "loading": "Loading exercises..."
   }
 }

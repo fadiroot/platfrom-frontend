@@ -1,0 +1,94 @@
+// CSS Variables for AdminLayout
+:root {
+  --admin-layout-bg: #f8fafc;
+  --admin-layout-content-bg: #ffffff;
+  --admin-layout-border: #e5e7eb;
+  --admin-layout-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --admin-layout-overlay: rgba(0, 0, 0, 0.5);
+}
+
+#dark {
+  --admin-layout-bg: #0f172a;
+  --admin-layout-content-bg: #1e293b;
+  --admin-layout-border: #334155;
+  --admin-layout-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --admin-layout-overlay: rgba(0, 0, 0, 0.7);
+}
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--admin-layout-bg);
+  transition: all 0.2s ease;
+
+  &__sidebar {
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+
+    &--collapsed {
+      width: 80px;
+    }
+
+    @media (max-width: 768px) {
+      transform: translateX(-100%);
+
+      &--mobile-visible {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  &__main {
+    flex: 1;
+    margin-left: 280px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: margin 0.3s ease;
+
+    .admin-layout__sidebar--collapsed ~ & {
+      margin-left: 80px;
+    }
+
+    @media (max-width: 768px) {
+      margin-left: 0;
+      
+      .admin-layout__sidebar--collapsed ~ & {
+        margin-left: 0;
+      }
+    }
+  }
+
+  &__content {
+    flex: 1;
+    padding: 2rem;
+    background-color: var(--admin-layout-content-bg);
+    margin: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--admin-layout-border);
+    box-shadow: var(--admin-layout-shadow);
+    overflow-y: auto;
+    transition: all 0.2s ease;
+  }
+
+  &__overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--admin-layout-overlay);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+}

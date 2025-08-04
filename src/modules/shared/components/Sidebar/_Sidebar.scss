@@ -1,40 +1,66 @@
+// CSS Variables for Sidebar
+:root {
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e5e7eb;
+  --sidebar-logo-bg: #3b82f6;
+  --sidebar-logo-text: #ffffff;
+  --sidebar-content-bg: #ffffff;
+  --sidebar-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --sidebar-text-primary: #1f2937;
+  --sidebar-text-secondary: #6b7280;
+}
+
+#dark {
+  --sidebar-bg: #1f2937;
+  --sidebar-border: #374151;
+  --sidebar-logo-bg: #1e40af;
+  --sidebar-logo-text: #f9fafb;
+  --sidebar-content-bg: #1f2937;
+  --sidebar-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --sidebar-text-primary: #f9fafb;
+  --sidebar-text-secondary: #d1d5db;
+}
+
 .sidebar {
-  width: 275px;
+  width: 280px;
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
   max-height: 100%;
   overflow: hidden;
-  transition: all 0.2s ease-out;
+  transition: all 0.3s ease;
 
   .sidebar-logo-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 25px;
-    min-height: 75px;
-    background: #506bcc;
-    border-radius: 10px;
-    color: #ffffff;
+    gap: 12px;
+    min-height: 64px;
+    background: var(--sidebar-logo-bg);
+    color: var(--sidebar-logo-text);
     user-select: none;
-    font-size: 25px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--sidebar-border);
   }
 
   .sidebar-content {
     height: 100%;
-    background: #fafafa;
-    box-shadow: 0px 4px 16px 4px rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
+    background: var(--sidebar-content-bg);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    padding: 1rem 0;
 
     .sidebar-nav-items {
       height: 100%;
-      overflow-y: scroll;
+      overflow-y: auto;
       -ms-overflow-style: none;
       scrollbar-width: none;
+      padding: 0 1rem;
 
       &::-webkit-scrollbar {
         display: none;
@@ -44,21 +70,37 @@
 }
 
 .collapse {
-  width: 100px;
-  transition: all 0.2s ease-out;
+  width: 80px;
+  transition: all 0.3s ease;
+
+  .sidebar-logo-container {
+    justify-content: center;
+    padding: 0 0.5rem;
+    
+    span {
+      display: none;
+    }
+  }
+
+  .sidebar-content .sidebar-nav-items {
+    padding: 0 0.5rem;
+  }
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 768px) {
   .sidebar {
-    background-color: white;
-    border-radius: 0 12px 12px 0;
-
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    box-shadow: var(--sidebar-shadow);
+    
     .sidebar-logo-container {
-      border-radius: 0 10px 0 0;
+      border-radius: 0;
     }
 
     .sidebar-content {
-      border-radius: 0 0 10px 0;
+      border-radius: 0;
     }
   }
 }

@@ -2,6 +2,7 @@
 import { RouteProps } from 'react-router-dom'
 import { Fragment, lazy } from 'react'
 import AuthGuard from '../../shared/guards/AuthGuard'
+import MainLayout from '../../shared/layout/MainLayout/MainLayout'
 
 type RouteConfig = {
   exact: boolean | null
@@ -16,6 +17,7 @@ const routes: RouteConfig[] = [
   {
     exact: true,
     guard: AuthGuard,
+    layout: MainLayout,
     path: '/subjects/:subjectId/chapters/:chapterId/exercises',
     component: lazy(() => import('../features/exercicesList/exercicesList')),
   }

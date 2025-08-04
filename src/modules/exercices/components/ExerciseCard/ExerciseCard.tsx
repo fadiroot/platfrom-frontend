@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { useTranslation } from 'react-i18next'
 import "./ExerciseCard.scss"
 import type { Exercise } from "../../types/exercise"
 import { CheckCircle2, Play, BookOpen, ArrowRight } from "lucide-react"
@@ -12,16 +13,17 @@ interface ExerciseCardProps {
 }
 
 const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick, onToggleComplete }) => {
+  const { t } = useTranslation('translation')
   const isCompleted = Boolean(exercise.completed)
 
   const getDifficultyText = (tag: number) => {
     switch (tag) {
       case 0:
-        return "Easy"
+        return t('exercises.difficulty.easy')
       case 1:
-        return "Medium"
+        return t('exercises.difficulty.medium')
       case 2:
-        return "Hard"
+        return t('exercises.difficulty.hard')
       default:
         return "Unknown"
     }
@@ -83,7 +85,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick, onToggle
 
           <button className="start-btn">
             <Play className="icon" />
-            <span>{isCompleted ? "Review" : "Start"}</span>
+            <span>{isCompleted ? t('exercises.review') : t('exercises.start')}</span>
             <ArrowRight  className="arrow-icon" />
           </button>
         </div>
@@ -93,7 +95,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick, onToggle
       <div className="hover-overlay">
         <div className="overlay-content">
           <Play className="play-icon" />
-          <span className="overlay-text">{isCompleted ? "Review Exercise" : "Start Exercise"}</span>
+          <span className="overlay-text">{isCompleted ? t('exercises.review') : t('exercises.start')}</span>
         </div>
       </div>
     </div>

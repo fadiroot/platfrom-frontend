@@ -1,6 +1,10 @@
 {
   "sidebar": {
     "dashboard": "لوحة التحكم",
+    "niveaux": "المستويات",
+    "matières": "المواد",
+    "chapitres": "الفصول",
+    "exercices": "التمارين",
     "settings": "إعدادات",
     "profile": "الملف الشخصي"
   }

@@ -1,39 +1,9 @@
-// Professional Design System Variables
-$primary: #4f46e5;
-$primary-light: #6366f1;
-$primary-dark: #3730a3;
-$secondary: #f8fafc;
-$accent: #059669;
-$text-primary: #0f172a;
-$text-secondary: #475569;
-$text-muted: #64748b;
-$background: #ffffff;
-$background-alt: #f8fafc;
-$border: #e2e8f0;
-$border-light: #f1f5f9;
-
-// Professional shadows
-$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-$shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-
-$radius: 8px;
-$radius-lg: 12px;
-$transition: all 0.2s ease-in-out;
-
-// Add dark button colors
-$button-dark: #374151;
-$button-dark-hover: #1f2937;
-$button-text: #ffffff;
+@import '../../../shared/assets/styles/abstracts/student-theme';
 
 // Main Container
 .chapters-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  @include student-container;
   min-height: 100vh;
-  background: $background-alt;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 // Header Section
@@ -41,83 +11,52 @@ $button-text: #ffffff;
   margin-bottom: 2rem;
 
   .back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    color: $text-secondary;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.75rem 0;
-    margin-bottom: 2rem;
-    transition: $transition;
-
-    &:hover {
-      color: $button-dark;
-    }
-
-    svg {
-      transition: $transition;
-    }
+    @include student-back-button;
   }
 
   .header-content {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid var(--student-border-primary);
 
     .course-title {
-      font-size: 2.25rem;
-      font-weight: 700;
-      color: $text-primary;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
+      @include student-title;
     }
 
     .course-subtitle {
-      font-size: 1.125rem;
-      color: $text-secondary;
-      font-weight: 400;
+      @include student-subtitle;
       max-width: 600px;
-      line-height: 1.5;
     }
   }
 
   // Course Statistics
   .course-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    @include student-stats-grid;
     margin-bottom: 1rem;
 
     .stat-card {
-      background: $background;
-      border: 1px solid $border;
-      border-radius: $radius;
+      @include student-card;
       padding: 1.25rem;
       display: flex;
       align-items: center;
       gap: 1rem;
-      transition: $transition;
 
       &:hover {
-        box-shadow: $shadow-md;
+        transform: translateY(-1px);
       }
 
       .stat-icon {
         width: 40px;
         height: 40px;
-        background: $secondary;
-        border-radius: $radius;
+        background: var(--student-bg-tertiary);
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
 
         svg {
-          color: $primary;
+          color: var(--student-primary);
         }
       }
 
@@ -127,14 +66,16 @@ $button-text: #ffffff;
 
         .stat-label {
           font-size: 0.875rem;
-          color: $text-secondary;
+          color: var(--student-text-secondary);
           font-weight: 500;
+          transition: color 0.3s ease;
         }
 
         .stat-value {
           font-size: 1.5rem;
           font-weight: 700;
-          color: $text-primary;
+          color: var(--student-text-primary);
+          transition: color 0.3s ease;
         }
       }
     }
@@ -151,7 +92,7 @@ $button-text: #ffffff;
   text-align: center;
 
   p {
-    color: $text-secondary;
+    color: var(--student-text-secondary);
     font-size: 1rem;
     margin-top: 1rem;
   }
@@ -160,8 +101,8 @@ $button-text: #ffffff;
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 2px solid $border;
-  border-top: 2px solid $primary;
+  border: 2px solid var(--student-border-primary);
+  border-top: 2px solid var(--student-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -187,26 +128,19 @@ $button-text: #ffffff;
 
 // Chapter Card
 .chapter-card {
-  background: $background;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
+  @include student-card;
   overflow: hidden;
   cursor: pointer;
-  transition: $transition;
 
   &:hover {
-    box-shadow: $shadow-lg;
-    border-color: $button-dark;
-    transform: translateY(-2px);
-
     .chapter-number {
-      background: $button-dark;
-      color: $button-text;
+      background: var(--student-primary);
+      color: var(--student-text-inverse);
     }
 
     .action-btn {
-      background: $button-dark-hover;
-      border-color: $button-dark-hover;
+      background: var(--student-button-primary-hover);
+      border-color: var(--student-button-primary-hover);
       transform: translateY(-1px);
     }
   }
@@ -220,16 +154,16 @@ $button-text: #ffffff;
     .chapter-number {
       width: 48px;
       height: 48px;
-      background: $secondary;
-      color: $text-secondary;
-      border-radius: $radius;
+      background: var(--student-bg-tertiary);
+      color: var(--student-text-secondary);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
       font-size: 1rem;
       flex-shrink: 0;
-      transition: $transition;
+      transition: all 0.2s ease-in-out;
     }
 
     .chapter-main {
@@ -246,9 +180,10 @@ $button-text: #ffffff;
         .chapter-title {
           font-size: 1.25rem;
           font-weight: 600;
-          color: $text-primary;
+          color: var(--student-text-primary);
           line-height: 1.3;
           margin: 0;
+          transition: color 0.3s ease;
         }
 
         .chapter-badges {
@@ -259,10 +194,11 @@ $button-text: #ffffff;
       }
 
       .chapter-description {
-        color: $text-secondary;
+        color: var(--student-text-secondary);
         line-height: 1.5;
         margin-bottom: 1rem;
         font-size: 0.9rem;
+        transition: color 0.3s ease;
       }
 
       .chapter-meta {
@@ -273,8 +209,9 @@ $button-text: #ffffff;
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          color: $text-muted;
+          color: var(--student-text-muted);
           font-size: 0.875rem;
+          transition: color 0.3s ease;
 
           svg {
             flex-shrink: 0;
@@ -298,55 +235,45 @@ $button-text: #ffffff;
         border: 1px solid;
 
         &.status-not-started {
-          background: $border-light;
-          color: $text-muted;
-          border-color: $border;
+          background: #374151;
+          color: #9ca3af;
+          border-color: #4b5563;
         }
 
         &.status-in-progress {
-          background: #dbeafe;
-          color: #1d4ed8;
-          border-color: #93c5fd;
+          background: #1e3a8a;
+          color: #93c5fd;
+          border-color: #3b82f6;
         }
 
         &.status-completed {
-          background: #dcfce7;
-          color: #166534;
-          border-color: #86efac;
+          background: #064e3b;
+          color: #86efac;
+          border-color: #10b981;
         }
       }
 
       .action-btn {
+        @include student-button-primary;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: $button-dark;
-        color: $button-text;
-        border: 1px solid $button-dark;
-        border-radius: $radius;
         padding: 0.75rem 1.25rem;
-        font-weight: 600;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: $transition;
-        box-shadow: $shadow-sm;
+        box-shadow: var(--student-shadow-md);
 
         svg {
-          transition: $transition;
+          transition: all 0.2s ease;
           width: 14px;
           height: 14px;
         }
 
         &:hover {
-          background: $button-dark-hover;
-          border-color: $button-dark-hover;
-          box-shadow: $shadow-md;
-          transform: translateY(-1px);
+          box-shadow: var(--student-shadow-hover);
         }
 
         &:active {
           transform: translateY(0);
-          box-shadow: $shadow-sm;
+          box-shadow: var(--student-shadow-md);
         }
       }
     }
@@ -354,7 +281,7 @@ $button-text: #ffffff;
 
   .chapter-progress {
     padding: 0 1.5rem 1.5rem;
-    border-top: 1px solid $border-light;
+    border-top: 1px solid var(--student-border-secondary);
     margin-top: 0.5rem;
     padding-top: 1rem;
 
@@ -366,26 +293,26 @@ $button-text: #ffffff;
 
       .progress-label {
         font-size: 0.875rem;
-        color: $text-secondary;
+        color: var(--student-text-secondary);
         font-weight: 500;
       }
 
       .progress-value {
         font-size: 0.875rem;
         font-weight: 600;
-        color: $text-primary;
+        color: var(--student-text-primary);
       }
     }
 
     .progress-track {
       height: 6px;
-      background: $border-light;
+      background: var(--student-border-secondary);
       border-radius: 3px;
       overflow: hidden;
 
       .progress-bar {
         height: 100%;
-        background: linear-gradient(90deg, $accent 0%, #10b981 100%);
+        background: linear-gradient(90deg, var(--student-accent) 0%, var(--student-accent-light) 100%);
         border-radius: 3px;
         transition: width 0.6s ease-out;
       }
@@ -404,48 +331,54 @@ $button-text: #ffffff;
 
 .type-badge {
   &.type-theory {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border-color: #bfdbfe;
+    background: #1e3a8a;
+    color: #93c5fd;
+    border-color: #3b82f6;
   }
 
   &.type-practical {
-    background: #f0fdf4;
-    color: #166534;
-    border-color: #bbf7d0;
+    background: #064e3b;
+    color: #86efac;
+    border-color: #10b981;
   }
 
   &.type-assessment {
-    background: #fef3c7;
-    color: #92400e;
-    border-color: #fde68a;
+    background: #92400e;
+    color: #fcd34d;
+    border-color: #f59e0b;
   }
 }
 
 .difficulty-badge {
   &.difficulty-beginner {
-    background: #f0fdf4;
-    color: #166534;
-    border-color: #bbf7d0;
+    background: #064e3b;
+    color: #86efac;
+    border-color: #10b981;
   }
 
   &.difficulty-intermediate {
-    background: #fef3c7;
-    color: #92400e;
-    border-color: #fde68a;
+    background: #92400e;
+    color: #fcd34d;
+    border-color: #f59e0b;
   }
 
   &.difficulty-advanced {
-    background: #fef2f2;
-    color: #991b1b;
-    border-color: #fecaca;
+    background: #7f1d1d;
+    color: #fca5a5;
+    border-color: #ef4444;
   }
 }
 
 // Responsive Design
+@media (max-width: 1400px) {
+  .chapters-container {
+    padding: 2rem 2rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .chapters-container {
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem;
   }
 
   .course-stats {
@@ -455,7 +388,7 @@ $button-text: #ffffff;
 
 @media (max-width: 768px) {
   .chapters-container {
-    padding: 1rem;
+    padding: 1rem 1rem;
   }
 
   .chapters-header {

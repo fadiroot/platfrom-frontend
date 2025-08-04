@@ -3,5 +3,93 @@
     "en": "Anglais",
     "fr": "Français",
     "ar": "Arabe"
+  },
+  "common": {
+    "welcome": "Bienvenue",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "view": "Voir",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "start": "Commencer",
+    "continue": "Continuer",
+    "review": "Réviser"
+  },
+  "subjects": {
+    "title": "Toutes les Matières",
+    "subtitle": "Sélectionnez une matière pour commencer votre parcours d'apprentissage",
+    "explore": "Explorer",
+    "noSubjects": "Aucune matière disponible actuellement",
+    "noDescription": "Aucune description disponible",
+    "loading": "Chargement des matières..."
+  },
+  "chapters": {
+    "title": "Chapitres",
+    "subtitle": "Choisissez le chapitre que vous souhaitez étudier",
+    "courseSubtitle": "Programme complet conçu pour le développement professionnel et l'amélioration des compétences",
+    "backToSubjects": "Retour aux Matières",
+    "exercises": "Exercice",
+    "minutes": "minutes",
+    "difficulty": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    },
+    "type": {
+      "theory": "Théorie",
+      "practical": "Pratique",
+      "mixed": "Mixte"
+    },
+    "status": {
+      "not_started": "Non commencé",
+      "in_progress": "En cours",
+      "completed": "Terminé"
+    },
+    "start": "Commencer l'étude",
+    "continue": "Continuer",
+    "review": "Réviser"
+  },
+  "exercises": {
+    "title": "Exercices",
+    "subtitle": "Résolvez des exercices pour améliorer vos compétences",
+    "backToChapters": "Retour aux Chapitres",
+    "start": "Commencer l'exercice",
+    "review": "Réviser l'exercice",
+    "complete": "Terminer",
+    "completed": "Terminé",
+    "difficulty": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire", 
+      "advanced": "Avancé",
+      "easy": "Facile",
+      "medium": "Moyen",
+      "hard": "Difficile"
+    },
+    "type": {
+      "theory": "Théorie",
+      "practical": "Pratique",
+      "quiz": "Quiz"
+    },
+    "duration": "Durée",
+    "points": "Points",
+    "questions": "Questions",
+    "noExercises": "Aucun exercice disponible dans ce chapitre",
+    "loading": "Chargement des exercices..."
   }
 }

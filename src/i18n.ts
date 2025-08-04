@@ -19,6 +19,15 @@ i18n
     react: {
       useSuspense: false,
     },
+
+    // Configure language detection
+    detection: {
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      caches: ['localStorage'],
+    },
   })
+
+// Always return LTR for all languages (no RTL support)
+i18n.dir = () => 'ltr'
 
 export default i18n

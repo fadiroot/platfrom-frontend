@@ -1,61 +1,41 @@
 import { useEffect } from 'react'
-import jwtDecode from 'jwt-decode'
-import axiosInstance from '../utils/axios'
-import { useSelector, useDispatch } from 'react-redux'
-import { clearTokens, getTokens } from '../utils/token'
-import useIsMountedRef from '../hook/useIsMountedRef'
-import { initialise } from '../data/authSlice'
-import { RootState } from '../../../modules/shared/store'
+import { useSelector } from 'react-redux'
+import { RootState, useAppDispatch } from '../../../modules/shared/store'
 import LazyLoad from '../../shared/components/LazyLoad/LazyLoad'
+import { initializeAuth, setupAuthListener } from '../data/authThunk'
 
 interface AuthProviderProps {
   children: React.ReactNode
 }
 
-interface JwtPayload {
-  exp: number
-}
-
 const AuthProvider = ({ children }: AuthProviderProps) => {
-  const isMounted = useIsMountedRef()
-
   const { isInitialised } = useSelector((state: RootState) => state.auth)
-  const dispatch = useDispatch()
-
-  const isValidToken = (token: string | undefined | null) => {
-    if (!token || typeof token !== 'string') return false;
-    try {
-      const decoded: JwtPayload = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-      return decoded.exp > currentTime;
-    } catch (e) {
-      return false;
-    }
-  }
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (!isMounted.current) {
-      return
+    // Initialize Supabase auth state
+    dispatch(initializeAuth())
+
+    // Set up auth state change listener
+    let authListener: any = null
+    
+    try {
+      authListener = setupAuthListener(dispatch)
+    } catch (error) {
+      console.error('Failed to setup auth listener:', error)
     }
 
-    async function fetchUser() {
-
-      const { refresh_token } = getTokens()
-      console.log(refresh_token )
-      if (refresh_token && isValidToken(refresh_token)) {
-        const response = await axiosInstance.get('/api/auth/me')
-        console.log({response})
-        const user = response.data.payload
-        dispatch(initialise({ isAuthenticated: true, user }))
-      } else {
-        dispatch(initialise({ isAuthenticated: false, user: null }))
-        clearTokens()
+    // Cleanup listener on unmount
+    return () => {
+      try {
+        if (authListener?.data?.unsubscribe) {
+          authListener.data.unsubscribe()
+        }
+      } catch (error) {
+        console.warn('Error cleaning up auth listener:', error)
       }
     }
-
-    fetchUser()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [dispatch])
 
   if (!isInitialised) {
     return <LazyLoad />

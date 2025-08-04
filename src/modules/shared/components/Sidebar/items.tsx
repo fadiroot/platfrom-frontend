@@ -1,22 +1,29 @@
 /* eslint-disable react-refresh/only-export-components */
-import { ReactComponent as DashboardIcon } from '../../assets/icons/sidebar/dashboard.svg'
-import { ReactComponent as SettingsIcon } from '../../assets/icons/sidebar/settings.svg'
-import { ReactComponent as ProfileIcon } from '../../assets/icons/sidebar/profile.svg'
 
 export const SIDEBARITEMS = [
   {
-    link: '/dashboard',
+    link: '/admin',
     label: 'Dashboard',
-    icon: <DashboardIcon />,
+    icon: '📊',
   },
   {
-    link: '/settings',
-    label: 'Settings',
-    icon: <SettingsIcon />,
+    link: '/admin/levels',
+    label: 'Niveaux',
+    icon: '🎓',
   },
   {
-    link: '/profile',
-    label: 'Profile',
-    icon: <ProfileIcon />,
+    link: '/admin/subjects',
+    label: 'Matières',
+    icon: '📚',
+  },
+  {
+    link: '/admin/chapters',
+    label: 'Chapitres',
+    icon: '📖',
+  },
+  {
+    link: '/admin/exercises',
+    label: 'Exercices',
+    icon: '✏️',
   },
 ]

@@ -8,12 +8,12 @@ export default defineConfig({
   plugins: [react(), svgr()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '.'),
+      '@': path.resolve(__dirname, './src'),
       '@src': path.resolve(__dirname, './src'),
     },
   },
   server: {
-    port: 3000,
+    port: 4000,
 
     // to get images from the server
     // proxy: {

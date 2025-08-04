@@ -3,5 +3,267 @@
     "en": "الإنجليزية",
     "fr": "الفرنسية",
     "ar": "العربية"
+  },
+  "common": {
+    "welcome": "مرحباً",
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "success": "نجح",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "view": "عرض",
+    "download": "تحميل",
+    "upload": "رفع",
+    "logout": "تسجيل الخروج",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "start": "بدء",
+    "continue": "متابعة",
+    "review": "مراجعة"
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول",
+      "subtitle": "أدخل بياناتك للوصول إلى حسابك",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "remember": "تذكرني",
+      "forgot": "نسيت كلمة المرور؟",
+      "submit": "تسجيل الدخول",
+      "noAccount": "لا تملك حساباً؟",
+      "createAccount": "إنشاء حساب جديد"
+    },
+    "register": {
+      "title": "إنشاء حساب جديد",
+      "subtitle": "أنشئ حسابك للبدء",
+      "name": "الاسم الكامل",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "terms": "أوافق على الشروط والأحكام",
+      "submit": "إنشاء الحساب",
+      "hasAccount": "تملك حساباً؟",
+      "signIn": "تسجيل الدخول",
+      "success": "تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني للتفعيل قبل تسجيل الدخول."
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "إدارة المحتوى التعليمي",
+    "stats": {
+      "levels": "المستويات",
+      "subjects": "المواد",
+      "chapters": "الفصول",
+      "exercises": "التمارين",
+      "students": "الطلاب",
+      "total": "المجموع"
+    },
+    "overview": "نظرة عامة",
+    "totalContent": "إجمالي المحتوى",
+    "avgExercises": "متوسط التمارين/الفصل",
+    "avgChapters": "متوسط الفصول/المادة"
+  },
+  "student": {
+    "dashboard": "الصفحة الرئيسية",
+    "subjects": "المواد الدراسية",
+    "chapters": "الفصول",
+    "exercises": "التمارين",
+    "profile": "الملف الشخصي",
+    "progress": "التقدم",
+    "achievements": "الإنجازات",
+    "settings": "الإعدادات"
+  },
+  "subjects": {
+    "title": "المواد الدراسية",
+    "subtitle": "اختر المادة التي تريد دراستها",
+    "explore": "استكشاف",
+    "noSubjects": "لا توجد مواد متاحة حالياً",
+    "noDescription": "لا يوجد وصف متاح",
+    "loading": "جاري تحميل المواد..."
+  },
+  "chapters": {
+    "title": "الفصول",
+    "subtitle": "اختر الفصل الذي تريد دراسته",
+    "courseSubtitle": "منهج شامل مصمم للتطوير المهني وتطوير المهارات",
+    "backToSubjects": "العودة إلى المواد",
+    "exercises": "تمرين",
+    "minutes": "دقيقة",
+    "difficulty": {
+      "beginner": "مبتدئ",
+      "intermediate": "متوسط",
+      "advanced": "متقدم"
+    },
+    "type": {
+      "theory": "نظري",
+      "practical": "عملي",
+      "mixed": "مختلط"
+    },
+    "status": {
+      "not_started": "لم يبدأ",
+      "in_progress": "قيد التقدم",
+      "completed": "مكتمل"
+    },
+    "start": "بدء الدراسة",
+    "continue": "متابعة",
+    "review": "مراجعة"
+  },
+  "exercises": {
+    "title": "التمارين",
+    "subtitle": "حل التمارين لتحسين مهاراتك",
+    "backToChapters": "العودة إلى الفصول",
+    "start": "بدء التمرين",
+    "review": "مراجعة التمرين",
+    "complete": "إكمال",
+    "completed": "مكتمل",
+    "difficulty": {
+      "beginner": "مبتدئ",
+      "intermediate": "متوسط", 
+      "advanced": "متقدم",
+      "easy": "سهل",
+      "medium": "متوسط",
+      "hard": "صعب"
+    },
+    "type": {
+      "theory": "نظري",
+      "practical": "عملي",
+      "quiz": "اختبار"
+    },
+    "duration": "المدة",
+    "points": "النقاط",
+    "questions": "الأسئلة",
+    "noExercises": "لا توجد تمارين متاحة في هذا الفصل",
+    "loading": "جاري تحميل التمارين..."
+  },
+  "admin": {
+    "title": "لوحة التحكم الإدارية",
+    "subtitle": "إدارة المحتوى التعليمي",
+    "goToStudent": "الانتقال إلى واجهة الطالب",
+    "menu": "القائمة",
+    "collapse": "طي",
+    "levels": {
+      "title": "إدارة المستويات",
+      "create": "إنشاء مستوى جديد",
+      "edit": "تعديل المستوى",
+      "delete": "حذف المستوى",
+      "name": "اسم المستوى",
+      "description": "الوصف",
+      "order": "الترتيب",
+      "actions": "الإجراءات",
+      "confirmDelete": "هل أنت متأكد من حذف هذا المستوى؟",
+      "messages": {
+        "titleRequired": "اسم المستوى مطلوب",
+        "createSuccess": "تم إنشاء المستوى بنجاح!",
+        "updateSuccess": "تم تحديث المستوى بنجاح!",
+        "deleteSuccess": "تم حذف المستوى بنجاح!",
+        "loadError": "خطأ في تحميل المستويات",
+        "saveError": "خطأ في حفظ المستوى",
+        "deleteError": "خطأ في حذف المستوى"
+      }
+    },
+    "subjects": {
+      "title": "إدارة المواد",
+      "create": "إنشاء مادة جديدة",
+      "edit": "تعديل المادة",
+      "delete": "حذف المادة",
+      "name": "اسم المادة",
+      "description": "الوصف",
+      "level": "المستوى",
+      "actions": "الإجراءات",
+      "confirmDelete": "هل أنت متأكد من حذف هذه المادة؟",
+      "messages": {
+        "titleRequired": "اسم المادة مطلوب",
+        "createSuccess": "تم إنشاء المادة بنجاح!",
+        "updateSuccess": "تم تحديث المادة بنجاح!",
+        "deleteSuccess": "تم حذف المادة بنجاح!",
+        "loadError": "خطأ في تحميل المواد",
+        "saveError": "خطأ في حفظ المادة",
+        "deleteError": "خطأ في حذف المادة"
+      }
+    },
+    "chapters": {
+      "title": "إدارة الفصول",
+      "create": "إنشاء فصل جديد",
+      "edit": "تعديل الفصل",
+      "delete": "حذف الفصل",
+      "name": "اسم الفصل",
+      "description": "الوصف",
+      "subject": "المادة",
+      "difficulty": "مستوى الصعوبة",
+      "type": "النوع",
+      "estimatedTime": "الوقت المقدر",
+      "actions": "الإجراءات",
+      "confirmDelete": "هل أنت متأكد من حذف هذا الفصل؟",
+      "messages": {
+        "titleRequired": "اسم الفصل مطلوب",
+        "createSuccess": "تم إنشاء الفصل بنجاح!",
+        "updateSuccess": "تم تحديث الفصل بنجاح!",
+        "deleteSuccess": "تم حذف الفصل بنجاح!",
+        "loadError": "خطأ في تحميل الفصول",
+        "saveError": "خطأ في حفظ الفصل",
+        "deleteError": "خطأ في حذف الفصل"
+      }
+    },
+    "exercises": {
+      "title": "إدارة التمارين",
+      "create": "إنشاء تمرين جديد",
+      "edit": "تعديل التمرين",
+      "delete": "حذف التمرين",
+      "name": "اسم التمرين",
+      "description": "الوصف",
+      "chapter": "الفصل",
+      "difficulty": "مستوى الصعوبة",
+      "type": "النوع",
+      "points": "النقاط",
+      "files": "الملفات",
+      "addFiles": "إضافة ملفات",
+      "removeFile": "إزالة الملف",
+      "actions": "الإجراءات",
+      "confirmDelete": "هل أنت متأكد من حذف هذا التمرين؟",
+      "fileUpload": {
+        "dragDrop": "اسحب وأفلت الملفات هنا أو انقر للتحديد",
+        "pdfOnly": "ملفات PDF فقط",
+        "maxSize": "حد أقصى 50 ميجابايت لكل ملف",
+        "invalidFiles": "ملفات PDF فقط مسموحة. الملفات غير الصالحة:",
+        "oversizedFiles": "ملفات كبيرة جداً (حد أقصى 50 ميجابايت):",
+        "uploadSuccess": "تم رفع الملفات بنجاح!",
+        "uploadError": "خطأ في رفع الملفات:"
+      },
+      "messages": {
+        "nameRequired": "اسم التمرين مطلوب",
+        "createSuccess": "تم إنشاء التمرين بنجاح!",
+        "updateSuccess": "تم تحديث التمرين بنجاح!",
+        "deleteSuccess": "تم حذف التمرين بنجاح!",
+        "loadError": "خطأ في تحميل التمارين",
+        "saveError": "خطأ في حفظ التمرين",
+        "deleteError": "خطأ في حذف التمرين"
+      }
+    }
+  },
+  "errors": {
+    "404": {
+      "title": "الصفحة غير موجودة",
+      "subtitle": "عذراً، الصفحة التي تبحث عنها غير موجودة.",
+      "goHome": "العودة إلى الصفحة الرئيسية"
+    },
+    "500": {
+      "title": "خطأ في الخادم",
+      "subtitle": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+      "retry": "إعادة المحاولة"
+    },
+    "network": {
+      "title": "خطأ في الاتصال",
+      "subtitle": "تحقق من اتصالك بالإنترنت وحاول مرة أخرى.",
+      "retry": "إعادة المحاولة"
+    }
   }
 }

@@ -1,60 +1,82 @@
+@import '../../../shared/assets/styles/abstracts/student-theme';
+
 .exercises-list-container {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  @include student-container;
+  min-height: 100vh;
   
   .exercises-list-header {
     margin-bottom: 2rem;
-    text-align: center;
     
     .back-button {
-      background: none;
-      border: none;
-      color: #666;
-      font-size: 1rem;
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      margin-bottom: 1rem;
-      display: inline-flex;
-      align-items: center;
-      transition: color 0.3s;
+      @include student-back-button;
+    }
+    
+    .header-content {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--student-border-primary);
       
-      &:hover {
-        color: #333;
+      .exercises-list-title {
+        @include student-title;
       }
-    }
-    
-    .exercises-list-title {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      color: #333;
-    }
-    
-    .exercises-list-subtitle {
-      font-size: 1.2rem;
-      color: #666;
+      
+      .exercises-list-subtitle {
+        @include student-subtitle;
+        max-width: 600px;
+      }
     }
   }
   
   .exercises-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    @include student-grid(320px);
     gap: 1.8rem;
+  }
+}
+
+@media (max-width: 1400px) {
+  .exercises-list-container {
+    padding: 2rem 2rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .exercises-list-container {
+    padding: 1.5rem 1.5rem;
   }
 }
 
 @media (max-width: 768px) {
   .exercises-list-container {
-    padding: 1rem;
+    padding: 1rem 1rem;
     
     .exercises-list-header {
-      .exercises-list-title {
-        font-size: 2rem;
+      .header-content {
+        .exercises-list-title {
+          font-size: 1.875rem;
+        }
+        
+        .exercises-list-subtitle {
+          font-size: 1rem;
+        }
       }
     }
     
     .exercises-grid {
       grid-template-columns: 1fr;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .exercises-list-container {
+    padding: 0.75rem 0.75rem;
+    
+    .exercises-list-header {
+      .header-content {
+        .exercises-list-title {
+          font-size: 1.5rem;
+        }
+      }
     }
   }
 }

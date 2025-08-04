@@ -2,6 +2,7 @@
 import { RouteProps } from 'react-router-dom'
 import { Fragment, lazy } from 'react'
 import AuthGuard from '../../shared/guards/AuthGuard'
+import MainLayout from '../../shared/layout/MainLayout/MainLayout'
 
 type RouteConfig = {
   exact: boolean | null
@@ -16,24 +17,14 @@ const routes: RouteConfig[] = [
   {
     exact: true,
     guard: AuthGuard,
-    path: '/levels',
-    component: lazy(() => import('../features/LevelsList/LevelsList')),
-  },
-  {
-    exact: true,
-    guard: AuthGuard,
-    path: '/levels/create',
-    component: lazy(() => import('../features/CreateLevel/CreateLevel')),
-  },
-  {
-    exact: true,
-    guard: AuthGuard,
+    layout: MainLayout,
     path: '/levels/:levelId/chapters',
     component: lazy(() => import('../../chapters/features/chaptersList/chaptersList')),
   },
   {
     exact: true,
     guard: AuthGuard,
+    layout: MainLayout,
     path: '/levels/:levelId/subjects',
     component: lazy(() => import('../../subjects/features/subjectList/subjectList')),
   },

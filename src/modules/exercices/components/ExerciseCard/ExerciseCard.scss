@@ -1,53 +1,61 @@
-// Variables
-$primary-color: #2563eb;
-$success-color: #10b981;
-$warning-color: #f59e0b;
-$danger-color: #ef4444;
-$gray-50: #f8fafc;
-$gray-100: #f1f5f9;
-$gray-200: #e2e8f0;
-$gray-300: #cbd5e1;
-$gray-500: #64748b;
-$gray-700: #334155;
-$gray-900: #1e293b;
+@import '../../../shared/assets/styles/abstracts/student-theme';
 
 .exercise-card {
+  @include student-card;
   position: relative;
-  background: linear-gradient(135deg, #ffffff 0%, $gray-50 100%);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.06);
-  border: 1px solid $gray-200;
+  background: var(--student-card-gradient);
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   overflow: hidden;
-  min-height: 180px; // Reduced from 280px
+  min-height: 180px;
   display: flex;
   flex-direction: column;
 
   &:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12), 0 8px 16px rgba(0, 0, 0, 0.08);
-    border-color: $primary-color;
-    backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.9);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(-4px);
+    box-shadow: var(--student-shadow-xl);
+    background: var(--student-card-gradient-hover);
+    border-color: var(--student-primary);
 
     .hover-overlay {
       opacity: 1;
       visibility: visible;
-      transform: scale(1.05);
+      pointer-events: auto;
+      .overlay-content {
+        transform: scale(1.08);
+        .play-icon {
+          color: #111;
+          transform: scale(1.15);
+        }
+        .overlay-text {
+          color: #111;
+          text-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+      }
     }
 
     .start-btn {
-      background: $success-color;
+      background: var(--student-success);
       color: white;
-      border-color: $success-color;
+      border-color: var(--student-success);
       transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+      box-shadow: var(--student-shadow-lg);
+    }
+
+    .start-btn:hover {
+      background: var(--student-button-secondary-bg);
+      color: var(--student-text-inverse) !important;
+      border-color: var(--student-button-secondary-bg);
+    }
+    .start-btn:hover .icon,
+    .start-btn:hover .arrow-icon,
+    .start-btn:hover span {
+      color: #fff !important;
+      stroke: #fff !important;
     }
 
     .card-header .exercise-title {
-      color: $primary-color;
+      color: black;
       transform: translateY(-1px);
     }
 
@@ -57,11 +65,11 @@ $gray-900: #1e293b;
   }
 
   &.completed {
-    border-left: 3px solid $success-color; // Reduced from 4px
+    border-left: 3px solid var(--student-success);
     background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
 
     .completion-indicator {
-      color: $success-color;
+      color: var(--student-success);
     }
   }
 }
@@ -69,7 +77,7 @@ $gray-900: #1e293b;
 // Compact Header
 .card-header {
   padding: 16px 16px 12px 16px; // Reduced padding
-  border-bottom: 1px solid $gray-100;
+  border-bottom: 1px solid var(--student-border-secondary);
 
   .header-content {
     display: flex;
@@ -85,7 +93,7 @@ $gray-900: #1e293b;
     .exercise-title {
       font-size: 14px; // Reduced from 18px
       font-weight: 600;
-      color: $gray-900;
+      color: var(--student-text-primary);
       margin: 0 0 8px 0;
       line-height: 1.3;
       display: -webkit-box;
@@ -102,8 +110,8 @@ $gray-900: #1e293b;
     }
 
     .subject-badge {
-      background: $gray-100;
-      color: $gray-500;
+      background: var(--student-bg-tertiary);
+      color: var(--student-text-secondary);
       padding: 2px 6px; // Reduced padding
       border-radius: 4px;
       font-size: 10px; // Reduced from 12px
@@ -119,18 +127,15 @@ $gray-900: #1e293b;
       letter-spacing: 0.3px;
 
       &.difficulty-0 {
-        background: #d1fae5;
-        color: #059669;
+        @include student-difficulty-badge('beginner');
       }
 
       &.difficulty-1 {
-        background: #fef3c7;
-        color: #d97706;
+        @include student-difficulty-badge('intermediate');
       }
 
       &.difficulty-2 {
-        background: #fee2e2;
-        color: #dc2626;
+        @include student-difficulty-badge('advanced');
       }
     }
   }
@@ -141,7 +146,7 @@ $gray-900: #1e293b;
     .icon {
       width: 16px; // Reduced from 18px
       height: 16px;
-      color: $success-color;
+      color: var(--student-success);
     }
   }
 }
@@ -191,11 +196,11 @@ $gray-900: #1e293b;
 
     .stat-number {
       font-weight: 600;
-      color: $gray-900;
+      color: var(--student-text-primary);
     }
 
     .stat-label {
-      color: $gray-500;
+      color: var(--student-text-secondary);
       font-weight: 500;
     }
   }
@@ -204,7 +209,7 @@ $gray-900: #1e293b;
 // Compact Footer
 .card-footer {
   padding: 12px 16px; // Reduced padding
-  border-top: 1px solid $gray-100;
+  border-top: 1px solid var(--student-border-secondary);
 
   .footer-actions {
     display: flex;
@@ -221,10 +226,10 @@ $gray-900: #1e293b;
       justify-content: center;
       width: 28px;
       height: 28px;
-      border: 1.5px solid $gray-300;
+      border: 1.5px solid var(--student-border-accent);
       border-radius: 6px;
-      background: white;
-      color: $gray-500;
+      background: var(--student-bg-secondary);
+      color: var(--student-text-secondary);
       cursor: pointer;
       transition: all 0.2s ease;
 
@@ -234,57 +239,51 @@ $gray-900: #1e293b;
       }
 
       &:hover {
-        border-color: $success-color;
-        color: $success-color;
-        background: #f0fdf4;
+        border-color: var(--student-success);
+        color: var(--student-success);
+        background: var(--student-hover-bg);
       }
 
       &.completed {
-        border-color: $success-color;
-        background: $success-color;
-        color: white;
+        border-color: var(--student-success);
+        background: var(--student-success);
+        color: var(--student-text-inverse);
 
         &:hover {
-          background: #059669;
+          background: var(--student-success);
+          opacity: 0.9;
         }
       }
     }
 
     .start-btn {
+      @include student-button-secondary;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      background: #1e293b; /* Dark background */
-      color: #ffffff !important; /* Force white text */
-      border: 1.5px solid #1e293b;
       padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 600;
       font-size: 11px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      margin: 0; /* Remove centering */
-      span{
-        color: white;
+      margin: 0;
+      span {
+        color: var(--student-text-inverse);
       }
-
       .icon, .arrow-icon {
         width: 12px;
         height: 12px;
-        color: #ffffff !important; /* Force white icons */
-        stroke: #ffffff !important; /* Force white stroke for SVG icons */
+        color: var(--student-text-inverse) !important;
+        stroke: var(--student-text-inverse) !important;
       }
+    }
 
-      &:hover {
-        background: #334155; /* Darker on hover */
-        border-color: #334155;
-        color: #ffffff !important; /* Keep white on hover */
-        
-        .icon, .arrow-icon {
-          color: #ffffff !important; /* Keep white icons on hover */
-          stroke: #ffffff !important; /* Keep white stroke on hover */
-        }
+    // Enhanced hover state for start button
+    .exercise-card:hover .start-btn,
+    .start-btn:hover {
+      background: var(--student-button-secondary-hover) !important;
+      border-color: var(--student-button-secondary-hover) !important;
+      span, .icon, .arrow-icon {
+        color: var(--student-text-inverse) !important;
+        stroke: var(--student-text-inverse) !important;
       }
     }
   }
@@ -297,35 +296,39 @@ $gray-900: #1e293b;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.07);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
+  opacity: 0; // Start fully transparent
   visibility: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(16px);
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+              backdrop-filter 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+              visibility 0.35s;
+  backdrop-filter: blur(6px);
   border-radius: 12px;
+  pointer-events: none;
+  z-index: 2;
 
   .overlay-content {
-    text-align: center;
-    color: $primary-color;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    gap: 10px;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
 
-    .play-icon {
-      width: 36px;
-      height: 36px;
-      margin-bottom: 12px;
-      color: $primary-color;
-      filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3));
-    }
-
-    .overlay-text {
-      font-size: 15px;
-      font-weight: 700;
-      color: $primary-color;
-      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-      letter-spacing: 0.5px;
-    }
+.exercise-card:hover .hover-overlay {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: scale(1.03);
+  .overlay-content {
+    transform: scale(1.08);
   }
 }
 

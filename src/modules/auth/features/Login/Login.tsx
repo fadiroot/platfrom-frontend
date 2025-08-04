@@ -9,7 +9,6 @@ import * as Yup from "yup"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAppDispatch } from "../../../../modules/shared/store"
 import { login } from "../../data/authThunk"
-import { getChangedValues } from "../../../../modules/shared/utils/getChangedValuesFormik"
 import { PATH } from "../../routes/paths"
 import "./_Login.scss"
 
@@ -97,11 +96,15 @@ const LoginComponent = () => {
     }),
     onSubmit: (values) => {
       setSubmitting(true)
-      const changedValues = getChangedValues(values, initialValues)
-      dispatch(login(changedValues))
+      dispatch(login(values))
         .unwrap()
-        .then(() => {
-          console.log("Login successful")
+        .then((result) => {
+          
+          if (result.user && result.user.level_id) {
+            navigate(`/subjects?levelId=${result.user.level_id}`)
+          } else {
+            navigate('/subjects') // Fallback to subjects page
+          }
         })
         .catch((err) => {
           alert(err?.message || "Login failed")
