@@ -9,20 +9,20 @@
   --student-bg-secondary: #ffffff;
   --student-bg-tertiary: #f1f5f9;
   --student-bg-accent: #e2e8f0;
-  
+
   // === TEXT COLORS ===
   --student-text-primary: #1e293b;
   --student-text-secondary: #64748b;
   --student-text-muted: #94a3b8;
   --student-text-inverse: #ffffff;
-  
+
   // === BRAND COLORS ===
   --student-primary: #6366f1;
   --student-primary-light: #818cf8;
   --student-primary-dark: #4f46e5;
   --student-accent: #10b981;
   --student-accent-light: #34d399;
-  
+
   // === STATUS COLORS ===
   --student-success: #10b981;
   --student-success-light: #86efac;
@@ -32,24 +32,24 @@
   --student-danger-light: #fca5a5;
   --student-info: #3b82f6;
   --student-info-light: #93c5fd;
-  
+
   // === BORDERS ===
   --student-border-primary: #e2e8f0;
   --student-border-secondary: #f1f5f9;
   --student-border-accent: #cbd5e1;
-  
+
   // === SHADOWS ===
   --student-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --student-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --student-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --student-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --student-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  
+
   // === INTERACTIVE STATES ===
   --student-hover-bg: #f8fafc;
   --student-active-bg: #f1f5f9;
   --student-focus-ring: #6366f1;
-  
+
   // === DIFFICULTY LEVELS ===
   --student-difficulty-beginner-bg: #d1fae5;
   --student-difficulty-beginner-text: #059669;
@@ -57,11 +57,11 @@
   --student-difficulty-intermediate-text: #d97706;
   --student-difficulty-advanced-bg: #fee2e2;
   --student-difficulty-advanced-text: #dc2626;
-  
+
   // === CARD GRADIENTS ===
   --student-card-gradient: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   --student-card-gradient-hover: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-  
+
   // === BUTTON STYLES ===
   --student-button-primary-bg: #6366f1;
   --student-button-primary-hover: #4f46e5;
@@ -76,20 +76,20 @@
   --student-bg-secondary: #1e293b;
   --student-bg-tertiary: #334155;
   --student-bg-accent: #475569;
-  
+
   // === TEXT COLORS ===
   --student-text-primary: #f8fafc;
   --student-text-secondary: #cbd5e1;
   --student-text-muted: #94a3b8;
   --student-text-inverse: #1e293b;
-  
+
   // === BRAND COLORS ===
   --student-primary: #6366f1;
   --student-primary-light: #818cf8;
   --student-primary-dark: #4f46e5;
   --student-accent: #10b981;
   --student-accent-light: #34d399;
-  
+
   // === STATUS COLORS ===
   --student-success: #10b981;
   --student-success-light: #86efac;
@@ -99,24 +99,24 @@
   --student-danger-light: #fca5a5;
   --student-info: #3b82f6;
   --student-info-light: #93c5fd;
-  
+
   // === BORDERS ===
   --student-border-primary: #374151;
   --student-border-secondary: #475569;
   --student-border-accent: #64748b;
-  
+
   // === SHADOWS ===
   --student-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
   --student-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
   --student-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
   --student-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
   --student-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
-  
+
   // === INTERACTIVE STATES ===
   --student-hover-bg: #374151;
   --student-active-bg: #475569;
   --student-focus-ring: #6366f1;
-  
+
   // === DIFFICULTY LEVELS ===
   --student-difficulty-beginner-bg: #064e3b;
   --student-difficulty-beginner-text: #86efac;
@@ -124,11 +124,11 @@
   --student-difficulty-intermediate-text: #fcd34d;
   --student-difficulty-advanced-bg: #7f1d1d;
   --student-difficulty-advanced-text: #fca5a5;
-  
+
   // === CARD GRADIENTS ===
   --student-card-gradient: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   --student-card-gradient-hover: linear-gradient(135deg, #334155 0%, #475569 100%);
-  
+
   // === BUTTON STYLES ===
   --student-button-primary-bg: #6366f1;
   --student-button-primary-hover: #4f46e5;
@@ -147,19 +147,19 @@
   color: var(--student-text-primary);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: color 0.3s ease;
-  
+
   @media (max-width: 1400px) {
     padding: 2rem 2rem;
   }
-  
+
   @media (max-width: 1024px) {
     padding: 1.5rem 1.5rem;
   }
-  
+
   @media (max-width: 768px) {
     padding: 1rem 1rem;
   }
-  
+
   @media (max-width: 480px) {
     padding: 0.75rem 0.75rem;
   }
@@ -171,7 +171,7 @@
   border-radius: 12px;
   box-shadow: var(--student-shadow-md);
   transition: all 0.2s ease;
-  
+
   &:hover {
     box-shadow: var(--student-shadow-hover);
     transform: translateY(-2px);
@@ -180,21 +180,23 @@
 }
 
 @mixin student-button-primary {
-  background: var(--student-button-primary-bg);
-  color: var(--student-text-inverse);
-  border: 1px solid var(--student-button-primary-bg);
-  border-radius: 6px;
-  padding: 8px 16px;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: var(--student-button-primary-hover);
-    border-color: var(--student-button-primary-hover);
-    transform: translateY(-1px);
-  }
+    box-shadow: 2px 2px 0px 0px #000;
+    border: 2px solid #000;
+    padding: 0.5rem 1rem;
+    background-color: white ;
+    &:hover{
+        transition: all 0.3s ease;
+        transform: translate(-1px, -1px);
+        background-color: black;
+        color: white;
+        box-shadow: 2px 2px 0px 0px #000;
+
+        svg{
+            transition: all 0.3s ease;
+            stroke:white;
+            color: white;
+        }
+    }
 }
 
 @mixin student-button-secondary {
@@ -207,7 +209,7 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: var(--student-button-secondary-hover);
     border-color: var(--student-button-secondary-hover);
@@ -222,11 +224,11 @@
   margin-bottom: 0.5rem;
   line-height: 1.2;
   transition: color 0.3s ease;
-  
+
   @media (max-width: 768px) {
     font-size: 1.875rem;
   }
-  
+
   @media (max-width: 480px) {
     font-size: 1.5rem;
   }
@@ -238,7 +240,7 @@
   font-weight: 400;
   line-height: 1.5;
   transition: color 0.3s ease;
-  
+
   @media (max-width: 768px) {
     font-size: 1rem;
   }
@@ -251,7 +253,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  
+
   @if $level == 'beginner' {
     background: var(--student-difficulty-beginner-bg);
     color: var(--student-difficulty-beginner-text);
@@ -277,7 +279,7 @@
   padding: 0.75rem 0;
   margin-bottom: 2rem;
   transition: all 0.2s ease;
-  
+
   &:hover {
     color: var(--student-primary);
   }
@@ -291,7 +293,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax($min-width, 1fr));
   gap: 1.5rem;
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -302,11 +304,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
-  
+
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -325,7 +327,7 @@
 // Apply Arabic fonts globally when Arabic language is selected (LTR layout)
 body.arabic-fonts {
   font-family: 'Noto Sans Arabic', 'Cairo', 'Amiri', 'Tajawal', sans-serif !important;
-  
+
   * {
     font-family: 'Noto Sans Arabic', 'Cairo', 'Amiri', 'Tajawal', sans-serif !important;
   }

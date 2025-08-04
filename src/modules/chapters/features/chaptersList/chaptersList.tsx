@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import "./index.scss"
+import './index.scss'
 import { getChaptersBySubject, getChaptersByLevel } from '@/lib/api/chapters'
 import { getSubjectById } from '@/lib/api/subjects'
 import { getLevelById } from '@/lib/api/levels'
@@ -17,8 +17,8 @@ interface Chapter {
   exercise_count: number | null
   progress?: number
   estimated_time?: string | null
-  difficulty?: "Beginner" | "Intermediate" | "Advanced" | null
-  type?: "Theory" | "Practical" | "Assessment" | null
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced' | null
+  type?: 'Theory' | 'Practical' | 'Assessment' | null
   name?: string
 }
 
@@ -27,7 +27,7 @@ const ChaptersList: React.FC = () => {
   const navigate = useNavigate()
   const { t } = useTranslation('translation')
   const [chapters, setChapters] = useState<Chapter[]>([])
-  const [subjectName, setSubjectName] = useState<string>("")
+  const [subjectName, setSubjectName] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,11 +35,8 @@ const ChaptersList: React.FC = () => {
     if (levelId) {
       setLoading(true)
       setError(null)
-      
-      Promise.all([
-        getChaptersByLevel(levelId),
-        getLevelById(levelId)
-      ])
+
+      Promise.all([getChaptersByLevel(levelId), getLevelById(levelId)])
         .then(([chaptersData, levelData]) => {
           setChapters(chaptersData)
           setSubjectName(levelData?.title || 'Level Chapters')
@@ -49,11 +46,8 @@ const ChaptersList: React.FC = () => {
     } else if (subjectId) {
       setLoading(true)
       setError(null)
-      
-      Promise.all([
-        getChaptersBySubject(subjectId),
-        getSubjectById(subjectId)
-      ])
+
+      Promise.all([getChaptersBySubject(subjectId), getSubjectById(subjectId)])
         .then(([chaptersData, subjectData]) => {
           setChapters(chaptersData)
           setSubjectName(subjectData?.title || 'Professional Course')
@@ -69,34 +63,34 @@ const ChaptersList: React.FC = () => {
 
   const getDifficultyClass = (difficulty?: string | null) => {
     switch (difficulty) {
-      case "Beginner":
-        return "difficulty-beginner"
-      case "Intermediate":
-        return "difficulty-intermediate"
-      case "Advanced":
-        return "difficulty-advanced"
+      case 'Beginner':
+        return 'difficulty-beginner'
+      case 'Intermediate':
+        return 'difficulty-intermediate'
+      case 'Advanced':
+        return 'difficulty-advanced'
       default:
-        return "difficulty-default"
+        return 'difficulty-default'
     }
   }
 
   const getTypeClass = (type?: string | null) => {
     switch (type) {
-      case "Theory":
-        return "type-theory"
-      case "Practical":
-        return "type-practical"
-      case "Assessment":
-        return "type-assessment"
+      case 'Theory':
+        return 'type-theory'
+      case 'Practical':
+        return 'type-practical'
+      case 'Assessment':
+        return 'type-assessment'
       default:
-        return "type-default"
+        return 'type-default'
     }
   }
 
   const getStatusInfo = (progress?: number) => {
-    if (!progress) return { text: t('chapters.status.not_started'), class: "status-not-started" }
-    if (progress === 100) return { text: t('chapters.status.completed'), class: "status-completed" }
-    return { text: t('chapters.status.in_progress'), class: "status-in-progress" }
+    if (!progress) return { text: t('chapters.status.not_started'), class: 'status-not-started' }
+    if (progress === 100) return { text: t('chapters.status.completed'), class: 'status-completed' }
+    return { text: t('chapters.status.in_progress'), class: 'status-in-progress' }
   }
 
   const totalExercises = chapters.reduce((sum, chapter) => sum + (chapter.exercise_count || 0), 0)
@@ -105,8 +99,16 @@ const ChaptersList: React.FC = () => {
   return (
     <div className="chapters-container">
       <div className="chapters-header">
-        <button className="back-btn" onClick={() => navigate("/subjects")}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <button className="back-btn" onClick={() => navigate('/subjects')}>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            className="back-icon"
+            strokeWidth="2"
+          >
             <path d="m15 18-6-6 6-6" />
           </svg>
           {t('chapters.backToSubjects')}
@@ -114,16 +116,21 @@ const ChaptersList: React.FC = () => {
 
         <div className="header-content">
           <h1 className="course-title">{subjectName}</h1>
-          <p className="course-subtitle">
-            {t('chapters.courseSubtitle')}
-          </p>
+          <p className="course-subtitle">{t('chapters.courseSubtitle')}</p>
         </div>
 
         {/* Course Statistics */}
         <div className="course-stats">
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
@@ -136,7 +143,14 @@ const ChaptersList: React.FC = () => {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                 <polyline points="14,2 14,8 20,8" />
               </svg>
@@ -149,7 +163,14 @@ const ChaptersList: React.FC = () => {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12,6 12,12 16,14" />
               </svg>
@@ -162,7 +183,14 @@ const ChaptersList: React.FC = () => {
 
           <div className="stat-card">
             <div className="stat-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22,4 12,14.01 9,11.01" />
               </svg>
@@ -193,26 +221,36 @@ const ChaptersList: React.FC = () => {
             const status = getStatusInfo(chapter.progress)
 
             return (
-              <div className="chapter-card" key={chapter.id} onClick={() => handleChapterClick(chapter.id)}>
+              <div
+                className="chapter-card"
+                key={chapter.id}
+                onClick={() => handleChapterClick(chapter.id)}
+              >
                 <div className="chapter-header">
-                  <div className="chapter-number">{String(index + 1).padStart(2, "0")}</div>
+                  <div className="chapter-number">{String(index + 1).padStart(2, '0')}</div>
 
                   <div className="chapter-main">
                     <div className="chapter-title-row">
                       <h2 className="chapter-title">{chapter.name || chapter.title}</h2>
                       <div className="chapter-badges">
                         {chapter.type && (
-                          <span className={`type-badge ${getTypeClass(chapter.type)}`}>{chapter.type}</span>
+                          <span className={`type-badge ${getTypeClass(chapter.type)}`}>
+                            {chapter.type}
+                          </span>
                         )}
                         {chapter.difficulty && (
-                          <span className={`difficulty-badge ${getDifficultyClass(chapter.difficulty)}`}>
+                          <span
+                            className={`difficulty-badge ${getDifficultyClass(chapter.difficulty)}`}
+                          >
                             {chapter.difficulty}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <p className="chapter-description">{chapter.description || 'No description available'}</p>
+                    <p className="chapter-description">
+                      {chapter.description || 'No description available'}
+                    </p>
 
                     <div className="chapter-meta">
                       <div className="meta-item">
@@ -252,8 +290,19 @@ const ChaptersList: React.FC = () => {
                   <div className="chapter-actions">
                     <div className={`status-badge ${status.class}`}>{status.text}</div>
                     <button className="action-btn">
-                      {chapter.progress === 100 ? t('chapters.review') : chapter.progress ? t('chapters.continue') : t('chapters.start')}
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      {chapter.progress === 100
+                        ? t('chapters.review')
+                        : chapter.progress
+                        ? t('chapters.continue')
+                        : t('chapters.start')}
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
                         <path d="m9 18 6-6-6-6" />
                       </svg>
                     </button>

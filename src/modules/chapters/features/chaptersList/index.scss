@@ -12,6 +12,22 @@
 
   .back-btn {
     @include student-back-button;
+    box-shadow: 2px 2px 0px 0px #000;
+    border: 2px solid #000;
+    padding: 0.5rem 1rem;
+    &:hover{
+        transition: all 0.3s ease;
+        transform: translate(-1px, -1px);
+        background-color: black;
+        color: white;
+        box-shadow: 2px 2px 0px 0px #000;
+
+        svg{
+            transition: all 0.3s ease;
+            stroke:white;
+            color: white;
+        }
+    }
   }
 
   .header-content {
@@ -35,14 +51,20 @@
     margin-bottom: 1rem;
 
     .stat-card {
-      @include student-card;
+    //   @include student-card;
+        border: 1px solid black;
+        border-radius: 4px;
+        box-shadow: 2px 2px 0px 0px #000;
+
       padding: 1.25rem;
       display: flex;
       align-items: center;
       gap: 1rem;
+      transition: all 0.3s ease;
 
       &:hover {
         transform: translateY(-1px);
+        box-shadow: 3px 3px 0px 0px #000;
       }
 
       .stat-icon {
@@ -66,7 +88,6 @@
 
         .stat-label {
           font-size: 0.875rem;
-          color: var(--student-text-secondary);
           font-weight: 500;
           transition: color 0.3s ease;
         }
@@ -128,21 +149,42 @@
 
 // Chapter Card
 .chapter-card {
-  @include student-card;
+//   @include student-card;
+border:  1px solid black;
+border-radius:4px;
+box-shadow: 2px 2px 0px 0px #000;
   overflow: hidden;
   cursor: pointer;
+   .action-btn {
+
+        border: 2px solid #000;
+        padding: 0.5rem 1rem;
+        box-shadow: 2px 2px 0px 0px #000 !important;
+    &:hover{
+        transition: all 0.3s ease;
+        transform: translate(-1px, -1px);
+        background-color: black;
+        color: white;
+        box-shadow: 2px 2px 0px 0px #000;
+
+        svg{
+            transition: all 0.3s ease;
+            stroke:white;
+            color: white;
+        }
+    }
+    }
 
   &:hover {
+    transition: all 0.3s ease;
+    transform: translateY(-1px);
+    box-shadow: 3px 3px 0px 0px #000;
     .chapter-number {
       background: var(--student-primary);
       color: var(--student-text-inverse);
     }
 
-    .action-btn {
-      background: var(--student-button-primary-hover);
-      border-color: var(--student-button-primary-hover);
-      transform: translateY(-1px);
-    }
+
   }
 
   .chapter-header {
@@ -188,6 +230,7 @@
 
         .chapter-badges {
           display: flex;
+          background-color: white !important;
           gap: 0.5rem;
           flex-shrink: 0;
         }
@@ -229,10 +272,15 @@
 
       .status-badge {
         padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
+        border-radius: 4px;
         font-size: 0.75rem;
         font-weight: 500;
         border: 1px solid;
+        transition: all 0.3s ease;
+        &:hover {
+          transform: translate(-1px, -1px);
+          box-shadow: 2px 2px 0px 0px #000;
+        }
 
         &.status-not-started {
           background: #374151;
@@ -327,6 +375,7 @@
   font-size: 0.75rem;
   font-weight: 500;
   border: 1px solid;
+
 }
 
 .type-badge {
@@ -334,18 +383,30 @@
     background: #1e3a8a;
     color: #93c5fd;
     border-color: #3b82f6;
+    &:hover{
+        transform: translate(-1px ,-1px);
+        box-shadow: 2px 2px 0px 0px #3b82f6 !important;
+    }
   }
 
   &.type-practical {
     background: #064e3b;
     color: #86efac;
     border-color: #10b981;
+    &:hover{
+        transform: translate(-1px ,-1px);
+        box-shadow: 2px 2px 0px 0px #10b981 !important;
+    }
   }
 
   &.type-assessment {
     background: #92400e;
     color: #fcd34d;
     border-color: #f59e0b;
+    &:hover{
+        transform: translate(-1px ,-1px);
+        box-shadow: 2px 2px 0px 0px #f59e0b !important;
+    }
   }
 }
 
@@ -354,18 +415,32 @@
     background: #064e3b;
     color: #86efac;
     border-color: #10b981;
+    // box-shadow: 0 0 2px 2px #10b981 !important;
+
+    &:hover{
+        transform: translate(-1px ,-1px);
+        box-shadow: 2px 2px 0px 0px #10b981 !important;
+    }
   }
 
   &.difficulty-intermediate {
     background: #92400e;
     color: #fcd34d;
     border-color: #f59e0b;
+    &:hover{
+        transform: translate(-1px ,-1px);
+        box-shadow: 2px 2px 0px 0px #f59e0b !important;
+    }
   }
 
   &.difficulty-advanced {
     background: #7f1d1d;
     color: #fca5a5;
     border-color: #ef4444;
+    &:hover{
+        transform: translate(-1px ,-1px);
+        box-shadow: 2px 2px 0px 0px #ef4444 !important;
+    }
   }
 }
 

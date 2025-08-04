@@ -1,27 +1,27 @@
-// Professional Light Theme Variables
+// Black and white theme variables
 $light-bg-primary: #ffffff;
-$light-bg-secondary: #f8fafc;
-$light-bg-tertiary: #e2e8f0;
-$light-border: #e2e8f0;
-$light-border-light: #e2e8f0;
-$text-primary: #0f172a;
-$text-secondary: #475569;
-$text-muted: #64748b;
-$accent-primary: #3b82f6;
-$accent-secondary: #6366f1;
-$accent-success: #10b981;
-$accent-warning: #f59e0b;
-$accent-danger: #ef4444;
+$light-bg-secondary: #f8f9fa;
+$light-bg-tertiary: #f1f3f4;
+$light-border: #000000;
+$light-border-light: #000000;
+$text-primary: #000000;
+$text-secondary: #333333;
+$text-muted: #666666;
+$accent-primary: #000000;
+$accent-secondary: #000000;
+$accent-success: #000000;
+$accent-warning: #000000;
+$accent-danger: #000000;
 
-// Professional shadows
-$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+// Enhanced black shadows
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.4);
+$shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.5);
 
 $radius: 8px;
 $radius-lg: 12px;
-$transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+$transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
 .exercise-viewer {
@@ -36,7 +36,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: $text-primary;
-  
+
   // Ensure content area takes full width when sidebar is collapsed
   &:not(.sidebar-open) .exercise-content {
     flex: 1;
@@ -49,32 +49,29 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     top: 20px;
     left: 20px;
     z-index: 1001;
+    width: 48px;
+    height: 48px;
     background: $light-bg-primary;
-    border: 1px solid $light-border;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    border: 2px solid $light-border;
+    border-radius: $radius;
+    box-shadow: $shadow-md;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: $transition;
-    color: $text-secondary;
-    box-shadow: $shadow-md;
+    color: $text-primary;
 
     &:hover {
-      background: $accent-primary;
-      color: $light-bg-primary;
-      border-color: $accent-primary;
-      transform: scale(1.05);
+      background: #f5f5f5;
       box-shadow: $shadow-lg;
-    }
-
-    &:active {
-      transform: scale(0.95);
+      transform: translateY(-2px);
+      border-color: $text-primary;
     }
 
     svg {
+      width: 20px;
+      height: 20px;
       transition: $transition;
     }
   }
@@ -87,7 +84,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.7);
     opacity: 0;
     visibility: hidden;
     transition: $sidebar-transition;
@@ -103,8 +100,8 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   .exercise-sidebar {
     width: 320px;
     background: $light-bg-primary;
-    border-right: 1px solid $light-border;
-    box-shadow: $shadow-lg;
+    border-right: 2px solid $light-border;
+    box-shadow: $shadow-xl;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -119,8 +116,9 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     .sidebar-header {
       padding: 80px 24px 24px 24px; // Extra top padding for toggle button
-      border-bottom: 1px solid $light-border;
-      background: $light-bg-tertiary;
+      border-bottom: 2px solid $light-border;
+      background: $light-bg-primary;
+      box-shadow: $shadow-sm;
 
       .back-button {
         background: none;
@@ -182,7 +180,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           gap: 12px;
 
           svg {
-            color: $text-muted;
+            color: white !important;
             transition: $transition;
           }
 
@@ -192,8 +190,8 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .nav-count {
-          background: $light-bg-tertiary;
-          color: $text-muted;
+          background: #f0f0f0;
+          color: $text-primary;
           padding: 4px 8px;
           border-radius: 12px;
           font-size: 12px;
@@ -201,37 +199,48 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           min-width: 24px;
           text-align: center;
           transition: $transition;
+          border: 1px solid $light-border;
         }
 
         &:hover {
-          background: rgba($accent-primary, 0.05);
-          border-color: rgba($accent-primary, 0.1);
+          background: #f8f8f8;
+          border-color: $light-border;
           color: $text-primary;
-          transform: translateY(-1px);
+          transform: translateX(4px);
+          box-shadow: $shadow-sm;
 
           .nav-content svg {
-            color: $accent-primary;
+            color: $text-primary;
           }
 
           .nav-count {
-            background: rgba($accent-primary, 0.1);
-            color: $accent-primary;
+            background: $text-primary;
+            color: $light-bg-primary;
+            border-color: $text-primary;
           }
         }
 
         &.active {
-          background: rgba($accent-primary, 0.1);
-          border-color: $accent-primary;
-          color: $text-primary;
-          box-shadow: $shadow-sm;
+          background: $text-primary;
+          border-color: $text-primary;
+          color: $light-bg-primary;
+          box-shadow: $shadow-md;
 
-          .nav-content svg {
-            color: $accent-primary;
+          .nav-content {
+            svg {
+              color: #fff !important;
+              stroke: #fff;
+            }
+
+            .nav-label {
+              color: $light-bg-primary;
+            }
           }
 
           .nav-count {
-            background: $accent-primary;
-            color: $light-bg-primary;
+            background: $light-bg-primary;
+            color: $text-primary;
+            border-color: $light-bg-primary;
           }
         }
       }
@@ -244,16 +253,17 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     display: flex;
     flex-direction: column;
     overflow: auto;
-    background: $light-bg-secondary;
+    background: #fafafa;
     transition: $sidebar-transition;
     margin-left: 0; // Start with no margin
-    
+    border-left: 1px solid $light-border;
+
     // When sidebar is collapsed, content takes full width
     .exercise-viewer:not(.sidebar-open) & {
       margin-left: 0;
       width: 100%;
     }
-    
+
     // When sidebar is open on desktop, add margin
     @media (min-width: 769px) {
       .exercise-viewer:not(.sidebar-open) & {
@@ -276,21 +286,21 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         opacity: 0.6;
 
         svg {
-          color: $text-muted;
+          color: $text-primary;
         }
       }
 
       h3 {
         font-size: 20px;
         font-weight: 600;
-        color: $text-secondary;
+        color: $text-primary;
         margin: 0 0 8px 0;
       }
 
       p {
         font-size: 14px;
         margin: 0;
-        color: $text-muted;
+        color: $text-secondary;
       }
     }
 
@@ -306,7 +316,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         background: $light-bg-primary;
         border-radius: $radius-lg;
         box-shadow: $shadow-md;
-        border: 1px solid $light-border;
+        border: 2px solid $light-border;
         padding: 20px;
         overflow-y: auto;
 
@@ -325,21 +335,22 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           .file-grid-item {
             display: flex;
             flex-direction: column;
-            background: $light-bg-secondary;
-            border: 1px solid $light-border;
+            background: $light-bg-primary;
+            border: 2px solid $light-border;
             border-radius: $radius;
             cursor: pointer;
             transition: $transition;
             overflow: hidden;
             padding: 0;
+            box-shadow: $shadow-sm;
 
             .file-preview {
               height: 80px;
-              background: $light-bg-tertiary;
+              background: $light-bg-secondary;
               display: flex;
               align-items: center;
               justify-content: center;
-              border-bottom: 1px solid $light-border;
+              border-bottom: 2px solid $light-border;
 
               .grid-pdf-viewer, .grid-image-viewer {
                 width: 100%;
@@ -356,7 +367,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
               gap: 8px;
 
               .file-icon {
-                color: $accent-primary;
+                color: $text-primary;
                 display: flex;
                 align-items: center;
               }
@@ -383,22 +394,43 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
 
             &:hover:not(.active) {
-              border-color: $accent-primary;
+              border-color: $text-primary;
               box-shadow: $shadow-md;
               transform: translateY(-2px);
+              background: #f8f8f8;
+
+              .file-grid-info .file-icon {
+                color: $text-primary;
+              }
+
+              .file-grid-info .file-details .file-name {
+                font-weight: 700;
+              }
             }
 
             &.active {
-              border-color: $accent-primary;
+              border-color: $text-primary;
               box-shadow: $shadow-lg;
-              background: rgba($accent-primary, 0.05);
+              background: $text-primary;
+              >svg{
+                fill : white !important;
+              }
+
+              .file-grid-info .file-icon {
+                color: $light-bg-primary;
+              }
 
               .file-grid-info .file-details .file-name {
-                color: $accent-primary;
+                color: $light-bg-primary;
+              }
+
+              .file-grid-info .file-details .file-type {
+                color: rgba($light-bg-primary, 0.7);
               }
 
               .file-preview {
-                background: rgba($accent-primary, 0.05);
+                background: rgba($light-bg-primary, 0.1);
+                border-bottom-color: rgba($light-bg-primary, 0.3);
               }
             }
           }
@@ -411,15 +443,16 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         border-radius: $radius-lg;
         box-shadow: $shadow-md;
         overflow: hidden;
-        border: 1px solid $light-border;
+        border: 2px solid $light-border;
 
         .file-preview-header {
           padding: 20px 24px;
-          background: $light-bg-tertiary;
-          border-bottom: 1px solid $light-border;
+          background: $light-bg-primary;
+          border-bottom: 2px solid $light-border;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          box-shadow: $shadow-sm;
 
           h2 {
             font-size: 18px;
@@ -442,25 +475,26 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
               font-weight: 600;
               text-transform: uppercase;
               letter-spacing: 0.5px;
+              border: 1px solid $light-border;
 
               &.pdf {
-                background: rgba($accent-danger, 0.1);
-                color: $accent-danger;
+                background: #f0f0f0;
+                color: $text-primary;
               }
 
               &.svg, &.png, &.jpg {
-                background: rgba($accent-success, 0.1);
-                color: $accent-success;
+                background: #f0f0f0;
+                color: $text-primary;
               }
 
               &.file {
-                background: rgba($text-muted, 0.1);
-                color: $text-muted;
+                background: #f0f0f0;
+                color: $text-primary;
               }
             }
 
             .file-counter {
-              color: $text-muted;
+              color: $text-secondary;
               font-size: 14px;
               font-weight: 500;
             }
@@ -472,13 +506,14 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           height: calc(100% - 80px);
 
           .file-display {
-            background: $light-bg-secondary;
+            background: #fafafa;
             border-radius: $radius;
-            border: 1px solid $light-border;
+            border: 2px solid $light-border;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 
             .pdf-viewer, .image-viewer {
               width: 100%;
@@ -507,15 +542,16 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        border: 1px solid $light-border;
+        border: 2px solid $light-border;
 
         .column-header {
           padding: 20px 24px;
-          background: $light-bg-tertiary;
-          border-bottom: 1px solid $light-border;
+          background: $light-bg-primary;
+          border-bottom: 2px solid $light-border;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          box-shadow: $shadow-sm;
 
           .column-title {
             display: flex;
@@ -523,7 +559,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             gap: 12px;
 
             svg {
-              color: $accent-primary;
+              color: $text-primary;
             }
 
             h2 {
@@ -535,29 +571,31 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           }
 
           .file-count {
-            background: $accent-primary;
+            background: $text-primary;
             color: $light-bg-primary;
             padding: 6px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
+            border: 1px solid $text-primary;
           }
         }
 
         &.exercise-column {
           .column-header {
             .column-title svg {
-              color: $accent-primary;
+              color: $text-primary;
             }
           }
 
           .file-card {
-            border-color: rgba($accent-primary, 0.2);
+            border-color: $light-border;
 
             &:hover {
-              border-color: $accent-primary;
+              border-color: $text-primary;
               box-shadow: $shadow-lg;
               transform: translateY(-2px);
+              background: #f8f8f8;
             }
           }
         }
@@ -565,21 +603,22 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         &.solution-column {
           .column-header {
             .column-title svg {
-              color: $accent-success;
+              color: $text-primary;
             }
 
             .file-count {
-              background: $accent-success;
+              background: $text-primary;
             }
           }
 
           .file-card {
-            border-color: rgba($accent-success, 0.2);
+            border-color: $light-border;
 
             &:hover {
-              border-color: $accent-success;
+              border-color: $text-primary;
               box-shadow: $shadow-lg;
               transform: translateY(-2px);
+              background: #f8f8f8;
             }
           }
         }
@@ -615,17 +654,18 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             gap: 16px;
 
             .file-card {
-              border: 1px solid $light-border;
+              border: 2px solid $light-border;
               border-radius: $radius;
-              background: $light-bg-secondary;
+              background: $light-bg-primary;
               box-shadow: $shadow-sm;
               overflow: hidden;
               transition: $transition;
 
               .file-card-header {
                 padding: 16px;
-                background: $light-bg-tertiary;
-                border-bottom: 1px solid $light-border;
+                background: $light-bg-primary;
+                border-bottom: 2px solid $light-border;
+                box-shadow: $shadow-sm;
 
                 .file-info {
                   display: flex;
@@ -644,20 +684,21 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                     padding: 4px 8px;
                     border-radius: 4px;
                     text-transform: uppercase;
+                    border: 1px solid $light-border;
 
                     &.pdf {
-                      background: rgba($accent-danger, 0.1);
-                      color: $accent-danger;
+                      background: #f0f0f0;
+                      color: $text-primary;
                     }
 
                     &.svg, &.png, &.jpg {
-                      background: rgba($accent-success, 0.1);
-                      color: $accent-success;
+                      background: #f0f0f0;
+                      color: $text-primary;
                     }
 
                     &.file {
-                      background: rgba($text-muted, 0.1);
-                      color: $text-muted;
+                      background: #f0f0f0;
+                      color: $text-primary;
                     }
                   }
                 }
@@ -668,16 +709,18 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: $light-bg-primary;
+                background: #fafafa;
                 min-height: 300px;
+                border-top: 1px solid $light-border;
 
                 .card-viewer {
                   width: 100%;
                   height: 300px;
-                  border: none;
+                  border: 2px solid $light-border;
                   border-radius: $radius;
                   object-fit: contain;
-                  background: $light-bg-secondary;
+                  background: $light-bg-primary;
+                  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
                 }
               }
             }
@@ -720,6 +763,12 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       left: 16px;
       width: 40px;
       height: 40px;
+      border-width: 2px;
+      box-shadow: $shadow-md;
+
+      &:hover {
+        box-shadow: $shadow-lg;
+      }
     }
 
     .exercise-sidebar {
@@ -729,6 +778,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       height: 100vh;
       z-index: 999;
       box-shadow: $shadow-xl;
+      border-right-width: 2px;
 
       &.collapsed {
         transform: translateX(-100%);
@@ -737,6 +787,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
       .sidebar-header {
         padding: 70px 20px 20px 20px;
+        border-bottom-width: 2px;
       }
     }
 
@@ -748,11 +799,45 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         .file-navigation {
           width: 100%;
           max-width: none;
+          border-width: 2px;
 
           .file-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 8px;
+
+            .file-grid-item {
+              border-width: 2px;
+              box-shadow: $shadow-sm;
+
+              &:hover {
+                box-shadow: $shadow-md;
+              }
+
+              &.active {
+                box-shadow: $shadow-md;
+              }
+            }
+          }
+        }
+
+        .file-preview-card {
+          border-width: 2px;
+
+          .file-preview-header {
+            padding: 16px;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch;
+            border-bottom-width: 2px;
+          }
+
+          .file-preview-area {
+            padding: 12px;
+
+            .file-display {
+              border-width: 2px;
+            }
           }
         }
       }
@@ -802,6 +887,7 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         .nav-tab {
           padding: 12px;
           font-size: 13px;
+
         }
       }
     }
@@ -812,22 +898,34 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
         .file-navigation {
           padding: 12px;
+          border-width: 2px;
 
           .file-grid {
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+
+            .file-grid-item {
+              border-width: 2px;
+            }
           }
         }
 
         .file-preview-card {
+          border-width: 2px;
+
           .file-preview-header {
             padding: 16px;
             flex-direction: column;
             gap: 8px;
             align-items: stretch;
+            border-bottom-width: 2px;
           }
 
           .file-preview-area {
             padding: 12px;
+
+            .file-display {
+              border-width: 2px;
+            }
           }
         }
       }
@@ -836,8 +934,11 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         padding: 8px;
 
         .column {
+          border-width: 2px;
+
           .column-header {
             padding: 16px;
+            border-bottom-width: 2px;
 
             .column-title h2 {
               font-size: 16px;
@@ -848,12 +949,19 @@ $sidebar-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             padding: 12px;
 
             .files-grid .file-card {
+              border-width: 2px;
+
+              .file-card-header {
+                border-bottom-width: 2px;
+              }
+
               .file-card-content {
                 min-height: 150px;
                 padding: 8px;
 
                 .card-viewer {
                   height: 150px;
+                  border-width: 2px;
                 }
               }
             }

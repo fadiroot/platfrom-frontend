@@ -3,16 +3,37 @@
 // Subject List Container
 .subject-list-container {
   @include student-container;
+  position: relative;
 }
-
+.subject-list-cap{
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top:25px;
+    left: 0;
+}
+.subject-list-arrow{
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        top: 80px;
+        opacity: 0.4;
+        right: 0;
+}
 .subject-list-title {
-  @include student-title;
+//   @include student-title;
   text-align: center;
+  font-size: 2.5rem;
+  font-family: 'inter';
+  font-weight: 700;
 }
 
 .subject-list-subtitle {
   @include student-subtitle;
   margin-bottom: 3rem;
+  font-family: 'inter';
+  font-size: 1rem;
+  font-weight: 500;
   text-align: center;
 }
 
@@ -24,41 +45,86 @@
 
 // Subject Card
 .subject-card {
-  @include student-card;
-  padding: 2rem 1.5rem;
   display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #000;
+  background-color: #000;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 2px 2px 2px 2px #000;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 1rem 1.5rem;
   flex-direction: column;
   align-items: flex-start;
-  min-height: 260px;
   border-radius: 12px;
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px 0px #000;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: translate(0, 0);
+      box-shadow: 2px 2px 0px 0px #000;
+    }
+  }
+
+  // Dark mode styles
+  @media (prefers-color-scheme: dark) {
+    background-color: #fff;
+    color: #000;
+    box-shadow: 2px 2px 0px 0px #757373;
+
+    &:hover {
+      box-shadow: 3px 3px 0px 0px #757373;
+    }
+
+    &:disabled:hover {
+      box-shadow: 2px 2px 0px 0px #757373;
+    }
   }
 }
 
 .subject-icon {
   font-size: 2.7rem;
-  margin-bottom: 1rem;
-  color: var(--student-primary);
+  color: #fff;
   transition: color 0.3s ease;
+
+  @media (prefers-color-scheme: dark) {
+    color: #000;
+  }
 }
 
 .subject-name {
   font-size: 1.35rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: var(--student-primary);
+  color: #fff;
   letter-spacing: 0.01em;
   transition: color 0.3s ease;
+
+  @media (prefers-color-scheme: dark) {
+    color: #000;
+  }
 }
 
 .subject-description {
-  color: var(--student-text-secondary);
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 1.2rem;
   line-height: 1.5;
   font-size: 1rem;
   transition: color 0.3s ease;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgba(0, 0, 0, 0.7);
+  }
 }
 
 .subject-meta {
@@ -70,15 +136,59 @@
 }
 
 .chapter-count {
-  color: var(--student-text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
+
+  @media (prefers-color-scheme: dark) {
+    color: rgba(0, 0, 0, 0.6);
+  }
 }
 
 .explore-button {
-  @include student-button-primary;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid #000;
+  background-color: #000;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 2px 2px 0px 0px #000;
+  transition: all 0.3s ease;
+  cursor: pointer;
   padding: 0.5rem 1.2rem;
   font-size: 1rem;
-  box-shadow: var(--student-shadow-md);
+  border-radius: 4px;
+
+  &:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px 0px #000;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: translate(0, 0);
+      box-shadow: 2px 2px 0px 0px #000;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #fff;
+    color: #000;
+    box-shadow: 2px 2px 0px 0px #757373;
+
+    &:hover {
+      box-shadow: 3px 3px 0px 0px #757373;
+    }
+
+    &:disabled:hover {
+      box-shadow: 2px 2px 0px 0px #757373;
+    }
+  }
 }
 
 // Additional responsive adjustments
