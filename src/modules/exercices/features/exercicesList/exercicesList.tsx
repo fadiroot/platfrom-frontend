@@ -16,7 +16,7 @@ const ExercisesList: React.FC = () => {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [chapterTitle, setChapterTitle] = useState<string>('');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-  const [showCorrection, setShowCorrection] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,22 +74,10 @@ const ExercisesList: React.FC = () => {
   
   const handleExerciseClick = (exercise: Exercise) => {
     setSelectedExercise(exercise);
-    setShowCorrection(false);
   };
   
   const handleCloseExercise = () => {
     setSelectedExercise(null);
-    setShowCorrection(false);
-  };
-  
-  const toggleExerciseCompletion = (exerciseId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setExercises(exercises.map(ex => 
-      ex.id === exerciseId ? { ...ex, completed: !ex.completed } : ex
-    ));
-    
-    // In a real app, you would send this update to your backend
-    console.log(`Exercise ${exerciseId} marked as ${!exercises.find(ex => ex.id === exerciseId)?.completed ? 'completed' : 'incomplete'}`);
   };
   
   return (
@@ -108,7 +96,7 @@ const ExercisesList: React.FC = () => {
             </button>
 
             <div className="header-content">
-              <h1 className="exercises-list-title">{chapterTitle}</h1>
+              <h1 className="exercises-list-title">{chapterTitle} - {t('exercises.title')}</h1>
               <p className="exercises-list-subtitle">{t('exercises.subtitle')}</p>
             </div>
           </div>

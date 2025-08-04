@@ -37,7 +37,6 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({ exercise, onClick, onToggle
           <div className="title-section">
             <h3 className="exercise-title">{exercise.name}</h3>
             <div className="badges">
-              <span className="subject-badge">{exercise.subjectId}</span>
               <span className={`difficulty-badge difficulty-${exercise.tag}`}>{getDifficultyText(exercise.tag)}</span>
             </div>
           </div>

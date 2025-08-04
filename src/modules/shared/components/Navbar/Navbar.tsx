@@ -13,7 +13,7 @@ import { ReactComponent as ProfileIcon } from "../../assets/icons/sidebar/profil
 import { ReactComponent as SettingsIcon } from "../../assets/icons/navbar/settings.svg"
 import { ReactComponent as LogoutIcon } from "../../assets/icons/navbar/logout.svg"
 import { useAppDispatch } from "../../store"
-import { logout } from "@src/modules/auth/data/authThunk"
+import { logout } from "../../../auth/data/authThunk"
 import { useTranslation } from "react-i18next"
 import { useState } from "react"
 
@@ -202,7 +202,7 @@ const Navbar: React.FC<INavbarProps> = ({ setShowSidebar, setCollapseSidebar, co
 
         {/* Right Section */}
         <div className="navbar-right">
-          <Space size="medium" className="navbar-actions">
+          <Space size={16} className="navbar-actions">
             {/* Language Selector */}
             <Tooltip title="Change Language" placement="bottom">
               <Dropdown

@@ -14,6 +14,7 @@ interface ChapterFormData {
   type: 'Theory' | 'Practical' | 'Assessment' | null
   estimated_time: string | null
   subject_id: string | null
+  exercise_count: number | null
 }
 
 const ChapterManagement: React.FC = () => {
@@ -28,7 +29,8 @@ const ChapterManagement: React.FC = () => {
     difficulty: null,
     type: null,
     estimated_time: '',
-    subject_id: null
+    subject_id: null,
+    exercise_count: null
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -89,7 +91,8 @@ const ChapterManagement: React.FC = () => {
       difficulty: chapter.difficulty,
       type: chapter.type,
       estimated_time: chapter.estimated_time,
-      subject_id: chapter.subject_id
+      subject_id: chapter.subject_id,
+      exercise_count: chapter.exercise_count
     })
     setShowForm(true)
   }
@@ -116,7 +119,8 @@ const ChapterManagement: React.FC = () => {
       difficulty: null,
       type: null,
       estimated_time: '',
-      subject_id: null
+      subject_id: null,
+      exercise_count: null
     })
     setEditingChapter(null)
     setShowForm(false)

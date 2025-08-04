@@ -2,7 +2,7 @@
 
 import type React from 'react'
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+
 import './ExerciseViewer.scss'
 import type { Exercise } from '../../types/exercise'
 
@@ -14,7 +14,7 @@ interface ExerciseViewerProps {
 const validUrl = (url: string) => url && url !== 'string'
 
 const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onClose }) => {
-  const navigate = useNavigate()
+
   const [activeTab, setActiveTab] = useState<'exercise' | 'correction' | 'hybrid'>('exercise')
   const [selectedFileIdx, setSelectedFileIdx] = useState(0)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)

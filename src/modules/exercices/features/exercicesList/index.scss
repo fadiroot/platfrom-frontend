@@ -9,6 +9,22 @@
     
     .back-button {
       @include student-back-button;
+      box-shadow: 2px 2px 0px 0px #000;
+      border: 2px solid #000;
+      padding: 0.5rem 1rem;
+      &:hover{
+          transition: all 0.3s ease;
+          transform: translate(-1px, -1px);
+          background-color: black;
+          color: white;
+          box-shadow: 2px 2px 0px 0px #000;
+
+          svg{
+              transition: all 0.3s ease;
+              stroke:white;
+              color: white;
+          }
+      }
     }
     
     .header-content {

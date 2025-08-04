@@ -1,5 +1,5 @@
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
-import { VITE_APP_ENABLE_REDUX_DEVTOOLS } from '@src/config'
+import { VITE_APP_ENABLE_REDUX_DEVTOOLS } from '../../../config'
 import { configureStore } from '@reduxjs/toolkit'
 import rootReducer from './rootReducer'
 

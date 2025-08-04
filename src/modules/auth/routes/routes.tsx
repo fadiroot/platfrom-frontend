@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import GuestLayout from '@src/modules/shared/layout/GuestLayout/GuestLayout'
+import GuestLayout from '../../shared/layout/GuestLayout/GuestLayout'
 import GuestGuard from '../../shared/guards/GuestGuard'
 import { Navigate, RouteProps } from 'react-router-dom'
 import { Fragment, lazy } from 'react'

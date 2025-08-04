@@ -31,7 +31,7 @@ export const uploadFile = async (
   file: File,
   options: UploadOptions = {}
 ): Promise<{ path: string; url: string }> => {
-  const { onProgress, cacheControl = '3600', contentType, upsert = false } = options
+  const { cacheControl = '3600', contentType, upsert = false } = options
 
   // Create a unique filename if needed
   const timestamp = Date.now()
@@ -292,7 +292,7 @@ export const setupStorageBuckets = async () => {
   const buckets = Object.values(STORAGE_BUCKETS)
   
   for (const bucket of buckets) {
-    const { data, error } = await supabase.storage.createBucket(bucket, {
+    const { error } = await supabase.storage.createBucket(bucket, {
       public: true, // Make files publicly accessible
       allowedMimeTypes: bucket === STORAGE_BUCKETS.EXERCISE_FILES || bucket === STORAGE_BUCKETS.CORRECTION_FILES
         ? ['application/pdf', 'image/*'] // Allow both PDFs and images for exercise files

@@ -61,37 +61,9 @@ const ChaptersList: React.FC = () => {
     navigate(`/subjects/${subjectId}/chapters/${chapterId}/exercises`)
   }
 
-  const getDifficultyClass = (difficulty?: string | null) => {
-    switch (difficulty) {
-      case 'Beginner':
-        return 'difficulty-beginner'
-      case 'Intermediate':
-        return 'difficulty-intermediate'
-      case 'Advanced':
-        return 'difficulty-advanced'
-      default:
-        return 'difficulty-default'
-    }
-  }
 
-  const getTypeClass = (type?: string | null) => {
-    switch (type) {
-      case 'Theory':
-        return 'type-theory'
-      case 'Practical':
-        return 'type-practical'
-      case 'Assessment':
-        return 'type-assessment'
-      default:
-        return 'type-default'
-    }
-  }
 
-  const getStatusInfo = (progress?: number) => {
-    if (!progress) return { text: t('chapters.status.not_started'), class: 'status-not-started' }
-    if (progress === 100) return { text: t('chapters.status.completed'), class: 'status-completed' }
-    return { text: t('chapters.status.in_progress'), class: 'status-in-progress' }
-  }
+
 
   const totalExercises = chapters.reduce((sum, chapter) => sum + (chapter.exercise_count || 0), 0)
   const completedChapters = chapters.filter((c) => c.progress === 100).length
@@ -116,7 +88,6 @@ const ChaptersList: React.FC = () => {
 
         <div className="header-content">
           <h1 className="course-title">{subjectName}</h1>
-          <p className="course-subtitle">{t('chapters.courseSubtitle')}</p>
         </div>
 
         {/* Course Statistics */}
@@ -218,8 +189,6 @@ const ChaptersList: React.FC = () => {
       ) : (
         <div className="chapters-list">
           {chapters.map((chapter, index) => {
-            const status = getStatusInfo(chapter.progress)
-
             return (
               <div
                 className="chapter-card"
@@ -232,20 +201,6 @@ const ChaptersList: React.FC = () => {
                   <div className="chapter-main">
                     <div className="chapter-title-row">
                       <h2 className="chapter-title">{chapter.name || chapter.title}</h2>
-                      <div className="chapter-badges">
-                        {chapter.type && (
-                          <span className={`type-badge ${getTypeClass(chapter.type)}`}>
-                            {chapter.type}
-                          </span>
-                        )}
-                        {chapter.difficulty && (
-                          <span
-                            className={`difficulty-badge ${getDifficultyClass(chapter.difficulty)}`}
-                          >
-                            {chapter.difficulty}
-                          </span>
-                        )}
-                      </div>
                     </div>
 
                     <p className="chapter-description">
@@ -288,7 +243,6 @@ const ChaptersList: React.FC = () => {
                   </div>
 
                   <div className="chapter-actions">
-                    <div className={`status-badge ${status.class}`}>{status.text}</div>
                     <button className="action-btn">
                       {chapter.progress === 100
                         ? t('chapters.review')

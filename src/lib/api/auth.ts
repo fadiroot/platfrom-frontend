@@ -235,7 +235,7 @@ export const getUserWithLevel = async (user: User): Promise<UserProfile & { leve
     
     if (!error && data) {
       levelId = data.level_id // Already a UUID string
-      level = data.levels as Tables<'levels'>
+      level = Array.isArray(data.levels) ? data.levels[0] : data.levels
     }
   } catch (error) {
     console.error('💥 Exception in getUserWithLevel:', error)

@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useFormik } from "formik"
@@ -80,7 +80,7 @@ const RegisterComponent = () => {
         .unwrap()
         .then((result) => {
           console.log("Account created successfully")
-          navigate(`/subjects?levelId=${result.user.levelId}`)
+          navigate(`/subjects?levelId=${result.user.level_id}`)
         })
         .catch((err: { message: any }) => {
           alert(err?.message || "Something went wrong")

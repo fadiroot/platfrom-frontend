@@ -29,7 +29,7 @@ export const createNewLevel = createAsyncThunk(
   'levels/createLevel',
   async (levelData: { title: string; description?: string }, { rejectWithValue }) => {
     try {
-      const level = await createLevel(levelData);
+      const level = await createLevel({ ...levelData, description: levelData.description || null });
       return level;
     } catch (err: any) {
       return rejectWithValue(err.message || 'Failed to create level');
