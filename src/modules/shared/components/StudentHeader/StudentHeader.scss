@@ -12,14 +12,14 @@
 
 // Dark theme variables for header (maintaining minimal design)
 #dark {
-  --header-bg: #ffffff;
-  --header-border: #000000;
-  --header-text-primary: #000000;
-  --header-text-secondary: #666666;
-  --header-text-muted: #999999;
-  --header-button-border: #000000;
-  --header-button-hover-bg: #f5f5f5;
-  --header-button-hover-border: #000000;
+  --header-bg: #1a1a1a;
+  --header-border: #ffffff;
+  --header-text-primary: #ffffff;
+  --header-text-secondary: #cccccc;
+  --header-text-muted: #888888;
+  --header-button-border: #ffffff;
+  --header-button-hover-bg: #2a2a2a;
+  --header-button-hover-border: #ffffff;
 }
 
 .student-header {
@@ -30,7 +30,7 @@
   top: 0;
   z-index: 100;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 0px 0px #000000;
+  box-shadow: 0 2px 0px 0px var(--header-border);
   
   &__container {
     display: flex;
@@ -97,11 +97,24 @@
     gap: 1rem;
   }
 
-  &__username {
-    font-size: 0.875rem;
-    color: var(--header-text-secondary);
-    font-weight: 500;
-    transition: color 0.3s ease;
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 1rem;
+    
+    .user-name {
+      font-weight: 600;
+      color: var(--header-text-primary);
+      font-size: 0.9rem;
+    }
+    
+    .user-level {
+      font-size: 0.75rem;
+      color: var(--header-text-secondary);
+      font-weight: 400;
+      margin-top: 0.1rem;
+    }
   }
 
   &__logout {
@@ -110,24 +123,24 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: #ffffff;
+    background: var(--header-bg);
     border: 2px solid var(--header-button-border);
     border-radius: 6px;
     color: var(--header-text-secondary);
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 2px 2px 0px 0px #000000;
+    box-shadow: 2px 2px 0px 0px var(--header-border);
 
     &:hover {
-      background: #000000;
-      color: #ffffff;
+      background: var(--header-button-hover-bg);
+      color: var(--header-text-primary);
       transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0px 0px #000000;
+      box-shadow: 3px 3px 0px 0px var(--header-border);
     }
 
     &:active {
       transform: translate(0px, 0px);
-      box-shadow: 2px 2px 0px 0px #000000;
+      box-shadow: 2px 2px 0px 0px var(--header-border);
     }
   }
 
@@ -138,18 +151,18 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      background: #ffffff;
+      background: var(--header-bg);
       border: 2px solid var(--header-button-border);
       border-radius: 8px;
       padding: 0.5rem 0.75rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 2px 2px 0px 0px #000000;
+      box-shadow: 2px 2px 0px 0px var(--header-border);
 
       &:hover {
         background: var(--header-button-hover-bg);
         transform: translate(-1px, -1px);
-        box-shadow: 3px 3px 0px 0px #000000;
+        box-shadow: 3px 3px 0px 0px var(--header-border);
       }
 
       .current-flag {
@@ -173,10 +186,10 @@
       position: absolute;
       top: 100%;
       right: 0;
-      background: #ffffff;
+      background: var(--header-bg);
       border: 2px solid var(--header-border);
       border-radius: 8px;
-      box-shadow: 4px 4px 0px 0px #000000;
+      box-shadow: 4px 4px 0px 0px var(--header-border);
       z-index: 1000;
       min-width: 160px;
       overflow: hidden;
@@ -201,11 +214,11 @@
         }
 
         &.active {
-          background: #000000;
-          color: white;
+          background: var(--header-text-primary);
+          color: var(--header-bg);
 
           .language-name {
-            color: white;
+            color: var(--header-bg);
           }
         }
 
@@ -225,7 +238,7 @@
 
         .language-active-indicator {
           margin-left: auto;
-          color: white;
+          color: var(--header-bg);
           font-weight: bold;
         }
       }
@@ -235,7 +248,7 @@
   // Responsive design
   @media (max-width: 768px) {
     padding: 0.75rem 1rem;
-    box-shadow: 0 2px 0px 0px #000000;
+    box-shadow: 0 2px 0px 0px var(--header-border);
 
     &__brand {
       gap: 0.5rem;
@@ -262,25 +275,25 @@
     &__logout {
       width: 32px;
       height: 32px;
-      box-shadow: 1px 1px 0px 0px #000000;
+      box-shadow: 1px 1px 0px 0px var(--header-border);
 
       &:hover {
-        box-shadow: 2px 2px 0px 0px #000000;
+        box-shadow: 2px 2px 0px 0px var(--header-border);
       }
     }
 
     &__language-switcher {
       .language-selector {
         padding: 0.25rem 0.5rem;
-        box-shadow: 1px 1px 0px 0px #000000;
+        box-shadow: 1px 1px 0px 0px var(--header-border);
 
         &:hover {
-          box-shadow: 2px 2px 0px 0px #000000;
+          box-shadow: 2px 2px 0px 0px var(--header-border);
         }
       }
 
       .language-dropdown {
-        box-shadow: 2px 2px 0px 0px #000000;
+        box-shadow: 2px 2px 0px 0px var(--header-border);
       }
     }
   }

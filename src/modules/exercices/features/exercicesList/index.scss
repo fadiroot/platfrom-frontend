@@ -1,4 +1,4 @@
-@import '../../../shared/assets/styles/abstracts/student-theme';
+@use '../../../shared/assets/styles/abstracts/student-theme' as *;
 
 .exercises-list-container {
   @include student-container;

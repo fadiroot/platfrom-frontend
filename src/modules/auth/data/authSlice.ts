@@ -10,6 +10,8 @@ export interface AuthState {
     id: string
     name: string
     email: string
+    firstName: string
+    lastName: string
     level_id: string | null
     level: {
       id: string

@@ -1,4 +1,4 @@
-@import '../../../shared/assets/styles/abstracts/student-theme';
+@use '../../../shared/assets/styles/abstracts/student-theme' as *;
 
 .exercise-card {
   position: relative;
@@ -252,7 +252,7 @@
         color: #ffffff;
 
         &:hover {
-          background: #333333;
+          background: #000000;
         }
       }
     }
@@ -265,8 +265,8 @@
       padding: 10px 16px;
       font-size: 12px;
       font-weight: 600;
-      background: #ffffff;
-      color: #000000;
+      background: #000000;
+      color: #ffffff;
       border: 2px solid #000000;
       border-radius: 6px;
       cursor: pointer;
@@ -275,14 +275,14 @@
       margin: 0;
       
       span {
-        color: #000000;
+        color: #ffffff;
       }
       
       .icon, .arrow-icon {
         width: 14px;
         height: 14px;
-        color: #000000;
-        stroke: #000000;
+        color: #ffffff;
+        stroke: #ffffff;
       }
 
       &:hover {

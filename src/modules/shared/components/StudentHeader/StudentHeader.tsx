@@ -15,6 +15,8 @@ const StudentHeader: React.FC = () => {
   const dispatch = useAppDispatch()
   const { user } = useAppSelector((state) => state.auth)
   const { t, i18n } = useTranslation('translation')
+  
+
   const [lang, setLang] = useState(i18n?.language?.toString() || 'en')
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -124,9 +126,16 @@ const StudentHeader: React.FC = () => {
           
           {user && (
             <div className="student-header__user">
-              <span className="student-header__username">
-                {user.name || user.email}
-              </span>
+              <div className="user-info">
+                <div className="user-name">
+                  {user?.firstName && user?.lastName
+                    ? `${user.firstName} ${user.lastName}`
+                    : user?.name || user?.email}
+                </div>
+                {user?.level && (
+                  <div className="user-level">{user.level.title}</div>
+                )}
+              </div>
               <button 
                 className="student-header__logout"
                 onClick={handleLogout}

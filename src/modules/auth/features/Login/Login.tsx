@@ -10,6 +10,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAppDispatch } from "../../../../modules/shared/store"
 import { login } from "../../data/authThunk"
 import { PATH } from "../../routes/paths"
+import ErrorModal from "../../components/ErrorModal"
 import "./_Login.scss"
 
 // Custom Input Component to match your original styling
@@ -87,6 +88,8 @@ const LoginComponent = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
+  const [showError, setShowError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const formik = useFormik({
     initialValues,
@@ -107,7 +110,8 @@ const LoginComponent = () => {
           }
         })
         .catch((err) => {
-          alert(err?.message || "Login failed")
+          setErrorMessage(err?.message || "Login failed")
+          setShowError(true)
         })
         .finally(() => {
           setSubmitting(false)
@@ -154,6 +158,13 @@ const LoginComponent = () => {
           Don't have an account? Sign Up
         </Link>
       </div>
+      
+      <ErrorModal 
+         isOpen={showError} 
+         onClose={() => setShowError(false)} 
+         title="Login Failed"
+         message={errorMessage} 
+       />
     </div>
   )
 }

@@ -37,6 +37,8 @@ export const login = createAsyncThunk(
               id: user.id,
               email: user.email || '',
               name: `${updatedUserWithLevel.firstName} ${updatedUserWithLevel.lastName}`.trim() || user.email || '',
+              firstName: updatedUserWithLevel.firstName || '',
+              lastName: updatedUserWithLevel.lastName || '',
               level_id: updatedUserWithLevel.levelId || null,
               level: updatedUserWithLevel.level || null
             },
@@ -57,6 +59,8 @@ export const login = createAsyncThunk(
           id: user.id,
           email: user.email || '',
           name: `${userWithLevel.firstName} ${userWithLevel.lastName}`.trim() || user.email || '',
+          firstName: userWithLevel.firstName || '',
+          lastName: userWithLevel.lastName || '',
           level_id: userWithLevel.levelId || null,
           level: userWithLevel.level || null
         },
@@ -93,6 +97,8 @@ export const register = createAsyncThunk(
           id: user.id,
           email: user.email || '',
           name: `${userData.firstName} ${userData.lastName}`.trim(),
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
           level_id: userData.levelId || null,
           level: null // Will be fetched on login
         },
@@ -146,6 +152,8 @@ export const initializeAuth = createAsyncThunk(
           id: user.id,
           email: user.email || '',
           name: `${userWithLevel.firstName} ${userWithLevel.lastName}`.trim() || user.email || '',
+          firstName: userWithLevel.firstName || '',
+          lastName: userWithLevel.lastName || '',
           level_id: userWithLevel.levelId || null,
           level: userWithLevel.level || null
         }

@@ -1,4 +1,4 @@
-@import '../../../shared/assets/styles/abstracts/student-theme';
+@use '../../../shared/assets/styles/abstracts/student-theme' as *;
 
 // Subject List Container
 .subject-list-container {
@@ -21,7 +21,7 @@
         right: 0;
 }
 .subject-list-title {
-//   @include student-title;
+  @include student-title;
   text-align: center;
   font-size: 2.5rem;
   font-weight: 700;
@@ -47,11 +47,11 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  border: 2px solid #000;
-  background-color: #fff !important;
+  border: 2px solid var(--student-text-primary);
+  background-color: var(--student-bg-secondary);
   font-weight: 700;
-  color: black !important;
-  box-shadow: 2px 2px 2px 2px #000;
+  color: var(--student-text-primary);
+  box-shadow: 2px 2px 2px 2px var(--student-text-primary);
   transition: all 0.3s ease;
   cursor: pointer;
   padding: 1rem 1.5rem;
@@ -61,7 +61,7 @@
 
   &:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0px 0px #000;
+    box-shadow: 3px 3px 0px 0px var(--student-text-primary);
   }
 
   &:disabled {
@@ -70,29 +70,14 @@
 
     &:hover {
       transform: translate(0, 0);
-      box-shadow: 2px 2px 0px 0px #000;
-    }
-  }
-
-  // Dark mode styles
-  @media (prefers-color-scheme: dark) {
-    background-color: #fff;
-    color: #000;
-    box-shadow: 2px 2px 0px 0px #757373;
-
-    &:hover {
-      box-shadow: 3px 3px 0px 0px #757373;
-    }
-
-    &:disabled:hover {
-      box-shadow: 2px 2px 0px 0px #757373;
+      box-shadow: 2px 2px 0px 0px var(--student-text-primary);
     }
   }
 }
 
 .subject-icon {
   font-size: 2.7rem;
-  color: #000;
+  color: var(--student-text-primary);
   transition: color 0.3s ease;
   display: flex;
   align-items: center;
@@ -105,20 +90,12 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: brightness(0) saturate(100%); // Makes SVG black
+    filter: brightness(0) saturate(100%);
     transition: filter 0.3s ease;
   }
 
   .default-icon {
     font-size: 2.7rem;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    color: #000;
-    
-    .subject-icon-img {
-      filter: brightness(0) saturate(100%); // Keep black in dark mode too
-    }
   }
 }
 
@@ -126,25 +103,17 @@
   font-size: 1.35rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #000;
+  color: var(--student-text-primary);
   letter-spacing: 0.01em;
   transition: color 0.3s ease;
-
-  @media (prefers-color-scheme: dark) {
-    color: #000;
-  }
 }
 
 .subject-description {
-  color: #000;
+  color: var(--student-text-secondary);
   margin-bottom: 1.2rem;
   line-height: 1.5;
   font-size: 1rem;
   transition: color 0.3s ease;
-
-  @media (prefers-color-scheme: dark) {
-    color: rgba(0, 0, 0, 0.7);
-  }
 }
 
 .subject-meta {
@@ -156,12 +125,8 @@
 }
 
 .chapter-count {
-  color: #000;
+  color: var(--student-text-secondary);
   font-size: 0.9rem;
-
-  @media (prefers-color-scheme: dark) {
-    color: rgba(0, 0, 0, 0.6);
-  }
 }
 
 .explore-button {
@@ -170,11 +135,11 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 2px solid #000;
-  background-color: #000;
+  border: 2px solid #000000;
+  background-color: #000000;
   font-weight: 700;
-  color: #fff;
-  box-shadow: 2px 2px 0px 0px #000;
+  color: var(--student-bg-secondary);
+  box-shadow: 2px 2px 0px 0px #000000;
   transition: all 0.3s ease;
   cursor: pointer;
   padding: 0.5rem 1.2rem;
@@ -183,7 +148,7 @@
 
   &:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0px 0px #000;
+    box-shadow: 3px 3px 0px 0px #000000;
   }
 
   &:disabled {
@@ -192,21 +157,7 @@
 
     &:hover {
       transform: translate(0, 0);
-      box-shadow: 2px 2px 0px 0px #000;
-    }
-  }
-
-  @media (prefers-color-scheme: dark) {
-    background-color: #fff;
-    color: #000;
-    box-shadow: 2px 2px 0px 0px #757373;
-
-    &:hover {
-      box-shadow: 3px 3px 0px 0px #757373;
-    }
-
-    &:disabled:hover {
-      box-shadow: 2px 2px 0px 0px #757373;
+      box-shadow: 2px 2px 0px 0px #000000;
     }
   }
 }

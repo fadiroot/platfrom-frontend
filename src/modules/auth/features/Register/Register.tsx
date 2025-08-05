@@ -12,6 +12,8 @@ import { PATH } from "../../routes/paths"
 import { fetchLevels } from "../../../levels/data/levelThunk"
 import { Level } from "../../../levels/data/levelTypes"
 import CustomSelect from "../../../shared/components/CustomSelect/CustomSelect"
+import EmailVerificationModal from "../../components/EmailVerificationModal"
+import ErrorModal from "../../components/ErrorModal"
 import "./_Register.scss"
 
 const initialValues = {
@@ -33,6 +35,10 @@ const RegisterComponent = () => {
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showEmailVerification, setShowEmailVerification] = useState(false)
+  const [showError, setShowError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [userEmail, setUserEmail] = useState('')
   const { levels, loading: levelsLoading } = useAppSelector((state: any) => state.levels)
 
   useEffect(() => {
@@ -65,6 +71,7 @@ const RegisterComponent = () => {
     }),
     onSubmit: (values) => {
       setSubmitting(true)
+      setUserEmail(values.email)
       // Map form values to API DTO
       const payload = {
         email: values.email,
@@ -80,10 +87,15 @@ const RegisterComponent = () => {
         .unwrap()
         .then((result) => {
           console.log("Account created successfully")
-          navigate(`/subjects?levelId=${result.user.level_id}`)
+          if (result.requiresVerification) {
+            setShowEmailVerification(true)
+          } else {
+            navigate(`/subjects?levelId=${result.user.level_id}`)
+          }
         })
         .catch((err: { message: any }) => {
-          alert(err?.message || "Something went wrong")
+          setErrorMessage(err?.message || "Something went wrong")
+          setShowError(true)
         })
         .finally(() => {
           setSubmitting(false)
@@ -301,6 +313,24 @@ const RegisterComponent = () => {
           Already have an account? Sign In
         </Link>
       </div>
+
+      {/* Email Verification Modal */}
+      <EmailVerificationModal
+        isOpen={showEmailVerification}
+        onClose={() => {
+          setShowEmailVerification(false)
+          navigate('/login')
+        }}
+        email={userEmail}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        title="Registration Failed"
+        message={errorMessage}
+      />
     </div>
   )
 }

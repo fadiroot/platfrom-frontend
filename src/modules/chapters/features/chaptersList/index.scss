@@ -1,4 +1,4 @@
-@import '../../../shared/assets/styles/abstracts/student-theme';
+@use '../../../shared/assets/styles/abstracts/student-theme' as *;
 
 // Main Container
 .chapters-container {
@@ -12,20 +12,20 @@
 
   .back-btn {
     @include student-back-button;
-    box-shadow: 2px 2px 0px 0px #000;
-    border: 2px solid #000;
+    box-shadow: 2px 2px 0px 0px var(--student-text-primary);
+    border: 2px solid var(--student-text-primary);
     padding: 0.5rem 1rem;
     &:hover{
         transition: all 0.3s ease;
         transform: translate(-1px, -1px);
-        background-color: black;
-        color: white;
-        box-shadow: 2px 2px 0px 0px #000;
+        background-color: var(--student-text-primary);
+        color: var(--student-bg-primary);
+        box-shadow: 2px 2px 0px 0px var(--student-text-primary);
 
         svg{
             transition: all 0.3s ease;
-            stroke:white;
-            color: white;
+            stroke: var(--student-bg-primary);
+            color: var(--student-bg-primary);
         }
     }
   }
@@ -52,9 +52,9 @@
 
     .stat-card {
     //   @include student-card;
-        border: 1px solid black;
+        border: 1px solid var(--student-text-primary);
         border-radius: 4px;
-        box-shadow: 2px 2px 0px 0px #000;
+        box-shadow: 2px 2px 0px 0px var(--student-text-primary);
 
       padding: 1.25rem;
       display: flex;
@@ -64,7 +64,7 @@
 
       &:hover {
         transform: translateY(-1px);
-        box-shadow: 3px 3px 0px 0px #000;
+        box-shadow: 3px 3px 0px 0px var(--student-text-primary);
       }
 
       .stat-icon {
@@ -150,27 +150,27 @@
 // Chapter Card
 .chapter-card {
 //   @include student-card;
-border:  1px solid black;
+border:  1px solid var(--student-text-primary);
 border-radius:4px;
-box-shadow: 2px 2px 0px 0px #000;
+box-shadow: 2px 2px 0px 0px var(--student-text-primary);
   overflow: hidden;
   cursor: pointer;
    .action-btn {
 
-        border: 2px solid #000;
+        border: 2px solid var(--student-text-primary);
         padding: 0.5rem 1rem;
-        box-shadow: 2px 2px 0px 0px #000 !important;
+        box-shadow: 2px 2px 0px 0px var(--student-text-primary) !important;
     &:hover{
         transition: all 0.3s ease;
         transform: translate(-1px, -1px);
-        background-color: black;
-        color: white;
-        box-shadow: 2px 2px 0px 0px #000;
+        background-color: var(--student-text-primary);
+        color: var(--student-bg-primary);
+        box-shadow: 2px 2px 0px 0px var(--student-text-primary);
 
         svg{
             transition: all 0.3s ease;
-            stroke:white;
-            color: white;
+            stroke: var(--student-bg-primary);
+            color: var(--student-bg-primary);
         }
     }
     }
@@ -178,7 +178,7 @@ box-shadow: 2px 2px 0px 0px #000;
   &:hover {
     transition: all 0.3s ease;
     transform: translateY(-1px);
-    box-shadow: 3px 3px 0px 0px #000;
+    box-shadow: 3px 3px 0px 0px var(--student-text-primary);
     .chapter-number {
       background: var(--student-primary);
       color: var(--student-text-inverse);
@@ -230,7 +230,7 @@ box-shadow: 2px 2px 0px 0px #000;
 
         .chapter-badges {
           display: flex;
-          background-color: white !important;
+          background-color: var(--student-bg-primary) !important;
           gap: 0.5rem;
           flex-shrink: 0;
         }
@@ -279,25 +279,25 @@ box-shadow: 2px 2px 0px 0px #000;
         transition: all 0.3s ease;
         &:hover {
           transform: translate(-1px, -1px);
-          box-shadow: 2px 2px 0px 0px #000;
+          box-shadow: 2px 2px 0px 0px var(--student-text-primary);
         }
 
         &.status-not-started {
-          background: #374151;
-          color: #9ca3af;
-          border-color: #4b5563;
+          background: var(--student-bg-tertiary);
+          color: var(--student-text-secondary);
+          border-color: var(--student-border-primary);
         }
 
         &.status-in-progress {
-          background: #1e3a8a;
-          color: #93c5fd;
-          border-color: #3b82f6;
+          background: var(--student-accent);
+          color: var(--student-bg-primary);
+          border-color: var(--student-accent);
         }
 
         &.status-completed {
-          background: #064e3b;
-          color: #86efac;
-          border-color: #10b981;
+          background: var(--student-success);
+          color: var(--student-bg-primary);
+          border-color: var(--student-success);
         }
       }
 
@@ -380,66 +380,66 @@ box-shadow: 2px 2px 0px 0px #000;
 
 .type-badge {
   &.type-theory {
-    background: #1e3a8a;
-    color: #93c5fd;
-    border-color: #3b82f6;
+    background: var(--student-accent);
+    color: var(--student-bg-primary);
+    border-color: var(--student-accent);
     &:hover{
         transform: translate(-1px ,-1px);
-        box-shadow: 2px 2px 0px 0px #3b82f6 !important;
+        box-shadow: 2px 2px 0px 0px var(--student-accent) !important;
     }
   }
 
   &.type-practical {
-    background: #064e3b;
-    color: #86efac;
-    border-color: #10b981;
+    background: var(--student-success);
+    color: var(--student-bg-primary);
+    border-color: var(--student-success);
     &:hover{
         transform: translate(-1px ,-1px);
-        box-shadow: 2px 2px 0px 0px #10b981 !important;
+        box-shadow: 2px 2px 0px 0px var(--student-success) !important;
     }
   }
 
   &.type-assessment {
-    background: #92400e;
-    color: #fcd34d;
-    border-color: #f59e0b;
+    background: var(--student-warning);
+    color: var(--student-bg-primary);
+    border-color: var(--student-warning);
     &:hover{
         transform: translate(-1px ,-1px);
-        box-shadow: 2px 2px 0px 0px #f59e0b !important;
+        box-shadow: 2px 2px 0px 0px var(--student-warning) !important;
     }
   }
 }
 
 .difficulty-badge {
   &.difficulty-beginner {
-    background: #064e3b;
-    color: #86efac;
-    border-color: #10b981;
-    // box-shadow: 0 0 2px 2px #10b981 !important;
+    background: var(--student-success);
+    color: var(--student-bg-primary);
+    border-color: var(--student-success);
+    // box-shadow: 0 0 2px 2px var(--student-success) !important;
 
     &:hover{
         transform: translate(-1px ,-1px);
-        box-shadow: 2px 2px 0px 0px #10b981 !important;
+        box-shadow: 2px 2px 0px 0px var(--student-success) !important;
     }
   }
 
   &.difficulty-intermediate {
-    background: #92400e;
-    color: #fcd34d;
-    border-color: #f59e0b;
+    background: var(--student-warning);
+    color: var(--student-bg-primary);
+    border-color: var(--student-warning);
     &:hover{
         transform: translate(-1px ,-1px);
-        box-shadow: 2px 2px 0px 0px #f59e0b !important;
+        box-shadow: 2px 2px 0px 0px var(--student-warning) !important;
     }
   }
 
   &.difficulty-advanced {
-    background: #7f1d1d;
-    color: #fca5a5;
-    border-color: #ef4444;
+    background: var(--student-danger);
+    color: var(--student-bg-primary);
+    border-color: var(--student-danger);
     &:hover{
         transform: translate(-1px ,-1px);
-        box-shadow: 2px 2px 0px 0px #ef4444 !important;
+        box-shadow: 2px 2px 0px 0px var(--student-danger) !important;
     }
   }
 }
