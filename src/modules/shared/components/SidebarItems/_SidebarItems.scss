@@ -1,23 +1,25 @@
-// CSS Variables for SidebarItems
+@import '../../assets/styles/abstracts/student-theme';
+
+// Student theme variables for SidebarItems
 :root {
-  --sidebar-item-text: #374151;
-  --sidebar-item-text-hover: #1f2937;
+  --sidebar-item-text: #000000;
+  --sidebar-item-text-hover: #000000;
   --sidebar-item-text-active: #ffffff;
-  --sidebar-item-bg-hover: #f3f4f6;
-  --sidebar-item-bg-active: #3b82f6;
-  --sidebar-item-icon: #6b7280;
-  --sidebar-item-icon-hover: #374151;
+  --sidebar-item-bg-hover: #f5f5f5;
+  --sidebar-item-bg-active: #000000;
+  --sidebar-item-icon: #666666;
+  --sidebar-item-icon-hover: #000000;
   --sidebar-item-icon-active: #ffffff;
 }
 
 #dark {
-  --sidebar-item-text: #d1d5db;
-  --sidebar-item-text-hover: #f9fafb;
+  --sidebar-item-text: #000000;
+  --sidebar-item-text-hover: #000000;
   --sidebar-item-text-active: #ffffff;
-  --sidebar-item-bg-hover: #374151;
-  --sidebar-item-bg-active: #2563eb;
-  --sidebar-item-icon: #9ca3af;
-  --sidebar-item-icon-hover: #d1d5db;
+  --sidebar-item-bg-hover: #f5f5f5;
+  --sidebar-item-bg-active: #000000;
+  --sidebar-item-icon: #666666;
+  --sidebar-item-icon-hover: #000000;
   --sidebar-item-icon-active: #ffffff;
 }
 
@@ -39,11 +41,14 @@
     padding: 0 12px;
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-weight: 500;
     font-size: 0.875rem;
     overflow: hidden;
     position: relative;
+    border: 2px solid transparent;
+    margin: 4px 0;
+    box-shadow: 2px 2px 0px 0px transparent;
 
     .icon_color {
       color: var(--sidebar-item-icon);
@@ -58,6 +63,9 @@
     &:hover {
       background-color: var(--sidebar-item-bg-hover);
       color: var(--sidebar-item-text-hover);
+      border: 2px solid #000000;
+      box-shadow: 2px 2px 0px 0px #000000;
+      transform: translate(-1px, -1px);
 
       .icon_color {
         color: var(--sidebar-item-icon-hover);
@@ -69,10 +77,16 @@
     background-color: var(--sidebar-item-bg-active);
     color: var(--sidebar-item-text-active);
     font-weight: 600;
+    border: 2px solid #000000;
+    box-shadow: 2px 2px 0px 0px #000000;
+    transform: translate(-1px, -1px);
 
     &:hover {
       background-color: var(--sidebar-item-bg-active);
       color: var(--sidebar-item-text-active);
+      border: 2px solid #000000;
+      box-shadow: 3px 3px 0px 0px #000000;
+      transform: translate(-2px, -2px);
 
       .icon_color {
         color: var(--sidebar-item-icon-active);

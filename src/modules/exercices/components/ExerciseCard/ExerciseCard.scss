@@ -117,20 +117,18 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border: 2px solid #000000;
+      color: white;
 
       &.difficulty-0 {
-        background: #ffffff;
-        color: #000000;
+        background: #10b981;
       }
 
       &.difficulty-1 {
-        background: #666666;
-        color: #ffffff;
+        background: #f59e0b;
       }
 
       &.difficulty-2 {
-        background: #000000;
-        color: #ffffff;
+        background: #ef4444;
       }
     }
   }

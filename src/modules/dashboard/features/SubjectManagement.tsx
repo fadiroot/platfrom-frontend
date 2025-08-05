@@ -7,11 +7,31 @@ import './SubjectManagement.scss'
 type Subject = Tables<'subjects'>
 type Level = Tables<'levels'>
 
+// Predefined subject icons
+const SUBJECT_ICONS = [
+  { id: 'math', name: '🧮 Mathématiques', icon: '🧮', url: '/doodles/rular.svg' },
+  { id: 'physics', name: '⚗️ Physique', icon: '⚗️', url: '/doodles/science-l.svg' },
+  { id: 'chemistry', name: '🧪 Chimie', icon: '🧪', url: '/doodles/science-d.svg' },
+  { id: 'computer', name: '💻 Informatique', icon: '💻', url: '/doodles/quiz.svg' },
+  { id: 'literature', name: '📚 Littérature', icon: '📚', url: '/doodles/book.svg' },
+  { id: 'history', name: '🏛️ Histoire', icon: '🏛️', url: '/doodles/cap-d.svg' },
+  { id: 'geography', name: '🌍 Géographie', icon: '🌍', url: '/doodles/cap-l.svg' },
+  { id: 'biology', name: '🧬 Biologie', icon: '🧬', url: '/doodles/science-d.svg' },
+  { id: 'philosophy', name: '🤔 Philosophie', icon: '🤔', url: '/doodles/idea.svg' },
+  { id: 'language', name: '🗣️ Langues', icon: '🗣️', url: '/doodles/speaker.svg' },
+  { id: 'art', name: '🎨 Arts', icon: '🎨', url: '/doodles/superman.svg' },
+  { id: 'music', name: '🎵 Musique', icon: '🎵', url: '/doodles/speaker.svg' },
+  { id: 'sports', name: '⚽ Sport', icon: '⚽', url: '/doodles/superman.svg' },
+  { id: 'economics', name: '💰 Économie', icon: '💰', url: '/doodles/arrows.svg' },
+  { id: 'custom', name: '🔗 URL personnalisée', icon: '🔗', url: null }
+]
+
 interface SubjectFormData {
   title: string
   description: string | null
   level_id: string | null
   image_url: string | null
+  selected_icon: string | null
 }
 
 const SubjectManagement: React.FC = () => {
@@ -24,7 +44,8 @@ const SubjectManagement: React.FC = () => {
     title: '',
     description: '',
     level_id: null,
-    image_url: null
+    image_url: null,
+    selected_icon: null
   })
   const [submitting, setSubmitting] = useState(false)
 
@@ -49,6 +70,17 @@ const SubjectManagement: React.FC = () => {
     }
   }
 
+  const handleIconSelect = (iconId: string) => {
+    const selectedIcon = SUBJECT_ICONS.find(icon => icon.id === iconId)
+    if (selectedIcon) {
+      setFormData(prev => ({
+        ...prev,
+        selected_icon: iconId,
+        image_url: selectedIcon.url
+      }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim()) {
@@ -59,11 +91,19 @@ const SubjectManagement: React.FC = () => {
     try {
       setSubmitting(true)
       
+      // Prepare data for submission (exclude selected_icon as it's not in the database)
+      const submitData = {
+        title: formData.title,
+        description: formData.description,
+        level_id: formData.level_id,
+        image_url: formData.image_url
+      }
+      
       if (editingSubject) {
-        await updateSubject(editingSubject.id, formData)
+        await updateSubject(editingSubject.id, submitData)
         alert('Matière mise à jour avec succès!')
       } else {
-        await createSubject(formData)
+        await createSubject(submitData)
         alert('Matière créée avec succès!')
       }
 
@@ -79,11 +119,16 @@ const SubjectManagement: React.FC = () => {
 
   const handleEdit = (subject: Subject) => {
     setEditingSubject(subject)
+    
+    // Find which predefined icon matches the current image_url
+    const matchingIcon = SUBJECT_ICONS.find(icon => icon.url === subject.image_url)
+    
     setFormData({
       title: subject.title,
       description: subject.description,
       level_id: subject.level_id,
-      image_url: subject.image_url
+      image_url: subject.image_url,
+      selected_icon: matchingIcon ? matchingIcon.id : 'custom'
     })
     setShowForm(true)
   }
@@ -104,7 +149,7 @@ const SubjectManagement: React.FC = () => {
   }
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', level_id: null, image_url: null })
+    setFormData({ title: '', description: '', level_id: null, image_url: null, selected_icon: null })
     setEditingSubject(null)
     setShowForm(false)
   }
@@ -186,14 +231,40 @@ const SubjectManagement: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="image_url">URL de l'image (optionnelle)</label>
-                <input
-                  type="url"
-                  id="image_url"
-                  value={formData.image_url || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <label htmlFor="icon_selector">Icône de la matière</label>
+                <div className="icon-selector">
+                  {SUBJECT_ICONS.map(iconOption => (
+                    <div
+                      key={iconOption.id}
+                      className={`icon-option ${formData.selected_icon === iconOption.id ? 'selected' : ''}`}
+                      onClick={() => handleIconSelect(iconOption.id)}
+                      title={iconOption.name}
+                    >
+                      <div className="icon-preview">
+                        {iconOption.url ? (
+                          <img src={iconOption.url} alt={iconOption.name} className="icon-svg" />
+                        ) : (
+                          <span className="icon-emoji">{iconOption.icon}</span>
+                        )}
+                      </div>
+                      <span className="icon-name">{iconOption.name}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Custom URL input - only show when custom is selected */}
+                {formData.selected_icon === 'custom' && (
+                  <div className="custom-url-input">
+                    <label htmlFor="custom_image_url">URL personnalisée</label>
+                    <input
+                      type="url"
+                      id="custom_image_url"
+                      value={formData.image_url || ''}
+                      onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-actions">

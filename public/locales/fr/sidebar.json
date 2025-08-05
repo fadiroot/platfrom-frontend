@@ -1,6 +1,10 @@
 {
   "sidebar": {
     "dashboard": "Tableau de bord",
+    "niveaux": "Niveaux",
+    "matières": "Matières",
+    "chapitres": "Chapitres",
+    "exercices": "Exercices",
     "settings": "Paramètres",
     "profile": "Profil"
   }

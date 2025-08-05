@@ -1,7 +1,7 @@
+@import '../../shared/assets/styles/abstracts/student-theme';
+
 .level-management {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  @include student-container;
 
   .loading {
     text-align: center;
@@ -19,25 +19,15 @@
     gap: 1rem;
 
     h1 {
-      font-size: 2rem;
-      color: #333;
+      @include student-title;
       margin: 0;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
+      @include student-button-primary;
+      font-weight: 700;
+      font-size: 1rem;
       border-radius: 8px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-      }
     }
   }
 
@@ -57,7 +47,9 @@
 
     .modal-content {
       background: white;
+      border: 2px solid #000;
       border-radius: 12px;
+      box-shadow: 4px 4px 0px 0px #000;
       width: 100%;
       max-width: 500px;
       max-height: 90vh;
@@ -77,16 +69,20 @@
         }
 
         .close-btn {
-          background: none;
-          border: none;
-          font-size: 1.5rem;
+          background: white;
+          border: 2px solid #000;
+          font-size: 1.2rem;
           cursor: pointer;
           padding: 0.5rem;
-          border-radius: 50%;
-          transition: background 0.2s;
+          border-radius: 6px;
+          box-shadow: 2px 2px 0px 0px #000;
+          transition: all 0.3s ease;
 
           &:hover {
-            background: #f3f4f6;
+            transform: translate(-1px, -1px);
+            background: #000;
+            color: white;
+            box-shadow: 3px 3px 0px 0px #000;
           }
         }
       }
@@ -107,15 +103,18 @@
           input, textarea {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #d1d5db;
+            border: 2px solid #000;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.2s;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: white;
 
             &:focus {
               outline: none;
-              border-color: #3b82f6;
-              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+              border-color: #000;
+              box-shadow: 2px 2px 0px 0px #000;
+              transform: translate(-1px, -1px);
             }
           }
 
@@ -131,36 +130,41 @@
           justify-content: flex-end;
 
           .btn-secondary {
-            background: #f8fafc;
-            color: #475569;
-            border: 1px solid #e2e8f0;
+            background: white;
+            color: #000;
+            border: 2px solid #000;
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            font-weight: 700;
+            box-shadow: 2px 2px 0px 0px #000;
+            transition: all 0.3s ease;
 
             &:hover {
-              background: #f1f5f9;
+              transform: translate(-1px, -1px);
+              background: #f8fafc;
+              box-shadow: 3px 3px 0px 0px #000;
             }
           }
 
           .btn-primary {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            border: none;
+            @include student-button-primary;
             padding: 0.75rem 1.5rem;
             border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-
-            &:hover:not(:disabled) {
-              transform: translateY(-1px);
-              box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            }
+            font-weight: 700;
 
             &:disabled {
               opacity: 0.6;
               cursor: not-allowed;
+              transform: none;
+              box-shadow: 2px 2px 0px 0px #000;
+
+              &:hover {
+                transform: none;
+                background: white;
+                color: #000;
+                box-shadow: 2px 2px 0px 0px #000;
+              }
             }
           }
         }
@@ -179,8 +183,9 @@
       text-align: center;
       padding: 4rem 2rem;
       background: white;
+      border: 2px solid #000;
       border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 2px 2px 2px 2px #000;
 
       .empty-icon {
         font-size: 4rem;
@@ -189,41 +194,35 @@
 
       h3 {
         font-size: 1.5rem;
-        color: #333;
+        color: var(--student-text-primary);
         margin-bottom: 0.5rem;
+        font-weight: 700;
       }
 
       p {
-        color: #666;
+        color: var(--student-text-secondary);
         margin-bottom: 2rem;
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-        border: none;
-        padding: 0.75rem 1.5rem;
+        @include student-button-primary;
+        font-weight: 700;
         border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-        }
       }
     }
 
     .level-card {
-      background: white;
+      background: #ffffff;
+      border: 2px solid #000;
       border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 2px 2px 2px 2px #000;
       overflow: hidden;
       transition: all 0.3s ease;
+      cursor: default;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0px 0px #000;
       }
 
       .card-header {
@@ -243,21 +242,27 @@
           gap: 0.5rem;
 
           .btn-edit, .btn-delete {
-            background: none;
-            border: none;
+            background: white;
+            border: 2px solid #000;
             padding: 0.5rem;
             border-radius: 6px;
             cursor: pointer;
             font-size: 1rem;
-            transition: background 0.2s;
+            box-shadow: 2px 2px 0px 0px #000;
+            transition: all 0.3s ease;
 
             &:hover {
-              background: #f3f4f6;
+              transform: translate(-1px, -1px);
+              background: #000;
+              color: white;
+              box-shadow: 3px 3px 0px 0px #000;
             }
           }
 
           .btn-delete:hover {
-            background: #fee2e2;
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
           }
         }
       }
@@ -281,13 +286,14 @@
 
       .card-footer {
         padding: 1rem 1.5rem;
-        background: #f9fafb;
-        border-top: 1px solid #f3f4f6;
+        background: #f8fafc;
+        border-top: 2px solid #000;
 
         .level-id {
           font-size: 0.75rem;
-          color: #6b7280;
+          color: #64748b;
           font-family: monospace;
+          font-weight: 600;
         }
       }
     }

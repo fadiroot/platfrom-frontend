@@ -1,18 +1,20 @@
-// CSS Variables for AdminLayout
+@import '../../assets/styles/abstracts/student-theme';
+
+// Student theme variables for AdminLayout
 :root {
   --admin-layout-bg: #f8fafc;
   --admin-layout-content-bg: #ffffff;
-  --admin-layout-border: #e5e7eb;
-  --admin-layout-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --admin-layout-border: #000000;
+  --admin-layout-shadow: 2px 2px 0px 0px #000000;
   --admin-layout-overlay: rgba(0, 0, 0, 0.5);
 }
 
 #dark {
-  --admin-layout-bg: #0f172a;
-  --admin-layout-content-bg: #1e293b;
-  --admin-layout-border: #334155;
-  --admin-layout-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --admin-layout-overlay: rgba(0, 0, 0, 0.7);
+  --admin-layout-bg: #f8fafc;
+  --admin-layout-content-bg: #ffffff;
+  --admin-layout-border: #000000;
+  --admin-layout-shadow: 2px 2px 0px 0px #000000;
+  --admin-layout-overlay: rgba(0, 0, 0, 0.5);
 }
 
 .admin-layout {
@@ -70,10 +72,15 @@
     background-color: var(--admin-layout-content-bg);
     margin: 1rem;
     border-radius: 12px;
-    border: 1px solid var(--admin-layout-border);
+    border: 2px solid var(--admin-layout-border);
     box-shadow: var(--admin-layout-shadow);
     overflow-y: auto;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px 0px #000000;
+    }
   }
 
   &__overlay {

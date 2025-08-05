@@ -1,6 +1,10 @@
 {
   "sidebar": {
     "dashboard": "Dashboard",
+    "niveaux": "Levels",
+    "matières": "Subjects",
+    "chapitres": "Chapters",
+    "exercices": "Exercises",
     "settings": "Settings",
     "profile": "Profile"
   }

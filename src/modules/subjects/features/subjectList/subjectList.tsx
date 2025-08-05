@@ -68,7 +68,13 @@ const SubjectList: React.FC = () => {
             key={subject.id}
             onClick={() => handleSubjectClick(subject.id)}
           >
-            <div className="subject-icon">📘</div>
+            <div className="subject-icon">
+              {subject.image_url ? (
+                <img src={subject.image_url} alt={subject.title} className="subject-icon-img" />
+              ) : (
+                <span className="default-icon">📘</span>
+              )}
+            </div>
             <h2 className="subject-name">{subject.title}</h2>
             <p className="subject-description">
               {subject.description || t('subjects.noDescription')}
