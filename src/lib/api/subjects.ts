@@ -32,6 +32,24 @@ export const getSubjectsByLevel = async (levelId: string): Promise<Subject[]> =>
   return data || []
 }
 
+// Get subjects by level ID with level information
+export const getSubjectsByLevelWithLevel = async (levelId: string): Promise<(Subject & { level: Tables<'levels'> | null })[]> => {
+  const { data, error } = await supabase
+    .from('subjects')
+    .select(`
+      *,
+      level:levels(*)
+    `)
+    .eq('level_id', levelId)
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    throw new Error(`Failed to fetch subjects by level with level info: ${error.message}`)
+  }
+
+  return data || []
+}
+
 // Get subject by ID
 export const getSubjectById = async (id: string): Promise<Subject | null> => {
   const { data, error } = await supabase

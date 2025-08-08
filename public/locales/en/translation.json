@@ -33,6 +33,7 @@
   },
   "subjects": {
     "title": "All Subjects",
+    "titleWithLevel": "Subjects - {{level}}",
     "subtitle": "Select a subject to start your learning journey",
     "explore": "Explore",
     "noSubjects": "No subjects available currently",

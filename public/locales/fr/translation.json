@@ -33,6 +33,7 @@
   },
   "subjects": {
     "title": "Toutes les Matières",
+    "titleWithLevel": "Matières - {{level}}",
     "subtitle": "Sélectionnez une matière pour commencer votre parcours d'apprentissage",
     "explore": "Explorer",
     "noSubjects": "Aucune matière disponible actuellement",

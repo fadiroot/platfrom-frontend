@@ -3,18 +3,23 @@ import './index.scss'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getSubjects, getSubjectsByLevel } from '@/lib/api/subjects'
+import { getSubjectsWithLevel, getSubjectsByLevelWithLevel } from '@/lib/api/subjects'
 import { RootState } from '@/modules/shared/store'
 import Cap from '@/modules/shared/svgs/Cap'
 import HandDrawnArrow from '@/modules/shared/svgs/HandDrawnArrow'
 
-// Define the Subject interface
+// Define the Subject interface with level information
 interface Subject {
   id: string
   title: string
   description: string | null
   image_url: string | null
   level_id: string | null
+  level?: {
+    id: string
+    title: string
+    description: string | null
+  } | null
 }
 
 const SubjectList: React.FC = () => {
@@ -36,12 +41,12 @@ const SubjectList: React.FC = () => {
       try {
         let subjects: Subject[]
         
-        // If user has a level_id, fetch subjects for that level only
+        // If user has a level_id, fetch subjects for that level with level information
         if (user?.level_id) {
-          subjects = await getSubjectsByLevel(user.level_id)
+          subjects = await getSubjectsByLevelWithLevel(user.level_id)
         } else {
-          // Fallback to all subjects if no level_id (shouldn't happen for students)
-          subjects = await getSubjects()
+          // Fallback to all subjects with level information if no level_id (shouldn't happen for students)
+          subjects = await getSubjectsWithLevel()
         }
         
         setSubjects(subjects)
@@ -98,7 +103,7 @@ const SubjectList: React.FC = () => {
                 <span className="default-icon">📘</span>
               )}
             </div>
-            <h2 className="subject-name">{subject.title}</h2>
+            <h2 className="subject-name">{subject.level ? `${subject.title} - ${subject.level.title}` : subject.title}</h2>
             <p className="subject-description">
               {subject.description || t('subjects.noDescription')}
             </p>
