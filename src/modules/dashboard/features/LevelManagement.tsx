@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { getLevels, createLevel, updateLevel, deleteLevel } from '@/lib/api/levels'
 import type { Tables } from '@/lib/supabase'
 import './LevelManagement.scss'
@@ -20,21 +20,65 @@ const LevelManagement: React.FC = () => {
     description: ''
   })
   const [submitting, setSubmitting] = useState(false)
+  
+  // Ref to track if component is mounted
+  const isMountedRef = useRef(true)
 
+  // Initial data fetch on component mount
   useEffect(() => {
     fetchLevels()
+    
+    // Cleanup function to handle component unmounting
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
+
+  // Handle modal navigation cleanup and body class management
+  useEffect(() => {
+    // Handle navigation away from page with open modal
+    const handleBeforeUnload = () => {
+      if (showForm) {
+        // Close modal before navigation
+        setShowForm(false)
+      }
+    }
+
+    // Manage body class for modal state
+    if (showForm) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+
+    // Add event listener for page navigation
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.body.classList.remove('modal-open')
+    }
+  }, [showForm])
 
   const fetchLevels = async () => {
     try {
       setLoading(true)
       const data = await getLevels()
-      setLevels(data)
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setLevels(data)
+      }
     } catch (error) {
       console.error('Error fetching levels:', error)
-      alert('Erreur lors du chargement des niveaux')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors du chargement des niveaux')
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if component is still mounted
+      if (isMountedRef.current) {
+        setLoading(false)
+      }
     }
   }
 
@@ -51,21 +95,36 @@ const LevelManagement: React.FC = () => {
       if (editingLevel) {
         // Update existing level
         await updateLevel(editingLevel.id, formData)
-        alert('Niveau mis à jour avec succès!')
+        // Only show alert if component is still mounted
+        if (isMountedRef.current) {
+          alert('Niveau mis à jour avec succès!')
+        }
       } else {
         // Create new level
         await createLevel(formData)
-        alert('Niveau créé avec succès!')
+        // Only show alert if component is still mounted
+        if (isMountedRef.current) {
+          alert('Niveau créé avec succès!')
+        }
       }
 
       // Refresh list and close form
       await fetchLevels()
-      resetForm()
+      // Only reset form if component is still mounted
+      if (isMountedRef.current) {
+        resetForm()
+      }
     } catch (error) {
       console.error('Error saving level:', error)
-      alert('Erreur lors de la sauvegarde')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors de la sauvegarde')
+      }
     } finally {
-      setSubmitting(false)
+      // Only update submitting state if component is still mounted
+      if (isMountedRef.current) {
+        setSubmitting(false)
+      }
     }
   }
 
@@ -85,11 +144,17 @@ const LevelManagement: React.FC = () => {
 
     try {
       await deleteLevel(level.id)
-      alert('Niveau supprimé avec succès!')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Niveau supprimé avec succès!')
+      }
       await fetchLevels()
     } catch (error) {
       console.error('Error deleting level:', error)
-      alert('Erreur lors de la suppression')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors de la suppression')
+      }
     }
   }
 
@@ -121,11 +186,21 @@ const LevelManagement: React.FC = () => {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="modal-overlay" onClick={() => resetForm()}>
+        <div className="modal-overlay" onClick={() => {
+          // Only reset form if component is still mounted
+          if (isMountedRef.current) {
+            resetForm()
+          }
+        }}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editingLevel ? '✏️ Modifier le Niveau' : '➕ Nouveau Niveau'}</h2>
-              <button className="close-btn" onClick={resetForm}>✕</button>
+              <button className="close-btn" onClick={() => {
+                // Only reset form if component is still mounted
+                if (isMountedRef.current) {
+                  resetForm()
+                }
+              }}>✕</button>
             </div>
 
             <form onSubmit={handleSubmit} className="level-form">
@@ -153,7 +228,12 @@ const LevelManagement: React.FC = () => {
               </div>
 
               <div className="form-actions">
-                <button type="button" onClick={resetForm} className="btn-secondary">
+                <button type="button" onClick={() => {
+                  // Only reset form if component is still mounted
+                  if (isMountedRef.current) {
+                    resetForm()
+                  }
+                }} className="btn-secondary">
                   Annuler
                 </button>
                 <button type="submit" disabled={submitting} className="btn-primary">

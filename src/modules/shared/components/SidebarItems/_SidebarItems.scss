@@ -71,6 +71,12 @@
         color: var(--sidebar-item-icon-hover);
       }
     }
+    
+    // Disable hover transforms when modal is open to prevent crashes
+    body:has(.modal-overlay) &:hover,
+    body.modal-open &:hover {
+      transform: none;
+    }
   }
 
   .active {

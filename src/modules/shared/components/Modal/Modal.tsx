@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './Modal.scss';
 
 interface ModalProps {
@@ -18,6 +18,18 @@ const Modal: React.FC<ModalProps> = ({
   type = 'info',
   showCloseButton = true 
 }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const getIcon = () => {

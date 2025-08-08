@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react'
 import './index.scss'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { getSubjects } from '@/lib/api/subjects'
+import { useSelector } from 'react-redux'
+import { getSubjects, getSubjectsByLevel } from '@/lib/api/subjects'
+import { RootState } from '@/modules/shared/store'
 import Cap from '@/modules/shared/svgs/Cap'
 import HandDrawnArrow from '@/modules/shared/svgs/HandDrawnArrow'
 
@@ -18,6 +20,9 @@ interface Subject {
 const SubjectList: React.FC = () => {
   const navigate = useNavigate()
   const { t } = useTranslation('translation')
+  
+  // Get user information from auth state
+  const { user } = useSelector((state: RootState) => state.auth)
 
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [loading, setLoading] = useState(false)
@@ -29,7 +34,16 @@ const SubjectList: React.FC = () => {
 
     const fetchSubjects = async () => {
       try {
-        const subjects = await getSubjects()
+        let subjects: Subject[]
+        
+        // If user has a level_id, fetch subjects for that level only
+        if (user?.level_id) {
+          subjects = await getSubjectsByLevel(user.level_id)
+        } else {
+          // Fallback to all subjects if no level_id (shouldn't happen for students)
+          subjects = await getSubjects()
+        }
+        
         setSubjects(subjects)
       } catch (err: any) {
         setError(err.message || 'Failed to fetch subjects')
@@ -39,7 +53,7 @@ const SubjectList: React.FC = () => {
     }
 
     fetchSubjects()
-  }, [])
+  }, [user?.level_id])
 
   const handleSubjectClick = (subjectId: string) => {
     navigate(`/subjects/${subjectId}/chapters`)
@@ -55,13 +69,22 @@ const SubjectList: React.FC = () => {
 
   return (
     <div className="subject-list-container">
-      <h1 className="subject-list-title">{t('subjects.title')}</h1>
+      <h1 className="subject-list-title">
+        {user?.level_id ? t('subjects.titleWithLevel', { level: user.level?.title || 'Level' }) : t('subjects.title')}
+      </h1>
       <p className="subject-list-subtitle">{t('subjects.subtitle')}</p>
       <Cap className="subject-list-cap" />
       <HandDrawnArrow className="subject-list-arrow" />
 
       <div className="subject-grid">
-        {subjects.length === 0 && <div>{t('subjects.noSubjects')}</div>}
+        {subjects.length === 0 && (
+          <div className="no-subjects-message">
+            {user?.level_id 
+              ? t('subjects.noSubjectsForLevel', { level: user.level?.title || 'your level' })
+              : t('subjects.noSubjects')
+            }
+          </div>
+        )}
         {subjects.map((subject) => (
           <div
             className="subject-card"

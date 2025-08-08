@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { getSubjects, createSubject, updateSubject, deleteSubject } from '@/lib/api/subjects'
 import { getLevels } from '@/lib/api/levels'
 import type { Tables } from '@/lib/supabase'
+import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
 import './SubjectManagement.scss'
 
 type Subject = Tables<'subjects'>
@@ -37,6 +38,7 @@ interface SubjectFormData {
 const SubjectManagement: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [levels, setLevels] = useState<Level[]>([])
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null)
@@ -48,10 +50,45 @@ const SubjectManagement: React.FC = () => {
     selected_icon: null
   })
   const [submitting, setSubmitting] = useState(false)
+  
+  // Ref to track if component is mounted
+  const isMountedRef = useRef(true)
 
+  // Initial data fetch on component mount
   useEffect(() => {
     fetchData()
+    
+    // Cleanup function to handle component unmounting
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
+
+  // Handle modal navigation cleanup and body class management
+  useEffect(() => {
+    // Handle navigation away from page with open modal
+    const handleBeforeUnload = () => {
+      if (showForm) {
+        // Close modal before navigation
+        setShowForm(false)
+      }
+    }
+
+    // Manage body class for modal state
+    if (showForm) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+
+    // Add event listener for page navigation
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.body.classList.remove('modal-open')
+    }
+  }, [showForm])
 
   const fetchData = async () => {
     try {
@@ -60,13 +97,23 @@ const SubjectManagement: React.FC = () => {
         getSubjects(),
         getLevels()
       ])
-      setSubjects(subjectsData)
-      setLevels(levelsData)
+      
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setSubjects(subjectsData)
+        setLevels(levelsData)
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
-      alert('Erreur lors du chargement des données')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors du chargement des données')
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if component is still mounted
+      if (isMountedRef.current) {
+        setLoading(false)
+      }
     }
   }
 
@@ -101,19 +148,34 @@ const SubjectManagement: React.FC = () => {
       
       if (editingSubject) {
         await updateSubject(editingSubject.id, submitData)
-        alert('Matière mise à jour avec succès!')
+        // Only show alert if component is still mounted
+        if (isMountedRef.current) {
+          alert('Matière mise à jour avec succès!')
+        }
       } else {
         await createSubject(submitData)
-        alert('Matière créée avec succès!')
+        // Only show alert if component is still mounted
+        if (isMountedRef.current) {
+          alert('Matière créée avec succès!')
+        }
       }
 
       await fetchData()
-      resetForm()
+      // Only reset form if component is still mounted
+      if (isMountedRef.current) {
+        resetForm()
+      }
     } catch (error) {
       console.error('Error saving subject:', error)
-      alert('Erreur lors de la sauvegarde')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors de la sauvegarde')
+      }
     } finally {
-      setSubmitting(false)
+      // Only update submitting state if component is still mounted
+      if (isMountedRef.current) {
+        setSubmitting(false)
+      }
     }
   }
 
@@ -140,11 +202,17 @@ const SubjectManagement: React.FC = () => {
 
     try {
       await deleteSubject(subject.id)
-      alert('Matière supprimée avec succès!')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Matière supprimée avec succès!')
+      }
       await fetchData()
     } catch (error) {
       console.error('Error deleting subject:', error)
-      alert('Erreur lors de la suppression')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors de la suppression')
+      }
     }
   }
 
@@ -160,6 +228,28 @@ const SubjectManagement: React.FC = () => {
     return level ? level.title : 'Niveau inconnu'
   }
 
+  // Filter subjects by selected level
+  const getFilteredSubjects = () => {
+    if (!selectedLevel) return subjects
+    return subjects.filter(subject => subject.level_id === selectedLevel)
+  }
+
+  // Group subjects by level for display
+  const getSubjectsByLevel = () => {
+    const grouped = levels.reduce((acc, level) => {
+      acc[level.id] = subjects.filter(subject => subject.level_id === level.id)
+      return acc
+    }, {} as Record<string, Subject[]>)
+    
+    // Add subjects without level
+    const noLevelSubjects = subjects.filter(subject => !subject.level_id)
+    if (noLevelSubjects.length > 0) {
+      grouped['no-level'] = noLevelSubjects
+    }
+    
+    return grouped
+  }
+
   if (loading) {
     return (
       <div className="subject-management">
@@ -172,21 +262,49 @@ const SubjectManagement: React.FC = () => {
     <div className="subject-management">
       <div className="management-header">
         <h1>📚 Gestion des Matières</h1>
-        <button 
-          className="btn-primary"
-          onClick={() => setShowForm(true)}
-        >
-          ➕ Nouvelle Matière
-        </button>
+        <div className="header-controls">
+          <div className="level-filter">
+            <label htmlFor="level-select">Filtrer par niveau:</label>
+            <CustomSelect
+              options={[
+                { value: '', label: 'Tous les niveaux' },
+                ...levels.map(level => ({
+                  value: level.id,
+                  label: level.title
+                }))
+              ]}
+              value={selectedLevel || ''}
+              onChange={(value) => setSelectedLevel(value || null)}
+              onBlur={() => {}}
+              placeholder="Tous les niveaux"
+            />
+          </div>
+          <button 
+            className="btn-primary"
+            onClick={() => setShowForm(true)}
+          >
+            ➕ Nouvelle Matière
+          </button>
+        </div>
       </div>
 
       {/* Form Modal */}
       {showForm && (
-        <div className="modal-overlay" onClick={() => resetForm()}>
+        <div className="modal-overlay" onClick={() => {
+          // Only reset form if component is still mounted
+          if (isMountedRef.current) {
+            resetForm()
+          }
+        }}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editingSubject ? '✏️ Modifier la Matière' : '➕ Nouvelle Matière'}</h2>
-              <button className="close-btn" onClick={resetForm}>✕</button>
+              <button className="close-btn" onClick={() => {
+                // Only reset form if component is still mounted
+                if (isMountedRef.current) {
+                  resetForm()
+                }
+              }}>✕</button>
             </div>
 
             <form onSubmit={handleSubmit} className="subject-form">
@@ -204,19 +322,19 @@ const SubjectManagement: React.FC = () => {
 
               <div className="form-group">
                 <label htmlFor="level_id">Niveau *</label>
-                <select
-                  id="level_id"
+                <CustomSelect
+                  options={[
+                    { value: '', label: 'Sélectionner un niveau' },
+                    ...levels.map(level => ({
+                      value: level.id,
+                      label: level.title
+                    }))
+                  ]}
                   value={formData.level_id || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, level_id: e.target.value || null }))}
-                  required
-                >
-                  <option value="">Sélectionner un niveau</option>
-                  {levels.map(level => (
-                    <option key={level.id} value={level.id}>
-                      {level.title}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setFormData(prev => ({ ...prev, level_id: value || null }))}
+                  onBlur={() => {}}
+                  placeholder="Sélectionner un niveau"
+                />
               </div>
 
               <div className="form-group">
@@ -268,7 +386,12 @@ const SubjectManagement: React.FC = () => {
               </div>
 
               <div className="form-actions">
-                <button type="button" onClick={resetForm} className="btn-secondary">
+                <button type="button" onClick={() => {
+                  // Only reset form if component is still mounted
+                  if (isMountedRef.current) {
+                    resetForm()
+                  }
+                }} className="btn-secondary">
                   Annuler
                 </button>
                 <button type="submit" disabled={submitting} className="btn-primary">
@@ -281,18 +404,24 @@ const SubjectManagement: React.FC = () => {
       )}
 
       {/* Subjects List */}
-      <div className="subjects-grid">
-        {subjects.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📚</div>
-            <h3>Aucune matière trouvée</h3>
-            <p>Commencez par créer votre première matière</p>
-            <button className="btn-primary" onClick={() => setShowForm(true)}>
-              Créer une matière
-            </button>
-          </div>
-        ) : (
-          subjects.map(subject => (
+      {selectedLevel ? (
+        // Filtered view by selected level
+        <div className="subjects-section">
+          <h2 className="section-title">
+            📚 {getLevelName(selectedLevel)} ({getFilteredSubjects().length} matière{getFilteredSubjects().length !== 1 ? 's' : ''})
+          </h2>
+          <div className="subjects-grid">
+            {getFilteredSubjects().length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">📚</div>
+                <h3>Aucune matière trouvée pour ce niveau</h3>
+                <p>Commencez par créer une matière pour ce niveau</p>
+                <button className="btn-primary" onClick={() => setShowForm(true)}>
+                  Créer une matière
+                </button>
+              </div>
+            ) : (
+              getFilteredSubjects().map(subject => (
             <div key={subject.id} className="subject-card">
               <div className="card-header">
                 <h3>{subject.title}</h3>
@@ -339,11 +468,82 @@ const SubjectManagement: React.FC = () => {
                 <span className="subject-id">ID: {subject.id.slice(0, 8)}...</span>
               </div>
             </div>
-          ))
+                ))
+              )}
+            </div>
+          </div>
+        ) : (
+          // Grouped view by level
+          <div className="subjects-by-level">
+            {Object.entries(getSubjectsByLevel()).map(([levelId, levelSubjects]) => (
+              <div key={levelId} className="level-section">
+                <h2 className="section-title">
+                  🎓 {levelId === 'no-level' ? 'Sans niveau assigné' : getLevelName(levelId)} 
+                  <span className="count">({levelSubjects.length} matière{levelSubjects.length !== 1 ? 's' : ''})</span>
+                </h2>
+                <div className="subjects-grid">
+                  {levelSubjects.map(subject => (
+                    <div key={subject.id} className="subject-card">
+                      <div className="card-header">
+                        <h3>{subject.title}</h3>
+                        <div className="card-actions">
+                          <button 
+                            onClick={() => handleEdit(subject)}
+                            className="btn-edit"
+                            title="Modifier"
+                          >
+                            ✏️
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(subject)}
+                            className="btn-delete"
+                            title="Supprimer"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="card-content">
+                        {subject.image_url && (
+                          <div className="subject-image">
+                            <img src={subject.image_url} alt={subject.title} />
+                          </div>
+                        )}
+                        
+                        <p className="description">
+                          {subject.description || 'Aucune description'}
+                        </p>
+                        
+                        <div className="card-meta">
+                          <span className="date">
+                            Créé le {new Date(subject.created_at).toLocaleDateString('fr-FR')}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="card-footer">
+                        <span className="subject-id">ID: {subject.id.slice(0, 8)}...</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            {subjects.length === 0 && (
+              <div className="empty-state">
+                <div className="empty-icon">📚</div>
+                <h3>Aucune matière trouvée</h3>
+                <p>Commencez par créer votre première matière</p>
+                <button className="btn-primary" onClick={() => setShowForm(true)}>
+                  Créer une matière
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
-    </div>
-  )
-}
+    )
+  }
 
 export default SubjectManagement

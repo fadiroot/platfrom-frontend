@@ -31,6 +31,12 @@
     top: 0;
     transition: all 0.3s ease;
     z-index: 1000;
+    
+    // Prevent interaction when modal is open
+    body:has(.modal-overlay) &,
+    body.modal-open & {
+      pointer-events: none;
+    }
 
     &--collapsed {
       width: 80px;
@@ -80,6 +86,13 @@
     &:hover {
       transform: translate(-1px, -1px);
       box-shadow: 3px 3px 0px 0px #000000;
+    }
+    
+    // Disable hover effects when modal is open to prevent crashes
+    body:has(.modal-overlay) &:hover,
+    body.modal-open &:hover {
+      transform: none;
+      box-shadow: var(--admin-layout-shadow);
     }
   }
 

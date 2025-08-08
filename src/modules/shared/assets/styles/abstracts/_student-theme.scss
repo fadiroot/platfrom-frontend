@@ -221,6 +221,71 @@
   }
 }
 
+@mixin student-select {
+  padding: 12px 16px;
+  border: 2px solid #000000;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #000000;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px 0px #000000;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+
+  &:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px 0px #000000;
+  }
+
+  &:focus {
+    outline: none;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px 0px #000000;
+  }
+
+  // Style the dropdown arrow to match CustomSelect chevron
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23666666' stroke-width='2'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+  padding-right: 40px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  // Disabled state
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    background-color: #f5f5f5;
+    border-color: #cccccc;
+    box-shadow: 2px 2px 0px 0px #cccccc;
+    transform: none;
+    
+    &:hover {
+      transform: none;
+      box-shadow: 2px 2px 0px 0px #cccccc;
+    }
+  }
+
+  // Dark theme support
+  #dark & {
+    background-color: var(--student-bg-secondary);
+    color: var(--student-text-primary);
+    border-color: var(--student-text-primary);
+    box-shadow: 2px 2px 0px 0px var(--student-text-primary);
+
+    &:hover, &:focus {
+      box-shadow: 3px 3px 0px 0px var(--student-text-primary);
+    }
+
+    // Dark theme arrow
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f8fafc' stroke-width='2'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  }
+}
+
 @mixin student-title {
   font-size: 2.25rem;
   font-weight: 700;

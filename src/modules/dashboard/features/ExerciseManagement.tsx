@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { getExercises, createExercise, updateExercise, deleteExercise } from '@/lib/api/exercises'
 import { getChapters } from '@/lib/api/chapters'
 import { uploadExercisePDF } from '@/lib/api/storage'
 import type { Tables } from '@/lib/supabase'
+import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
 import './ExerciseManagement.scss'
 
 // Add some inline styles for the upload info (you can move this to SCSS later)
@@ -44,10 +45,45 @@ const ExerciseManagement: React.FC = () => {
   })
   const [submitting, setSubmitting] = useState(false)
   const [uploadingFiles, setUploadingFiles] = useState(false)
+  
+  // Ref to track if component is mounted
+  const isMountedRef = useRef(true)
 
+  // Initial data fetch on component mount
   useEffect(() => {
     fetchData()
+    
+    // Cleanup function to handle component unmounting
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
+
+  // Handle modal navigation cleanup and body class management
+  useEffect(() => {
+    // Handle navigation away from page with open modal
+    const handleBeforeUnload = () => {
+      if (showForm) {
+        // Close modal before navigation
+        setShowForm(false)
+      }
+    }
+
+    // Manage body class for modal state
+    if (showForm) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+
+    // Add event listener for page navigation
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.body.classList.remove('modal-open')
+    }
+  }, [showForm])
 
   const fetchData = async () => {
     try {
@@ -274,33 +310,35 @@ const ExerciseManagement: React.FC = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="chapter_id">Chapitre *</label>
-                  <select
-                    id="chapter_id"
-                    value={formData.chapter_id || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, chapter_id: e.target.value || null }))}
-                    required
-                  >
-                    <option value="">Sélectionner un chapitre</option>
-                    {chapters.map(chapter => (
-                      <option key={chapter.id} value={chapter.id}>
-                        {chapter.title}
-                      </option>
-                    ))}
-                  </select>
+                  <CustomSelect
+                  options={[
+                    { value: '', label: 'Sélectionner un chapitre' },
+                    ...chapters.map(chapter => ({
+                      value: chapter.id,
+                      label: chapter.title
+                    }))
+                  ]}
+                  value={formData.chapter_id || ''}
+                  onChange={(value: string) => setFormData(prev => ({ ...prev, chapter_id: value || null }))}
+                  onBlur={() => {}}
+                  placeholder="Sélectionner un chapitre"
+                />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="difficulty">Difficulté</label>
-                  <select
-                    id="difficulty"
-                    value={formData.difficulty || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, difficulty: e.target.value as any || null }))}
-                  >
-                    <option value="">Sélectionner la difficulté</option>
-                    <option value="Easy">Facile</option>
-                    <option value="Medium">Moyen</option>
-                    <option value="Hard">Difficile</option>
-                  </select>
+                  <CustomSelect
+                  options={[
+                    { value: '', label: 'Sélectionner la difficulté' },
+                    { value: 'Easy', label: 'Facile' },
+                    { value: 'Medium', label: 'Moyen' },
+                    { value: 'Hard', label: 'Difficile' }
+                  ]}
+                  value={formData.difficulty || ''}
+                  onChange={(value: string) => setFormData(prev => ({ ...prev, difficulty: (value as 'Easy' | 'Medium' | 'Hard') || null }))}
+                  onBlur={() => {}}
+                  placeholder="Sélectionner la difficulté"
+                />
                 </div>
               </div>
 

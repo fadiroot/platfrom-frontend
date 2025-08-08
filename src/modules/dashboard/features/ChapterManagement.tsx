@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { getChapters, createChapter, updateChapter, deleteChapter } from '@/lib/api/chapters'
 import { getSubjects } from '@/lib/api/subjects'
 import type { Tables } from '@/lib/supabase'
+import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
 import './ChapterManagement.scss'
 
 type Chapter = Tables<'chapters'>
@@ -20,6 +21,7 @@ interface ChapterFormData {
 const ChapterManagement: React.FC = () => {
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingChapter, setEditingChapter] = useState<Chapter | null>(null)
@@ -33,10 +35,45 @@ const ChapterManagement: React.FC = () => {
     exercise_count: null
   })
   const [submitting, setSubmitting] = useState(false)
+  
+  // Ref to track if component is mounted
+  const isMountedRef = useRef(true)
 
+  // Initial data fetch on component mount
   useEffect(() => {
     fetchData()
+    
+    // Cleanup function to handle component unmounting
+    return () => {
+      isMountedRef.current = false
+    }
   }, [])
+
+  // Handle modal navigation cleanup and body class management
+  useEffect(() => {
+    // Handle navigation away from page with open modal
+    const handleBeforeUnload = () => {
+      if (showForm) {
+        // Close modal before navigation
+        setShowForm(false)
+      }
+    }
+
+    // Manage body class for modal state
+    if (showForm) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+
+    // Add event listener for page navigation
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      document.body.classList.remove('modal-open')
+    }
+  }, [showForm])
 
   const fetchData = async () => {
     try {
@@ -45,13 +82,23 @@ const ChapterManagement: React.FC = () => {
         getChapters(),
         getSubjects()
       ])
-      setChapters(chaptersData)
-      setSubjects(subjectsData)
+      
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setChapters(chaptersData)
+        setSubjects(subjectsData)
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
-      alert('Erreur lors du chargement des données')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors du chargement des données')
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if component is still mounted
+      if (isMountedRef.current) {
+        setLoading(false)
+      }
     }
   }
 
@@ -67,19 +114,34 @@ const ChapterManagement: React.FC = () => {
       
       if (editingChapter) {
         await updateChapter(editingChapter.id, formData)
-        alert('Chapitre mis à jour avec succès!')
+        // Only show alert if component is still mounted
+        if (isMountedRef.current) {
+          alert('Chapitre mis à jour avec succès!')
+        }
       } else {
         await createChapter(formData)
-        alert('Chapitre créé avec succès!')
+        // Only show alert if component is still mounted
+        if (isMountedRef.current) {
+          alert('Chapitre créé avec succès!')
+        }
       }
 
       await fetchData()
-      resetForm()
+      // Only reset form if component is still mounted
+      if (isMountedRef.current) {
+        resetForm()
+      }
     } catch (error) {
       console.error('Error saving chapter:', error)
-      alert('Erreur lors de la sauvegarde')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors de la sauvegarde')
+      }
     } finally {
-      setSubmitting(false)
+      // Only update submitting state if component is still mounted
+      if (isMountedRef.current) {
+        setSubmitting(false)
+      }
     }
   }
 
@@ -104,11 +166,17 @@ const ChapterManagement: React.FC = () => {
 
     try {
       await deleteChapter(chapter.id)
-      alert('Chapitre supprimé avec succès!')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Chapitre supprimé avec succès!')
+      }
       await fetchData()
     } catch (error) {
       console.error('Error deleting chapter:', error)
-      alert('Erreur lors de la suppression')
+      // Only show alert if component is still mounted
+      if (isMountedRef.current) {
+        alert('Erreur lors de la suppression')
+      }
     }
   }
 
@@ -131,6 +199,8 @@ const ChapterManagement: React.FC = () => {
     const subject = subjects.find(s => s.id === subjectId)
     return subject ? subject.title : 'Matière inconnue'
   }
+
+  // Removed unused functions: getFilteredChapters and getChaptersBySubject
 
   const getDifficultyColor = (difficulty: string | null) => {
     switch (difficulty) {
@@ -162,21 +232,49 @@ const ChapterManagement: React.FC = () => {
     <div className="chapter-management">
       <div className="management-header">
         <h1>📖 Gestion des Chapitres</h1>
-        <button 
-          className="btn-primary"
-          onClick={() => setShowForm(true)}
-        >
-          ➕ Nouveau Chapitre
-        </button>
+        <div className="header-controls">
+          <div className="subject-filter">
+            <label htmlFor="subject-select">Filtrer par matière:</label>
+            <CustomSelect
+              options={[
+                { value: '', label: 'Toutes les matières' },
+                ...subjects.map(subject => ({
+                  value: subject.id,
+                  label: subject.title
+                }))
+              ]}
+              value={selectedSubject || ''}
+              onChange={(value) => setSelectedSubject(value || null)}
+              onBlur={() => {}}
+              placeholder="Toutes les matières"
+            />
+          </div>
+          <button 
+            className="btn-primary"
+            onClick={() => setShowForm(true)}
+          >
+            ➕ Nouveau Chapitre
+          </button>
+        </div>
       </div>
 
       {/* Form Modal */}
       {showForm && (
-        <div className="modal-overlay" onClick={() => resetForm()}>
+        <div className="modal-overlay" onClick={() => {
+          // Only reset form if component is still mounted
+          if (isMountedRef.current) {
+            resetForm()
+          }
+        }}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editingChapter ? '✏️ Modifier le Chapitre' : '➕ Nouveau Chapitre'}</h2>
-              <button className="close-btn" onClick={resetForm}>✕</button>
+              <button className="close-btn" onClick={() => {
+                // Only reset form if component is still mounted
+                if (isMountedRef.current) {
+                  resetForm()
+                }
+              }}>✕</button>
             </div>
 
             <form onSubmit={handleSubmit} className="chapter-form">
@@ -194,48 +292,52 @@ const ChapterManagement: React.FC = () => {
 
               <div className="form-group">
                 <label htmlFor="subject_id">Matière *</label>
-                <select
-                  id="subject_id"
+                <CustomSelect
+                  options={[
+                    { value: '', label: 'Sélectionner une matière' },
+                    ...subjects.map(subject => ({
+                      value: subject.id,
+                      label: subject.title
+                    }))
+                  ]}
                   value={formData.subject_id || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, subject_id: e.target.value || null }))}
-                  required
-                >
-                  <option value="">Sélectionner une matière</option>
-                  {subjects.map(subject => (
-                    <option key={subject.id} value={subject.id}>
-                      {subject.title}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => setFormData(prev => ({ ...prev, subject_id: value || null }))}
+                  onBlur={() => {}}
+                  placeholder="Sélectionner une matière"
+                />
               </div>
 
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="difficulty">Difficulté</label>
-                  <select
-                    id="difficulty"
+                  <CustomSelect
+                    options={[
+                      { value: '', label: 'Sélectionner la difficulté' },
+                      { value: 'Beginner', label: 'Débutant' },
+                      { value: 'Intermediate', label: 'Intermédiaire' },
+                      { value: 'Advanced', label: 'Avancé' }
+                    ]}
                     value={formData.difficulty || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, difficulty: e.target.value as any || null }))}
-                  >
-                    <option value="">Sélectionner la difficulté</option>
-                    <option value="Beginner">Débutant</option>
-                    <option value="Intermediate">Intermédiaire</option>
-                    <option value="Advanced">Avancé</option>
-                  </select>
+                    onChange={(value) => setFormData(prev => ({ ...prev, difficulty: value as any || null }))}
+                    onBlur={() => {}}
+                    placeholder="Sélectionner la difficulté"
+                  />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="type">Type</label>
-                  <select
-                    id="type"
+                  <CustomSelect
+                    options={[
+                      { value: '', label: 'Sélectionner le type' },
+                      { value: 'Theory', label: 'Théorie' },
+                      { value: 'Practical', label: 'Pratique' },
+                      { value: 'Assessment', label: 'Évaluation' }
+                    ]}
                     value={formData.type || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any || null }))}
-                  >
-                    <option value="">Sélectionner le type</option>
-                    <option value="Theory">Théorie</option>
-                    <option value="Practical">Pratique</option>
-                    <option value="Assessment">Évaluation</option>
-                  </select>
+                    onChange={(value) => setFormData(prev => ({ ...prev, type: value as any || null }))}
+                    onBlur={() => {}}
+                    placeholder="Sélectionner le type"
+                  />
                 </div>
               </div>
 
@@ -262,7 +364,12 @@ const ChapterManagement: React.FC = () => {
               </div>
 
               <div className="form-actions">
-                <button type="button" onClick={resetForm} className="btn-secondary">
+                <button type="button" onClick={() => {
+                  // Only reset form if component is still mounted
+                  if (isMountedRef.current) {
+                    resetForm()
+                  }
+                }} className="btn-secondary">
                   Annuler
                 </button>
                 <button type="submit" disabled={submitting} className="btn-primary">

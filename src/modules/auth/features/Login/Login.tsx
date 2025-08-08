@@ -101,13 +101,10 @@ const LoginComponent = () => {
       setSubmitting(true)
       dispatch(login(values))
         .unwrap()
-        .then((result) => {
-          
-          if (result.user && result.user.level_id) {
-            navigate(`/subjects?levelId=${result.user.level_id}`)
-          } else {
-            navigate('/subjects') // Fallback to subjects page
-          }
+        .then(() => {
+          // Navigate to subjects page - the SubjectList component will automatically
+          // filter subjects based on the user's level from Redux store
+          navigate('/subjects')
         })
         .catch((err) => {
           setErrorMessage(err?.message || "Login failed")
