@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { login, logout, register, initializeAuth } from './authThunk'
+import { login, register, logout, initializeAuth, requestPasswordReset, resetUserPassword } from './authThunk'
 
 export interface AuthState {
-  status: string
+  status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'verification_required'
   isAuthenticated: boolean
   isInitialised: boolean
   user: {
     id: string
-    name: string
     email: string
+    name: string
     firstName: string
     lastName: string
     level_id: string | null
@@ -18,8 +18,12 @@ export interface AuthState {
       title: string
       description: string | null
     } | null
+    role?: string // Add role field for admin detection
+    isAdmin?: boolean // Add explicit admin flag
   } | null
   error: string | null
+  resetPasswordStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
+  resetPasswordMessage: string | null
 }
 
 const initialState: AuthState = {
@@ -28,6 +32,8 @@ const initialState: AuthState = {
   isInitialised: false,
   user: null,
   error: null,
+  resetPasswordStatus: 'idle',
+  resetPasswordMessage: null,
 }
 
 const authSlice = createSlice({
@@ -42,6 +48,10 @@ const authSlice = createSlice({
     },
     restore: (state) => {
       state.error = null
+    },
+    clearResetPasswordState: (state) => {
+      state.resetPasswordStatus = 'idle'
+      state.resetPasswordMessage = null
     },
   },
   extraReducers: (builder) => {
@@ -90,25 +100,17 @@ const authSlice = createSlice({
     })
 
     // Logout cases
-    builder.addCase(logout.pending, (state) => {
-      state.error = null
-      state.status = 'loading'
-    })
     builder.addCase(logout.fulfilled, (state) => {
       state.isAuthenticated = false
       state.user = null
-      state.status = 'succeeded'
+      state.status = 'idle'
+      state.error = null
     })
     builder.addCase(logout.rejected, (state, action: PayloadAction<any>) => {
       state.error = action?.payload
-      state.status = 'failed'
     })
 
     // Initialize auth cases
-    builder.addCase(initializeAuth.pending, (state) => {
-      state.error = null
-      state.status = 'loading'
-    })
     builder.addCase(initializeAuth.fulfilled, (state, action: PayloadAction<any>) => {
       const { isAuthenticated, user } = action.payload
       state.isAuthenticated = isAuthenticated
@@ -118,14 +120,39 @@ const authSlice = createSlice({
     })
     builder.addCase(initializeAuth.rejected, (state, action: PayloadAction<any>) => {
       state.error = action?.payload
-      state.status = 'failed'
-      state.isAuthenticated = false
-      state.user = null
       state.isInitialised = true
+    })
+
+    // Request password reset cases
+    builder.addCase(requestPasswordReset.pending, (state) => {
+      state.resetPasswordStatus = 'loading'
+      state.resetPasswordMessage = null
+    })
+    builder.addCase(requestPasswordReset.fulfilled, (state) => {
+      state.resetPasswordStatus = 'succeeded'
+      state.resetPasswordMessage = 'Password reset email sent successfully'
+    })
+    builder.addCase(requestPasswordReset.rejected, (state, action: PayloadAction<any>) => {
+      state.resetPasswordStatus = 'failed'
+      state.resetPasswordMessage = action?.payload || 'Failed to send reset email'
+    })
+
+    // Reset user password cases
+    builder.addCase(resetUserPassword.pending, (state) => {
+      state.resetPasswordStatus = 'loading'
+      state.resetPasswordMessage = null
+    })
+    builder.addCase(resetUserPassword.fulfilled, (state) => {
+      state.resetPasswordStatus = 'succeeded'
+      state.resetPasswordMessage = 'Password updated successfully'
+    })
+    builder.addCase(resetUserPassword.rejected, (state, action: PayloadAction<any>) => {
+      state.resetPasswordStatus = 'failed'
+      state.resetPasswordMessage = action?.payload || 'Failed to reset password'
     })
   },
 })
 
-export const { initialise, restore } = authSlice.actions
+export const { initialise, restore, clearResetPasswordState } = authSlice.actions
 
 export default authSlice.reducer

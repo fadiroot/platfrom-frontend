@@ -5,10 +5,7 @@ import { logout } from '../../../auth/data/authThunk'
 import ThemeButton from '../ThemeButton/ThemeButton'
 import { useTranslation } from 'react-i18next'
 import './StudentHeader.scss'
-import logoImg from '../../assets/images/Black & Blue Minimalist Modern Initial Font Logo (3).png'
-import enFlagIcon from '../../assets/icons/navbar/en-flag.png'
-import frFlagIcon from '../../assets/icons/navbar/fr-flag.png'
-import arFlagIcon from '../../assets/icons/navbar/ar-flag.png'
+import logoImg from '/logo/astuceLogo.png'
 
 const StudentHeader: React.FC = () => {
   const navigate = useNavigate()
@@ -38,16 +35,16 @@ const StudentHeader: React.FC = () => {
 
   const getCurrentFlag = () => {
     switch (lang) {
-      case 'fr': return frFlagIcon
-      case 'ar': return arFlagIcon
-      default: return enFlagIcon
+      case 'fr': return '🇫🇷'
+      case 'ar': return '🇹🇳'
+      default: return '🇺🇸'
     }
   }
 
   const languages = [
-    { code: 'en', name: t('language.en'), flag: enFlagIcon },
-    { code: 'fr', name: t('language.fr'), flag: frFlagIcon },
-    { code: 'ar', name: t('language.ar'), flag: arFlagIcon }
+    { code: 'en', name: t('language.en'), flag: '🇺🇸' },
+    { code: 'fr', name: t('language.fr'), flag: '🇫🇷' },
+    { code: 'ar', name: t('language.ar'), flag: '🇹🇳' }
   ]
 
   // Close dropdown when clicking outside
@@ -74,10 +71,6 @@ const StudentHeader: React.FC = () => {
             alt="Platform Logo" 
             className="student-header__logo"
           />
-          <div className="student-header__brand-text">
-            <h1 className="student-header__title">المنصة لي تنجحك</h1>
-            <p className="student-header__subtitle">Educational Excellence Platform</p>
-          </div>
         </div>
 
         {/* Right Actions */}
@@ -89,11 +82,7 @@ const StudentHeader: React.FC = () => {
               onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
               title="Change Language"
             >
-              <img 
-                src={getCurrentFlag()} 
-                alt="Current Language" 
-                className="current-flag"
-              />
+              <span className="current-flag">{getCurrentFlag()}</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 9l6 6 6-6"/>
               </svg>
@@ -107,11 +96,7 @@ const StudentHeader: React.FC = () => {
                     className={`language-item ${lang === language.code ? 'active' : ''}`}
                     onClick={() => onChangeLanguage(language.code)}
                   >
-                    <img 
-                      src={language.flag} 
-                      alt={language.name} 
-                      className="language-flag" 
-                    />
+                    <span className="language-flag">{language.flag}</span>
                     <span className="language-name">{language.name}</span>
                     {lang === language.code && (
                       <div className="language-active-indicator">✓</div>

@@ -1,6 +1,6 @@
 'use client'
 
-import type React from 'react'
+import React from 'react'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -8,6 +8,7 @@ import './index.scss'
 import { getChaptersBySubject, getChaptersByLevel } from '@/lib/api/chapters'
 import { getSubjectById } from '@/lib/api/subjects'
 import { getLevelById } from '@/lib/api/levels'
+import Loader from '../../../shared/components/Loader/Loader'
 
 // Define the Chapter interface to match the database schema
 interface Chapter {
@@ -20,6 +21,7 @@ interface Chapter {
   difficulty?: 'Beginner' | 'Intermediate' | 'Advanced' | null
   type?: 'Theory' | 'Practical' | 'Assessment' | null
   name?: string
+  exercises?: { count: number }[]
 }
 
 const ChaptersList: React.FC = () => {
@@ -66,7 +68,6 @@ const ChaptersList: React.FC = () => {
 
 
   const totalExercises = chapters.reduce((sum, chapter) => sum + (chapter.exercise_count || 0), 0)
-  const completedChapters = chapters.filter((c) => c.progress === 100).length
 
   return (
     <div className="chapters-container">
@@ -131,56 +132,11 @@ const ChaptersList: React.FC = () => {
               <span className="stat-value">{totalExercises}</span>
             </div>
           </div>
-
-          <div className="stat-card">
-            <div className="stat-icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12,6 12,12 16,14" />
-              </svg>
-            </div>
-            <div className="stat-content">
-              <span className="stat-label">Est. Duration</span>
-              <span className="stat-value">16h</span>
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22,4 12,14.01 9,11.01" />
-              </svg>
-            </div>
-            <div className="stat-content">
-              <span className="stat-label">Completed</span>
-              <span className="stat-value">
-                {completedChapters}/{chapters.length}
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 
       {loading ? (
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
-          <p>Loading course content...</p>
-        </div>
+        <Loader fullScreen />
       ) : error ? (
         <div className="error-state">
           <div className="error-icon">⚠️</div>
@@ -203,10 +159,6 @@ const ChaptersList: React.FC = () => {
                       <h2 className="chapter-title">{chapter.name || chapter.title}</h2>
                     </div>
 
-                    <p className="chapter-description">
-                      {chapter.description || 'No description available'}
-                    </p>
-
                     <div className="chapter-meta">
                       <div className="meta-item">
                         <svg
@@ -220,25 +172,8 @@ const ChaptersList: React.FC = () => {
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                           <polyline points="14,2 14,8 20,8" />
                         </svg>
-                        <span>{chapter.exercise_count || 0} exercises</span>
+                        <span>{chapter.exercise_count ?? 0} exercises</span>
                       </div>
-
-                      {chapter.estimated_time && (
-                        <div className="meta-item">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12,6 12,12 16,14" />
-                          </svg>
-                          <span>{chapter.estimated_time}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
 

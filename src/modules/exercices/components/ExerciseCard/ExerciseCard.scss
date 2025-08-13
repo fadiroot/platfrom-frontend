@@ -61,6 +61,113 @@
       color: #000000;
     }
   }
+
+  // Available exercise state (green styling)
+  &.available {
+    border-color: #10b981 !important;
+    background: #f0fdf4 !important;
+    box-shadow: 4px 4px 0px 0px #10b981 !important;
+
+    &:hover {
+      background: #ecfdf5 !important;
+      border-color: #059669 !important;
+      box-shadow: 8px 8px 0px 0px #059669 !important;
+    }
+
+    .card-header {
+      background: #f0fdf4 !important;
+      border-bottom-color: #10b981 !important;
+    }
+
+    .card-content {
+      background: #f0fdf4 !important;
+    }
+
+    .card-footer {
+      background: #f0fdf4 !important;
+      border-top-color: #10b981 !important;
+    }
+
+    .start-btn {
+      background: #10b981 !important;
+      border-color: #10b981 !important;
+      color: #ffffff !important;
+
+      &:hover {
+        background: #059669 !important;
+        border-color: #059669 !important;
+      }
+
+      span, .icon, .arrow-icon {
+        color: #ffffff !important;
+        stroke: #ffffff !important;
+      }
+    }
+
+    .available-badge {
+      background: #10b981 !important;
+      border-color: #10b981 !important;
+      color: #ffffff !important;
+    }
+
+    .exercise-title {
+      color: #10b981 !important;
+    }
+  }
+
+  // Premium locked state
+  &.premium-locked {
+    opacity: 0.9;
+    background: #fff5f0 !important;
+    border-color: #ff6b35 !important;
+    box-shadow: 4px 4px 0px 0px #ff6b35 !important;
+
+    &:hover {
+      transform: none;
+      box-shadow: 4px 4px 0px 0px #ff6b35 !important;
+      background: #fff5f0 !important;
+    }
+
+    .card-header {
+      background: #fff5f0 !important;
+      border-bottom-color: #ff6b35 !important;
+    }
+
+    .card-content {
+      background: #fff5f0 !important;
+    }
+
+    .card-footer {
+      background: #fff5f0 !important;
+      border-top-color: #ff6b35 !important;
+    }
+
+    .start-btn {
+      background: #ff6b35 !important;
+      border-color: #ff6b35 !important;
+      color: #ffffff !important;
+
+      &:hover {
+        background: #e55a2b !important;
+        border-color: #e55a2b !important;
+      }
+
+      span, .icon, .arrow-icon {
+        color: #ffffff !important;
+        stroke: #ffffff !important;
+      }
+    }
+
+    .premium-badge {
+      background: #ff6b35 !important;
+      border-color: #ff6b35 !important;
+      color: #ffffff !important;
+    }
+
+    .exercise-title {
+      color: #ff6b35 !important;
+    }
+  }
 }
 
 // Compact Header
@@ -129,6 +236,46 @@
 
       &.difficulty-2 {
         background: #ef4444;
+      }
+    }
+
+    .premium-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 2px solid #ff6b35;
+      background: #ff6b35;
+      color: white;
+
+      .premium-icon {
+        width: 12px;
+        height: 12px;
+      }
+    }
+
+    .available-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: 2px solid #10b981;
+      background: #10b981;
+      color: white;
+
+      .available-icon {
+        width: 12px;
+        height: 12px;
       }
     }
   }
@@ -296,6 +443,26 @@
           stroke: #ffffff;
         }
       }
+
+      // Upgrade required state
+      &.upgrade-required {
+        background: #ff6b35;
+        border-color: #ff6b35;
+        color: #ffffff;
+        cursor: pointer;
+
+        &:hover {
+          transform: translate(-1px, -1px);
+          box-shadow: 3px 3px 0px 0px #000000;
+          background: #e55a2b;
+          border-color: #e55a2b;
+        }
+
+        span, .icon {
+          color: #ffffff;
+          stroke: #ffffff;
+        }
+      }
     }
   }
 }
@@ -323,32 +490,85 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    color: #000000;
-    gap: 12px;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
     .play-icon {
       width: 32px;
       height: 32px;
       color: #000000;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     .overlay-text {
       font-size: 14px;
-      font-weight: 700;
+      font-weight: 600;
       color: #000000;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
 }
 
-.exercise-card:hover .hover-overlay {
+// Premium Lock Overlay
+.premium-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 107, 53, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 2;
+  border: 2px solid #ff6b35;
+
+  .overlay-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .lock-icon {
+      width: 32px;
+      height: 32px;
+      color: #ff6b35;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .overlay-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ff6b35;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+}
+
+// Show premium overlay on hover for locked cards
+.exercise-card.premium-locked:hover .premium-overlay {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  
+  .overlay-content {
+    transform: scale(1.05);
+    
+    .lock-icon {
+      transform: scale(1.1);
+    }
+    
+    .overlay-text {
+      color: #ff6b35;
+      font-weight: 600;
+    }
+  }
 }
 
 // Responsive Design

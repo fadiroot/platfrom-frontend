@@ -16,6 +16,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
     "@supabase/supabase-js": "^2.53.0",
+    "@types/react-router-dom": "^5.3.3",
     "accessible-nprogress": "^2.1.2",
     "antd": "^5.5.2",
     "axios": "^1.4.0",

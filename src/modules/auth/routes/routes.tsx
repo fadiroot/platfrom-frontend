@@ -35,6 +35,20 @@ const routes: RouteConfig[] = [
     component: lazy(() => import('../features/Register/Register')),
     layout: GuestLayout,
   },
+  {
+    exact: true,
+    guard: GuestGuard,
+    path: PATH.FORGOT_PASSWORD,
+    component: lazy(() => import('../features/ForgotPassword/ForgotPassword')),
+    layout: GuestLayout,
+  },
+  {
+    exact: true,
+    guard: GuestGuard,
+    path: PATH.RESET_PASSWORD,
+    component: lazy(() => import('../features/ResetPassword/ResetPassword')),
+    layout: GuestLayout,
+  },
 ]
 
 export default routes

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { getLevels, getLevelById, createLevel, updateLevel, deleteLevel } from '../../../lib/api/levels';
+import { getLevels, getPublicLevels, getLevelById, createLevel, updateLevel, deleteLevel } from '../../../lib/api/levels';
 
 export const fetchLevels = createAsyncThunk(
   'levels/fetchLevels',
@@ -9,6 +9,18 @@ export const fetchLevels = createAsyncThunk(
       return levels;
     } catch (err: any) {
       return rejectWithValue(err.message || 'Failed to fetch levels');
+    }
+  }
+);
+
+export const fetchPublicLevels = createAsyncThunk(
+  'levels/fetchPublicLevels',
+  async (_, { rejectWithValue }) => {
+    try {
+      const levels = await getPublicLevels();
+      return levels;
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Failed to fetch public levels');
     }
   }
 );

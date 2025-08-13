@@ -166,10 +166,14 @@
       }
 
       .current-flag {
-        width: 20px;
-        height: 15px;
+        width: 28px;
+        height: 21px;
         border-radius: 3px;
         object-fit: cover;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       svg {
@@ -223,10 +227,14 @@
         }
 
         .language-flag {
-          width: 20px;
-          height: 15px;
+          width: 28px;
+          height: 21px;
           border-radius: 3px;
           object-fit: cover;
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .language-name {

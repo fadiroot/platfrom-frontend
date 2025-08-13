@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { useAppSelector, useAppDispatch } from "../../store"
 import { logout } from "../../../auth/data/authThunk"
 import "./_Header.scss"
-import logoImg from '../../assets/images/Black & Blue Minimalist Modern Initial Font Logo (3).png'
+import logoImg from '/logo/astuceLogo.png'
 
 const Header: React.FC = () => {
   const navigate = useNavigate()
@@ -28,10 +28,6 @@ const Header: React.FC = () => {
           <div className="logo-container">
             <div className="logo-wrapper">
               <img src={logoImg || "/placeholder.svg"} alt="Educational Platform Logo" className="logo-image" />
-            </div>
-            <div className="brand-info">
-              <h1 className="brand-title">المنصة لي تنجحك</h1>
-              <p className="brand-subtitle">Educational Excellence Platform</p>
             </div>
           </div>
         </div>

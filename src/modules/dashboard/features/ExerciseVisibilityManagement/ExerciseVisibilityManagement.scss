@@ -1,0 +1,229 @@
+.exercise-visibility-management {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+
+  .page-header {
+    margin-bottom: 24px;
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0 0 8px 0;
+    }
+    
+    p {
+      font-size: 16px;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .ant-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e8e8e8;
+    
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0;
+      
+      .ant-card-head-title {
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+    }
+  }
+
+  .ant-statistic {
+    .ant-statistic-title {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .ant-statistic-content {
+      font-size: 24px;
+      font-weight: 700;
+    }
+  }
+
+  .ant-table {
+    .ant-table-thead > tr > th {
+      background: #fafafa;
+      font-weight: 600;
+      color: #1a1a1a;
+      border-bottom: 2px solid #e8e8e8;
+    }
+    
+    .ant-table-tbody > tr > td {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 16px 12px;
+    }
+    
+    .ant-table-tbody > tr:hover > td {
+      background: #f8f9fa;
+    }
+  }
+
+  .ant-tag {
+    border-radius: 4px;
+    font-weight: 500;
+    padding: 2px 8px;
+    
+    &.ant-tag-green {
+      background: #f6ffed;
+      border-color: #b7eb8f;
+      color: #52c41a;
+    }
+    
+    &.ant-tag-orange {
+      background: #fff7e6;
+      border-color: #ffd591;
+      color: #fa8c16;
+    }
+    
+    &.ant-tag-red {
+      background: #fff2f0;
+      border-color: #ffccc7;
+      color: #ff4d4f;
+    }
+    
+    &.ant-tag-blue {
+      background: #e6f7ff;
+      border-color: #91d5ff;
+      color: #1890ff;
+    }
+  }
+
+  .ant-switch {
+    &.ant-switch-checked {
+      background-color: #52c41a;
+    }
+    
+    &.ant-switch-checked .ant-switch-handle {
+      background-color: #fff;
+    }
+  }
+
+  .ant-btn {
+    border-radius: 6px;
+    font-weight: 500;
+    
+    &.ant-btn-primary {
+      background: #1890ff;
+      border-color: #1890ff;
+      
+      &:hover {
+        background: #40a9ff;
+        border-color: #40a9ff;
+      }
+    }
+  }
+
+  .ant-select {
+    .ant-select-selector {
+      border-radius: 6px;
+      border: 1px solid #d9d9d9;
+      
+      &:hover {
+        border-color: #40a9ff;
+      }
+      
+      &.ant-select-focused {
+        border-color: #1890ff;
+        box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+      }
+    }
+  }
+
+  .ant-input {
+    border-radius: 6px;
+    border: 1px solid #d9d9d9;
+    
+    &:hover {
+      border-color: #40a9ff;
+    }
+    
+    &:focus {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+  }
+
+  .exercise-info {
+    .exercise-name {
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    
+    .exercise-path {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+
+  .visibility-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .visibility-label {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 16px;
+    
+    .page-header {
+      h1 {
+        font-size: 24px;
+      }
+      
+      p {
+        font-size: 14px;
+      }
+    }
+    
+    .ant-row {
+      margin-bottom: 16px;
+    }
+    
+    .ant-col {
+      margin-bottom: 16px;
+    }
+    
+    .ant-table {
+      .ant-table-thead > tr > th,
+      .ant-table-tbody > tr > td {
+        padding: 8px 4px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding: 12px;
+    
+    .ant-card {
+      margin-bottom: 12px;
+    }
+    
+    .ant-table {
+      .ant-table-thead > tr > th,
+      .ant-table-tbody > tr > td {
+        padding: 6px 2px;
+        font-size: 11px;
+      }
+    }
+    
+    .ant-btn {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+  }
+} 

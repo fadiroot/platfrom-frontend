@@ -31,6 +31,74 @@
     "continue": "Continuer",
     "review": "Réviser"
   },
+  "auth": {
+    "login": {
+      "title": "Bon Retour",
+      "subtitle": "Veuillez vous connecter à votre compte",
+      "email": "Email",
+      "emailPlaceholder": "Votre email",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "••••••••",
+      "remember": "Se souvenir de moi",
+      "forgot": "Mot de passe oublié ?",
+      "submit": "Se Connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "createAccount": "S'inscrire",
+      "signIn": "Se Connecter"
+    },
+    "register": {
+      "title": "Créer un Compte",
+      "subtitle": "Rejoignez-nous aujourd'hui et commencez",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Entrez votre prénom",
+      "lastName": "Nom de famille",
+      "lastNamePlaceholder": "Entrez votre nom de famille",
+      "username": "Nom d'utilisateur",
+      "usernamePlaceholder": "Entrez votre nom d'utilisateur",
+      "email": "Email",
+      "emailPlaceholder": "Entrez votre email",
+      "phoneNumber": "Numéro de téléphone",
+      "phoneNumberPlaceholder": "Entrez votre numéro de téléphone",
+      "level": "Niveau",
+      "levelPlaceholder": "Sélectionnez un niveau",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+      "terms": "J'accepte les termes et conditions",
+      "submit": "Créer le Compte",
+      "creatingAccount": "Création du compte...",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se Connecter",
+      "success": "Compte créé avec succès ! Veuillez vérifier votre email pour l'activation avant de vous connecter."
+    },
+    "forgotPassword": {
+      "title": "Mot de Passe Oublié",
+      "subtitle": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+      "email": "Adresse Email",
+      "emailPlaceholder": "Entrez votre adresse email",
+      "sendReset": "Envoyer le Lien de Réinitialisation",
+      "sending": "Envoi",
+      "checkEmail": "Vérifiez Votre Email",
+      "emailSent": "Nous avons envoyé un lien de réinitialisation de mot de passe à votre adresse email",
+      "instructions": "Veuillez vérifier votre email et suivre les instructions pour réinitialiser votre mot de passe",
+      "backToLogin": "Retour à la Connexion"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le Mot de Passe",
+      "subtitle": "Entrez votre nouveau mot de passe ci-dessous",
+      "newPassword": "Nouveau Mot de Passe",
+      "passwordPlaceholder": "Entrez votre nouveau mot de passe",
+      "confirmPassword": "Confirmer le Mot de Passe",
+      "confirmPasswordPlaceholder": "Confirmez votre nouveau mot de passe",
+      "submit": "Mettre à Jour le Mot de Passe",
+      "updating": "Mise à jour...",
+      "backToLogin": "Retour à la Connexion",
+      "rememberPassword": "Vous vous souvenez de votre mot de passe ?",
+      "signIn": "Se Connecter",
+      "checkingLink": "Vérification du lien de réinitialisation..."
+    }
+  },
   "subjects": {
     "title": "Toutes les Matières",
     "titleWithLevel": "Matières - {{level}}",
@@ -68,19 +136,18 @@
   },
   "exercises": {
     "title": "Exercices",
-    "subtitle": "Résolvez des exercices pour améliorer vos compétences",
+    "subtitle": "Pratiquez et améliorez vos compétences avec ces exercices",
     "backToChapters": "Retour aux Chapitres",
-    "start": "Commencer l'exercice",
-    "review": "Réviser l'exercice",
-    "complete": "Terminer",
-    "completed": "Terminé",
+    "start": "Commencer l'Exercice",
+    "review": "Réviser l'Exercice",
+    "premium": "PREMIUM",
+    "available": "DISPONIBLE",
+    "upgradeRequired": "Mise à Niveau Requise",
+    "premiumContent": "Contenu Premium",
     "difficulty": {
-      "beginner": "Débutant",
-      "intermediate": "Intermédiaire", 
-      "advanced": "Avancé",
-      "easy": "Facile",
-      "medium": "Moyen",
-      "hard": "Difficile"
+      "easy": "FACILE",
+      "medium": "MOYEN",
+      "hard": "DIFFICILE"
     },
     "type": {
       "theory": "Théorie",
@@ -92,5 +159,13 @@
     "questions": "Questions",
     "noExercises": "Aucun exercice disponible dans ce chapitre",
     "loading": "Chargement des exercices..."
+  },
+  "premium": {
+    "title": "Contenu Premium",
+    "message": "Cet exercice nécessite un abonnement actif",
+    "subMessage": "Pour accéder à ce contenu premium, veuillez contacter l'administrateur pour activer votre compte. Vous pouvez essayer les exercices généraux gratuits en attendant l'activation.",
+    "cancel": "Annuler",
+    "contactAdmin": "Contacter l'administrateur",
+    "contactInfo": "Veuillez contacter votre administrateur pour activer votre compte. Vous pouvez les joindre à admin@example.com ou appeler au +1234567890."
   }
 }

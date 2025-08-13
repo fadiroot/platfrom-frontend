@@ -21,7 +21,10 @@ export const getChapters = async (): Promise<Chapter[]> => {
 export const getChaptersBySubject = async (subjectId: string): Promise<Chapter[]> => {
   const { data, error } = await supabase
     .from('chapters')
-    .select('*')
+    .select(`
+      *,
+      exercises:exercises(count)
+    `)
     .eq('subject_id', subjectId)
     .order('created_at', { ascending: true })
 
@@ -29,7 +32,13 @@ export const getChaptersBySubject = async (subjectId: string): Promise<Chapter[]
     throw new Error(`Failed to fetch chapters by subject: ${error.message}`)
   }
 
-  return data || []
+  // Transform the data to include exercise_count
+  const transformedData = data?.map(chapter => ({
+    ...chapter,
+    exercise_count: chapter.exercises?.[0]?.count || 0
+  })) || []
+
+  return transformedData
 }
 
 // Get chapters by level ID (through subjects)
@@ -40,7 +49,8 @@ export const getChaptersByLevel = async (levelId: string): Promise<Chapter[]> =>
       *,
       subject:subjects!inner(
         level_id
-      )
+      ),
+      exercises:exercises(count)
     `)
     .eq('subject.level_id', levelId)
     .order('created_at', { ascending: true })
@@ -49,7 +59,13 @@ export const getChaptersByLevel = async (levelId: string): Promise<Chapter[]> =>
     throw new Error(`Failed to fetch chapters by level: ${error.message}`)
   }
 
-  return data || []
+  // Transform the data to include exercise_count
+  const transformedData = data?.map(chapter => ({
+    ...chapter,
+    exercise_count: chapter.exercises?.[0]?.count || 0
+  })) || []
+
+  return transformedData
 }
 
 // Get chapter by ID

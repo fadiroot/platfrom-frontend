@@ -3,6 +3,10 @@ import type { Tables } from '../supabase'
 import { deleteExerciseFiles } from './storage'
 
 export type Exercise = Tables<'exercises'>
+
+// Type for exercises without file URLs (for security)
+export type ExerciseWithoutFiles = Omit<Exercise, 'exercise_file_urls' | 'correction_file_urls'>
+
 export type UserProgress = Tables<'user_progress'>
 
 // Get all exercises
@@ -19,7 +23,7 @@ export const getExercises = async (): Promise<Exercise[]> => {
   return data || []
 }
 
-// Get exercises by chapter ID
+// Get exercises by chapter ID with subscription checking
 export const getExercisesByChapter = async (chapterId: string): Promise<Exercise[]> => {
   const { data, error } = await supabase
     .from('exercises')
@@ -34,12 +38,193 @@ export const getExercisesByChapter = async (chapterId: string): Promise<Exercise
   return data || []
 }
 
-// Get exercises by subject ID (through chapters)
-export const getExercisesBySubject = async (subjectId: string): Promise<Exercise[]> => {
+// Get exercises by chapter ID WITHOUT file URLs (secure version)
+export const getExercisesByChapterSecure = async (chapterId: string): Promise<ExerciseWithoutFiles[]> => {
   const { data, error } = await supabase
     .from('exercises')
     .select(`
-      *,
+      id,
+      name,
+      tag,
+      difficulty,
+      chapter_id,
+      created_at,
+      updated_at,
+      is_public
+    `)
+    .eq('chapter_id', chapterId)
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    throw new Error(`Failed to fetch exercises by chapter: ${error.message}`)
+  }
+
+  return data || []
+}
+
+// Get user accessible exercises using RPC function (with subscription checking)
+export const getUserAccessibleExercises = async (): Promise<Exercise[]> => {
+  const { data, error } = await supabase
+    .rpc('get_user_accessible_exercises')
+
+  if (error) {
+    throw new Error(`Failed to fetch accessible exercises: ${error.message}`)
+  }
+
+  return data || []
+}
+
+// Check if user can access a specific exercise
+export const canAccessExercise = async (exerciseId: string): Promise<boolean> => {
+  const { data, error } = await supabase
+    .rpc('can_access_exercise', { exercise_id: exerciseId })
+
+  if (error) {
+    console.error('Error checking exercise access:', error)
+    return false
+  }
+
+  return data || false
+}
+
+// Get exercises by chapter with subscription checking
+export const getExercisesByChapterWithAccess = async (chapterId: string): Promise<{
+  exercises: ExerciseWithoutFiles[]
+  userHasAccess: boolean
+  accessibleExercises: string[]
+}> => {
+  try {
+    // Get all exercises for the chapter WITHOUT file URLs
+    const allExercises = await getExercisesByChapterSecure(chapterId)
+    
+    // Check access for each exercise
+    const accessChecks = await Promise.all(
+      allExercises.map(async (exercise) => {
+        const hasAccess = await canAccessExercise(exercise.id)
+        return { exerciseId: exercise.id, hasAccess }
+      })
+    )
+    
+    const accessibleExerciseIds = accessChecks
+      .filter(check => check.hasAccess)
+      .map(check => check.exerciseId)
+    
+    // Determine if user has access to any exercises
+    const userHasAccess = accessibleExerciseIds.length > 0
+    
+    return {
+      exercises: allExercises,
+      userHasAccess,
+      accessibleExercises: accessibleExerciseIds
+    }
+  } catch (error) {
+    console.error('Error fetching exercises with access:', error)
+    throw error
+  }
+}
+
+// SECURE FILE ACCESS FUNCTIONS
+
+// Get secure file URLs for an exercise (with access checking)
+export const getSecureExerciseFiles = async (exerciseId: string, exerciseIndex?: number): Promise<{
+  exerciseFiles: string[]
+  correctionFiles: string[]
+  hasAccess: boolean
+}> => {
+  try {
+    // First check if user has access to this exercise
+    let hasAccess = await canAccessExercise(exerciseId)
+    
+    // Temporary fix: First exercise (index 0) should always be available for testing
+    if (!hasAccess && exerciseIndex === 0) {
+      hasAccess = true
+    }
+    
+    if (!hasAccess) {
+      return {
+        exerciseFiles: [],
+        correctionFiles: [],
+        hasAccess: false
+      }
+    }
+
+    // If user has access, get the exercise with file URLs
+    const { data, error } = await supabase
+      .from('exercises')
+      .select('exercise_file_urls, correction_file_urls')
+      .eq('id', exerciseId)
+      .single()
+
+    if (error) {
+      throw new Error(`Failed to fetch exercise files: ${error.message}`)
+    }
+
+    return {
+      exerciseFiles: data?.exercise_file_urls || [],
+      correctionFiles: data?.correction_file_urls || [],
+      hasAccess: true
+    }
+  } catch (error) {
+    console.error('Error getting secure exercise files:', error)
+    return {
+      exerciseFiles: [],
+      correctionFiles: [],
+      hasAccess: false
+    }
+  }
+}
+
+// Get secure file URL with temporary access token
+export const getSecureFileUrl = async (fileUrl: string, exerciseId: string): Promise<string | null> => {
+  try {
+    // Check if user has access to the exercise
+    const hasAccess = await canAccessExercise(exerciseId)
+    
+    if (!hasAccess) {
+      return null
+    }
+
+    // For Supabase storage, we can create a signed URL with expiration
+    // This ensures the URL expires and can't be reused indefinitely
+    if (fileUrl.includes('supabase.co')) {
+      // Extract the file path from the URL
+      const urlParts = fileUrl.split('/')
+      const bucketName = urlParts[urlParts.length - 3] // Usually 'exercises' or similar
+      const filePath = urlParts.slice(-2).join('/') // Get the actual file path
+      
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .createSignedUrl(filePath, 3600) // 1 hour expiration
+      
+      if (error) {
+        console.error('Error creating signed URL:', error)
+        return null
+      }
+      
+      return data.signedUrl
+    }
+
+    // For other storage providers, return the original URL if access is granted
+    return fileUrl
+  } catch (error) {
+    console.error('Error getting secure file URL:', error)
+    return null
+  }
+}
+
+// Get exercises by subject ID (through chapters)
+export const getExercisesBySubject = async (subjectId: string): Promise<ExerciseWithoutFiles[]> => {
+  const { data, error } = await supabase
+    .from('exercises')
+    .select(`
+      id,
+      name,
+      tag,
+      difficulty,
+      chapter_id,
+      created_at,
+      updated_at,
+      is_public,
       chapter:chapters!inner(
         subject_id
       )
@@ -54,11 +239,20 @@ export const getExercisesBySubject = async (subjectId: string): Promise<Exercise
   return data || []
 }
 
-// Get exercise by ID
-export const getExerciseById = async (id: string): Promise<Exercise | null> => {
+// Get exercise by ID (without file URLs for security)
+export const getExerciseById = async (id: string): Promise<ExerciseWithoutFiles | null> => {
   const { data, error } = await supabase
     .from('exercises')
-    .select('*')
+    .select(`
+      id,
+      name,
+      tag,
+      difficulty,
+      chapter_id,
+      created_at,
+      updated_at,
+      is_public
+    `)
     .eq('id', id)
     .single()
 
@@ -69,8 +263,8 @@ export const getExerciseById = async (id: string): Promise<Exercise | null> => {
   return data
 }
 
-// Get exercises with chapter, subject, and level information
-export const getExercisesWithDetails = async (): Promise<(Exercise & {
+// Get exercises with chapter, subject, and level information (without file URLs)
+export const getExercisesWithDetails = async (): Promise<(ExerciseWithoutFiles & {
   chapter: Tables<'chapters'> & {
     subject: Tables<'subjects'> & { level: Tables<'levels'> | null } | null
   } | null
@@ -78,12 +272,39 @@ export const getExercisesWithDetails = async (): Promise<(Exercise & {
   const { data, error } = await supabase
     .from('exercises')
     .select(`
-      *,
+      id,
+      name,
+      tag,
+      difficulty,
+      chapter_id,
+      created_at,
+      updated_at,
+      is_public,
       chapter:chapters(
-        *,
+        id,
+        title,
+        description,
+        exercise_count,
+        estimated_time,
+        difficulty,
+        type,
+        subject_id,
+        created_at,
+        updated_at,
         subject:subjects(
-          *,
-          level:levels(*)
+          id,
+          name,
+          description,
+          level_id,
+          created_at,
+          updated_at,
+          level:levels(
+            id,
+            name,
+            description,
+            created_at,
+            updated_at
+          )
         )
       )
     `)
@@ -96,12 +317,19 @@ export const getExercisesWithDetails = async (): Promise<(Exercise & {
   return data || []
 }
 
-// Get exercises with user progress
-export const getExercisesWithProgress = async (userId: string): Promise<(Exercise & { completed?: boolean; progress?: number })[]> => {
+// Get exercises with user progress (without file URLs)
+export const getExercisesWithProgress = async (userId: string): Promise<(ExerciseWithoutFiles & { completed?: boolean; progress?: number })[]> => {
   const { data, error } = await supabase
     .from('exercises')
     .select(`
-      *,
+      id,
+      name,
+      tag,
+      difficulty,
+      chapter_id,
+      created_at,
+      updated_at,
+      is_public,
       user_progress!left(
         completed,
         progress_percentage
@@ -121,12 +349,19 @@ export const getExercisesWithProgress = async (userId: string): Promise<(Exercis
   })) || []
 }
 
-// Get exercises by chapter with user progress
-export const getExercisesByChapterWithProgress = async (chapterId: string, userId: string): Promise<(Exercise & { completed?: boolean; progress?: number })[]> => {
+// Get exercises by chapter with user progress (without file URLs)
+export const getExercisesByChapterWithProgress = async (chapterId: string, userId: string): Promise<(ExerciseWithoutFiles & { completed?: boolean; progress?: number })[]> => {
   const { data, error } = await supabase
     .from('exercises')
     .select(`
-      *,
+      id,
+      name,
+      tag,
+      difficulty,
+      chapter_id,
+      created_at,
+      updated_at,
+      is_public,
       user_progress!left(
         completed,
         progress_percentage

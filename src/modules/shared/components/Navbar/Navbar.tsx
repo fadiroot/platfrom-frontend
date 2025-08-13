@@ -178,11 +178,7 @@ const Navbar: React.FC<INavbarProps> = ({ setShowSidebar, setCollapseSidebar, co
           <div className="brand-section">
             <div className="brand-logo">
               <div className="logo-icon">
-                <span className="logo-symbol">🎓</span>
-              </div>
-              <div className="brand-text">
-                <h1 className="brand-name">المنصة لي تنجحك</h1>
-                <p className="brand-tagline">Educational Excellence Platform</p>
+                <img src="/logo/astuceLogo.png" alt="Platform Logo" className="logo-image" />
               </div>
             </div>
           </div>

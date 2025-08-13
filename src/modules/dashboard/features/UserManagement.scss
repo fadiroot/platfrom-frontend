@@ -1,0 +1,525 @@
+.user-management {
+  padding: 24px;
+  background: #f5f5f5;
+  min-height: 100vh;
+
+  // Page Header
+  .page-header {
+    margin-bottom: 24px;
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 20px 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        h1 {
+          margin: 0;
+          font-size: 24px;
+          font-weight: 600;
+          color: #262626;
+        }
+
+        svg {
+          color: #1890ff;
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+      }
+    }
+  }
+
+  // Statistics Row
+  .stats-row {
+    margin-bottom: 24px;
+
+    .ant-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      .ant-statistic-title {
+        font-size: 14px;
+        color: #8c8c8c;
+        margin-bottom: 8px;
+      }
+
+      .ant-statistic-content {
+        font-size: 24px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Filters Card
+  .filters-card {
+    margin-bottom: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .ant-row {
+      align-items: center;
+    }
+  }
+
+  // Table Card
+  .table-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .students-table {
+      .ant-table-thead > tr > th {
+        background: #fafafa;
+        font-weight: 600;
+        color: #262626;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .ant-table-tbody > tr:hover > td {
+        background: #f5f5f5;
+      }
+
+      .ant-table-tbody > tr > td {
+        padding: 16px 12px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      // Student Info Column
+      .student-info {
+        display: flex;
+        align-items: center;
+
+        .student-name {
+          font-weight: 500;
+          color: #262626;
+          margin-bottom: 4px;
+          font-size: 14px;
+        }
+
+        .student-email {
+          font-size: 12px;
+          color: #8c8c8c;
+        }
+      }
+
+      // Subscription Info
+      .subscription-info {
+        font-size: 12px;
+        color: #595959;
+
+        div {
+          margin-bottom: 2px;
+        }
+      }
+
+      // Payment Info
+      .payment-info {
+        div {
+          margin-bottom: 4px;
+          font-weight: 500;
+        }
+      }
+
+      // Action Buttons
+      .ant-btn {
+        border-radius: 6px;
+        font-weight: 500;
+        
+        &.ant-btn-primary {
+          background: #1890ff;
+          border-color: #1890ff;
+          
+          &:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+          }
+        }
+        
+        &.ant-btn-dangerous {
+          background: #ff4d4f;
+          border-color: #ff4d4f;
+          
+          &:hover {
+            background: #ff7875;
+            border-color: #ff7875;
+          }
+        }
+      }
+    }
+  }
+
+  // Modal Styles
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+      &.enhanced-modal {
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 24px 24px 0;
+          border-bottom: 1px solid #f0f0f0;
+          margin-bottom: 24px;
+
+          h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #262626;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+
+          .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #8c8c8c;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: #f5f5f5;
+              color: #262626;
+            }
+
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+        }
+
+        .modal-body {
+          padding: 0 24px;
+
+          .user-info-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 24px;
+
+            .user-avatar {
+              width: 60px;
+              height: 60px;
+              border-radius: 50%;
+              background: #1890ff;
+              color: white;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 24px;
+              font-weight: 600;
+              margin-right: 16px;
+            }
+
+            .user-details {
+              h4 {
+                margin: 0 0 4px 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #262626;
+              }
+
+              p {
+                margin: 0 0 2px 0;
+                color: #8c8c8c;
+                font-size: 14px;
+
+                &:last-child {
+                  margin-bottom: 0;
+                }
+              }
+            }
+          }
+
+          .form-section {
+            margin-bottom: 24px;
+
+            h4 {
+              margin: 0 0 16px 0;
+              font-size: 16px;
+              font-weight: 600;
+              color: #262626;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+
+            .form-row {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 16px;
+              margin-bottom: 16px;
+
+              @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+              }
+            }
+
+            .form-group {
+              margin-bottom: 16px;
+
+              label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 500;
+                color: #262626;
+              }
+
+              input, select, textarea {
+                width: 100%;
+                padding: 12px;
+                border: 1px solid #d9d9d9;
+                border-radius: 6px;
+                font-size: 14px;
+                transition: all 0.2s ease;
+
+                &:focus {
+                  outline: none;
+                  border-color: #1890ff;
+                  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+                }
+
+                &:disabled {
+                  background: #f5f5f5;
+                  cursor: not-allowed;
+                }
+              }
+
+              textarea {
+                resize: vertical;
+                min-height: 80px;
+              }
+            }
+
+            .end-date-display {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 12px;
+              background: #f6ffed;
+              border: 1px solid #b7eb8f;
+              border-radius: 6px;
+              color: #52c41a;
+              font-weight: 500;
+            }
+          }
+
+          .activation-form {
+            .form-section {
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+          }
+
+          .deactivation-form {
+            .warning-message {
+              display: flex;
+              align-items: flex-start;
+              gap: 12px;
+              padding: 16px;
+              background: #fff2e8;
+              border: 1px solid #ffbb96;
+              border-radius: 8px;
+              margin-bottom: 20px;
+
+              svg {
+                color: #fa8c16;
+                margin-top: 2px;
+              }
+
+              p {
+                margin: 0;
+                color: #d46b08;
+                font-size: 14px;
+                line-height: 1.5;
+              }
+            }
+          }
+        }
+
+        .modal-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          padding: 24px;
+          border-top: 1px solid #f0f0f0;
+          margin-top: 24px;
+
+          .btn-cancel {
+            padding: 12px 24px;
+            border: 1px solid #d9d9d9;
+            background: white;
+            color: #595959;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+
+            &:hover {
+              border-color: #40a9ff;
+              color: #40a9ff;
+            }
+
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+
+          .btn-confirm {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+
+            &.btn-activate {
+              background: #52c41a;
+              color: white;
+
+              &:hover {
+                background: #73d13d;
+              }
+
+              &:disabled {
+                background: #b7eb8f;
+                cursor: not-allowed;
+              }
+            }
+
+            &.btn-deactivate {
+              background: #ff4d4f;
+              color: white;
+
+              &:hover {
+                background: #ff7875;
+              }
+
+              &:disabled {
+                background: #ffccc7;
+                cursor: not-allowed;
+              }
+            }
+
+            .spinner {
+              width: 16px;
+              height: 16px;
+              border: 2px solid transparent;
+              border-top: 2px solid currentColor;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 16px;
+
+    .page-header {
+      .header-content {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+
+        .header-actions {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+
+    .stats-row {
+      .ant-col {
+        margin-bottom: 16px;
+      }
+    }
+
+    .filters-card {
+      .ant-row {
+        .ant-col {
+          margin-bottom: 16px;
+        }
+      }
+    }
+
+    .modal-overlay {
+      padding: 10px;
+
+      .modal-content {
+        .modal-body {
+          .form-section {
+            .form-row {
+              grid-template-columns: 1fr;
+            }
+          }
+        }
+
+        .modal-actions {
+          flex-direction: column;
+
+          button {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

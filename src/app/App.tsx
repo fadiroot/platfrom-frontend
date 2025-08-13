@@ -2,7 +2,7 @@ import routes, { renderRoutes } from '../modules/shared/routes'
 import { useAppSelector } from '../modules/shared/store'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet-async'
-import newLogo from '../modules/shared/assets/images/Black & Blue Minimalist Modern Initial Font Logo (3).png'
+import newLogo from '/logo/astuceLogo.png'
 
 const App = () => {
   // get translation.json file from public/locales

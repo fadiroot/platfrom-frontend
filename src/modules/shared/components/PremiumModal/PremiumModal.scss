@@ -1,0 +1,229 @@
+@use '../../../shared/assets/styles/abstracts/student-theme' as *;
+
+.premium-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.premium-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  border: 2px solid #000000;
+  animation: modalSlideIn 0.3s ease-out;
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #000000;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .premium-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+
+      .star-icon {
+        width: 18px;
+        height: 18px;
+        color: #ffffff;
+        fill: #ffffff;
+      }
+    }
+
+    .modal-title {
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .close-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    .close-icon {
+      width: 16px;
+      height: 16px;
+      color: #ffffff;
+    }
+  }
+}
+
+.modal-content {
+  padding: 32px 24px;
+  text-align: center;
+
+  .lock-icon-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+
+    .lock-icon {
+      width: 64px;
+      height: 64px;
+      color: #ff6b35;
+      opacity: 0.8;
+    }
+  }
+
+  .content-text {
+    .main-message {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333333;
+      margin: 0 0 16px 0;
+      line-height: 1.4;
+    }
+
+    .sub-message {
+      font-size: 14px;
+      color: #666666;
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}
+
+.modal-actions {
+  padding: 24px;
+  display: flex;
+  gap: 12px;
+  border-top: 2px solid #000000;
+  background: #f8f9fa;
+
+  .cancel-button,
+  .contact-button {
+    flex: 1;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid #000000;
+    box-shadow: 2px 2px 0px 0px #000000;
+
+    &:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px 0px #000000;
+    }
+
+    &:active {
+      transform: translate(0, 0);
+      box-shadow: 1px 1px 0px 0px #000000;
+    }
+  }
+
+  .cancel-button {
+    background: #ffffff;
+    color: #333333;
+
+    &:hover {
+      background: #f0f0f0;
+    }
+  }
+
+  .contact-button {
+    background: #ff6b35;
+    color: #ffffff;
+
+    &:hover {
+      background: #e55a2b;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  .premium-modal {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .modal-header {
+    padding: 20px;
+
+    .header-content {
+      .modal-title {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .modal-content {
+    padding: 24px 20px;
+
+    .content-text {
+      .main-message {
+        font-size: 16px;
+      }
+
+      .sub-message {
+        font-size: 13px;
+      }
+    }
+  }
+
+  .modal-actions {
+    padding: 20px;
+    flex-direction: column;
+
+    .cancel-button,
+    .contact-button {
+      width: 100%;
+    }
+  }
+}

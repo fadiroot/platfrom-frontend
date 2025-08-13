@@ -182,6 +182,23 @@ export const resetPassword = async (email: string): Promise<{ error: AuthError |
   return { error }
 }
 
+// Handle password reset recovery (when user clicks email link)
+export const handlePasswordResetRecovery = async (): Promise<{ user: User | null; error: AuthError | null }> => {
+  const { data, error } = await supabase.auth.getUser()
+  
+  if (error) {
+    return { user: null, error }
+  }
+  
+  // Check if user is in recovery mode (has recovery token)
+  const session = await getCurrentSession()
+  if (session?.user?.aud === 'recovery') {
+    return { user: session.user, error: null }
+  }
+  
+  return { user: data.user, error: null }
+}
+
 // Update password
 export const updatePassword = async (newPassword: string): Promise<{ error: AuthError | null }> => {
   const { error } = await supabase.auth.updateUser({
@@ -210,13 +227,22 @@ export const getUserProfile = async (user: User): Promise<UserProfile> => {
 }
 
 // Get user with level information from student_profile table
-export const getUserWithLevel = async (user: User): Promise<UserProfile & { level: Tables<'levels'> | null }> => {
+export const getUserWithLevel = async (user: User): Promise<UserProfile & { level: Tables<'levels'> | null; role?: string; isAdmin?: boolean }> => {
   const profile = await getUserProfile(user)
   
   let level = null
   let levelId = null
+  let role = null
+  let isAdmin = false
   
   try {
+    // Check if user is admin using the is_admin function
+    const { data: adminCheck, error: adminError } = await supabase.rpc('is_admin')
+    if (!adminError && adminCheck) {
+      isAdmin = true
+      role = 'admin'
+    }
+    
     // Get user level from student_profile table
     const { data, error } = await supabase
       .from('student_profile')
@@ -244,7 +270,9 @@ export const getUserWithLevel = async (user: User): Promise<UserProfile & { leve
   return {
     ...profile,
     levelId,
-    level
+    level,
+    role,
+    isAdmin
   }
 }
 

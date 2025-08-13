@@ -31,6 +31,74 @@
     "continue": "Continue",
     "review": "Review"
   },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Please sign in to your account",
+      "email": "Email",
+      "emailPlaceholder": "Your email",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "remember": "Remember me",
+      "forgot": "Forgot your password?",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Sign Up",
+      "signIn": "Sign In"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join us today and get started",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter your first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter your last name",
+      "username": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter your phone number",
+      "level": "Level",
+      "levelPlaceholder": "Select a level",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "terms": "I agree to the terms and conditions",
+      "submit": "Create Account",
+      "creatingAccount": "Creating Account...",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign In",
+      "success": "Account created successfully! Please check your email for verification before logging in."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address and we will send you a link to reset your password",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "sendReset": "Send Reset Link",
+      "sending": "Sending",
+      "checkEmail": "Check Your Email",
+      "emailSent": "We have sent a password reset link to your email address",
+      "instructions": "Please check your email and follow the instructions to reset your password",
+      "backToLogin": "Back to Login"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your new password below",
+      "newPassword": "New Password",
+      "passwordPlaceholder": "Enter your new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your new password",
+      "submit": "Update Password",
+      "updating": "Updating...",
+      "backToLogin": "Back to Login",
+      "rememberPassword": "Remember your password?",
+      "signIn": "Sign In",
+      "checkingLink": "Checking reset link..."
+    }
+  },
   "subjects": {
     "title": "All Subjects",
     "titleWithLevel": "Subjects - {{level}}",
@@ -68,29 +136,26 @@
   },
   "exercises": {
     "title": "Exercises",
-    "subtitle": "Solve exercises to improve your skills",
+    "subtitle": "Practice and improve your skills with these exercises",
     "backToChapters": "Back to Chapters",
     "start": "Start Exercise",
     "review": "Review Exercise",
-    "complete": "Complete",
-    "completed": "Completed",
+    "premium": "PREMIUM",
+    "available": "AVAILABLE",
+    "upgradeRequired": "Upgrade Required",
+    "premiumContent": "Premium Content",
     "difficulty": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate", 
-      "advanced": "Advanced",
-      "easy": "Easy",
-      "medium": "Medium",
-      "hard": "Hard"
-    },
-    "type": {
-      "theory": "Theory",
-      "practical": "Practical",
-      "quiz": "Quiz"
-    },
-    "duration": "Duration",
-    "points": "Points",
-    "questions": "Questions",
-    "noExercises": "No exercises available in this chapter",
-    "loading": "Loading exercises..."
+      "easy": "EASY",
+      "medium": "MEDIUM", 
+      "hard": "HARD"
+    }
+  },
+  "premium": {
+    "title": "Premium Content",
+    "message": "This exercise requires an active subscription",
+    "subMessage": "To access this premium content, please contact the administrator to activate your account. You can try the free general exercises while waiting for activation.",
+    "cancel": "Cancel",
+    "contactAdmin": "Contact Administrator",
+    "contactInfo": "Please contact your administrator to activate your account. You can reach them at admin@example.com or call +1234567890."
   }
 }

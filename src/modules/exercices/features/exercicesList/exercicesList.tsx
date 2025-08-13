@@ -1,128 +1,194 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import './index.scss';
+
 import ExerciseCard from '../../components/ExerciseCard/ExerciseCard';
 import ExerciseViewer from '../../components/ExerciseViewer/ExerciseViewer';
-import { getExercisesByChapter } from '@/lib/api/exercises';
+import PremiumModal from '../../../shared/components/PremiumModal/PremiumModal';
+import { getExercisesByChapterWithAccess, canAccessExercise } from '@/lib/api/exercises';
 import { getChapterById } from '@/lib/api/chapters';
 import type { Exercise as SupabaseExercise } from '@/lib/api/exercises';
 import { Exercise } from '../../types/exercise';
+import Loader from '../../../shared/components/Loader/Loader';
+import './index.scss';
 
 const ExercisesList: React.FC = () => {
-  const { chapterId, subjectId } = useParams<{ chapterId: string, subjectId: string }>();
-  const navigate = useNavigate();
   const { t } = useTranslation('translation');
-  const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [chapterTitle, setChapterTitle] = useState<string>('');
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Map Supabase exercise data to local Exercise format
-  const mapSupabaseToLocalExercise = (supabaseExercise: SupabaseExercise): Exercise => {
-    const difficultyToTag = (difficulty: string | null): number => {
-      switch (difficulty?.toLowerCase()) {
-        case 'easy': return 0;
-        case 'medium': return 1;
-        case 'hard': return 2;
-        default: return 0;
-      }
-    };
-
-    return {
-      id: supabaseExercise.id,
-      name: supabaseExercise.name || '',
-      tag: difficultyToTag(supabaseExercise.difficulty),
-      subjectId: supabaseExercise.chapter_id || '', // Note: This is actually chapter_id but keeping for compatibility
-      exerciseFileUrls: supabaseExercise.exercise_file_urls || [],
-      correctionFileUrls: supabaseExercise.correction_file_urls || [],
-      completed: false // Default value - in real app, this would come from user progress
-    };
-  };
+  const { chapterId, subjectId } = useParams<{ chapterId: string; subjectId: string }>();
+  const navigate = useNavigate();
   
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [chapterTitle, setChapterTitle] = useState<string>('');
+  const [accessibleExercises, setAccessibleExercises] = useState<string[]>([]);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumExerciseId, setPremiumExerciseId] = useState<string | null>(null);
+
   useEffect(() => {
     if (chapterId) {
       setLoading(true);
       setError(null);
       
-      // Fetch both exercises and chapter data
       Promise.all([
-        getExercisesByChapter(chapterId),
+        getExercisesByChapterWithAccess(chapterId),
         getChapterById(chapterId)
       ])
         .then(([exercisesData, chapterData]) => {
-          const mappedExercises = exercisesData.map(mapSupabaseToLocalExercise);
-          setExercises(mappedExercises);
+          // Map the secure exercise data (without file URLs) to local exercise format
+          const mappedExercises = exercisesData.exercises.map((exercise) => ({
+            id: exercise.id,
+            name: exercise.name,
+            tag: exercise.tag || 0,
+            difficulty: exercise.difficulty || 'Easy',
+            chapterId: exercise.chapter_id,
+            subjectId: exercise.chapter_id, // Using chapter_id as subjectId for compatibility
+            exerciseFileUrls: [], // Empty array - files will be loaded securely when needed
+            correctionFileUrls: [], // Empty array - files will be loaded securely when needed
+            completed: false // Default value - will be updated when user progress is loaded
+          }));
           
-          // Set the actual chapter title from the database
+          setExercises(mappedExercises);
+          setAccessibleExercises(exercisesData.accessibleExercises);
+          
           if (chapterData) {
-            setChapterTitle(chapterData.title || 'Chapter');
-          } else {
-            setChapterTitle('Chapter');
+            setChapterTitle(chapterData.title);
           }
         })
         .catch((err) => {
-          setError(err.message || 'Failed to fetch data');
-          // Fallback chapter title in case of error
-          setChapterTitle('Chapter');
+          console.error('Error fetching exercises:', err);
+          setError(err.message || 'Failed to load exercises');
         })
-        .finally(() => setLoading(false));
+        .finally(() => {
+          setLoading(false);
+        });
     }
   }, [chapterId]);
-  
-  const handleExerciseClick = (exercise: Exercise) => {
+
+  const handleExerciseClick = async (exercise: Exercise) => {
+    // Check if user has access to this exercise (including temporary fix for first exercise)
+    const exerciseIndex = exercises.findIndex(ex => ex.id === exercise.id);
+    const hasAccess = accessibleExercises.includes(exercise.id) || exerciseIndex === 0;
+    
+    if (!hasAccess) {
+      setPremiumExerciseId(exercise.id);
+      setShowPremiumModal(true);
+      return;
+    }
+    
     setSelectedExercise(exercise);
   };
-  
-  const handleCloseExercise = () => {
+
+  const handleClosePremiumModal = () => {
+    setShowPremiumModal(false);
+    setPremiumExerciseId(null);
+  };
+
+  const handleContactAdmin = () => {
+    alert(t('premium.contactInfo') || 'Please contact your administrator to activate your account.');
+    handleClosePremiumModal();
+  };
+
+  const handleCloseViewer = () => {
     setSelectedExercise(null);
   };
-  
+
+  const handleBackToChapters = () => {
+    console.log('Navigating back to chapters. subjectId:', subjectId, 'chapterId:', chapterId);
+    if (subjectId) {
+      const chaptersPath = `/subjects/${subjectId}/chapters`;
+      console.log('Navigating to:', chaptersPath);
+      navigate(chaptersPath);
+    } else {
+      // Fallback to browser back if subjectId is not available
+      console.log('SubjectId not available, using browser back');
+      navigate(-1);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="exercises-list-container">
+        <Loader fullScreen />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="exercises-list-container">
+        <div className="error-container">
+          <h3>Error</h3>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="exercises-list-container">
-      {!selectedExercise ? (
-        <>
-          <div className="exercises-list-header">
+    <>
+      {selectedExercise ? (
+        <div className="exercise-viewer-fullscreen">
+          <ExerciseViewer
+            exercise={selectedExercise}
+            onClose={handleCloseViewer}
+            exerciseIndex={exercises.findIndex(ex => ex.id === selectedExercise.id)}
+          />
+        </div>
+      ) : (
+        <div className="exercises-list-container">
+          <div className="exercises-header">
             <button 
-              className="back-button"
-              onClick={() => navigate(`/subjects/${subjectId}/chapters`)}
+              onClick={handleBackToChapters} 
+              className="back-btn"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                className="back-icon"
+                strokeWidth="2"
+              >
                 <path d="m15 18-6-6 6-6" />
               </svg>
               {t('exercises.backToChapters')}
             </button>
-
+            
             <div className="header-content">
-              <h1 className="exercises-list-title">{chapterTitle} - {t('exercises.title')}</h1>
-              <p className="exercises-list-subtitle">{t('exercises.subtitle')}</p>
+              <h1>{chapterTitle} - {t('exercises.title')}</h1>
+              <p>{t('exercises.subtitle')}</p>
             </div>
           </div>
-          {loading ? (
-            <div style={{ padding: 32 }}>{t('exercises.loading')}</div>
-          ) : error ? (
-            <div style={{ padding: 32, color: 'red' }}>Error: {error}</div>
-          ) : (
-            <div className="exercises-grid">
-              {exercises.map((exercise) => (
+
+          <div className="exercises-grid">
+            {exercises.map((exercise, index) => {
+              // Check if user has access to this exercise
+              const hasAccess = accessibleExercises.includes(exercise.id) || index === 0; // Temporary fix for first exercise
+              const isPremium = !hasAccess; // Premium if user doesn't have access
+
+              return (
                 <ExerciseCard
                   key={exercise.id}
                   exercise={exercise}
                   onClick={handleExerciseClick}
+                  isPremium={isPremium}
+                  hasAccess={hasAccess}
                 />
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <ExerciseViewer
-          exercise={selectedExercise}
-          onClose={handleCloseExercise}
-        />
+              );
+            })}
+          </div>
+        </div>
       )}
-    </div>
+
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={handleClosePremiumModal}
+        onContactAdmin={handleContactAdmin}
+      />
+    </>
   );
 };
 

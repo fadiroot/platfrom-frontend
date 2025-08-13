@@ -6,15 +6,18 @@ import { Link, useNavigate } from "react-router-dom"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "../../../shared/store"
 import { register } from "../../data/authThunk"
 import { PATH } from "../../routes/paths"
-import { fetchLevels } from "../../../levels/data/levelThunk"
+import { fetchPublicLevels } from "../../../levels/data/levelThunk"
 import { Level } from "../../../levels/data/levelTypes"
 import CustomSelect from "../../../shared/components/CustomSelect/CustomSelect"
 import EmailVerificationModal from "../../components/EmailVerificationModal"
 import ErrorModal from "../../components/ErrorModal"
+import LanguageSelector from "../../../shared/components/LanguageSelector/LanguageSelector"
 import "./_Register.scss"
+import logoImg from '/logo/astuceLogo.png'
 
 const initialValues = {
   username: "",
@@ -32,6 +35,7 @@ const initialValues = {
 const RegisterComponent = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [submitting, setSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -42,7 +46,7 @@ const RegisterComponent = () => {
   const { levels, loading: levelsLoading } = useAppSelector((state: any) => state.levels)
 
   useEffect(() => {
-    dispatch(fetchLevels())
+    dispatch(fetchPublicLevels())
   }, [dispatch])
 
   const formik = useFormik({
@@ -105,22 +109,30 @@ const RegisterComponent = () => {
 
   return (
     <div className="register-module">
+      <div className="language-selector-container">
+        <LanguageSelector />
+      </div>
+      
       <div className="register-card-container">
-        <h1 className="title">Create Account</h1>
-        <p className="subtitle">Join us today and get started</p>
+        <div className="logo-container">
+          <img src={logoImg} alt="Platform Logo" className="logo-image" />
+        </div>
+        
+        <h1 className="title">{t('auth.register.title')}</h1>
+        <p className="subtitle">{t('auth.register.subtitle')}</p>
 
         <form onSubmit={formik.handleSubmit} noValidate>
           {/* Row 1: First Name and Last Name */}
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="firstName" className="label">
-                First Name *
+                {t('auth.register.firstName')} *
               </label>
               <input
                 id="firstName"
                 name="firstName"
                 type="text"
-                placeholder="Enter your first name"
+                placeholder={t('auth.register.firstNamePlaceholder')}
                 autoComplete="given-name"
                 value={formik.values.firstName}
                 onChange={formik.handleChange}
@@ -133,13 +145,13 @@ const RegisterComponent = () => {
             </div>
             <div className="form-field">
               <label htmlFor="lastName" className="label">
-                Last Name *
+                {t('auth.register.lastName')} *
               </label>
               <input
                 id="lastName"
                 name="lastName"
                 type="text"
-                placeholder="Enter your last name"
+                placeholder={t('auth.register.lastNamePlaceholder')}
                 autoComplete="family-name"
                 value={formik.values.lastName}
                 onChange={formik.handleChange}
@@ -155,7 +167,7 @@ const RegisterComponent = () => {
           <div className="form-row single">
             <div className="form-field">
               <label htmlFor="levelId" className="label">
-                Level *
+                {t('auth.register.level')} *
               </label>
               <CustomSelect
                 options={levels.map((level: Level) => ({
@@ -165,7 +177,7 @@ const RegisterComponent = () => {
                 value={formik.values.levelId}
                 onChange={(value: string) => formik.setFieldValue("levelId", value)}
                 onBlur={() => formik.setFieldTouched("levelId", true)}
-                placeholder="Select a level"
+                placeholder={t('auth.register.levelPlaceholder')}
                 disabled={levelsLoading}
               />
               {formik.touched.levelId && formik.errors.levelId && (
@@ -177,13 +189,13 @@ const RegisterComponent = () => {
           <div className="form-row single">
             <div className="form-field">
               <label htmlFor="email" className="label">
-                Email *
+                {t('auth.register.email')} *
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('auth.register.emailPlaceholder')}
                 autoComplete="email"
                 value={formik.values.email}
                 onChange={formik.handleChange}
@@ -198,13 +210,13 @@ const RegisterComponent = () => {
           <div className="form-row single">
             <div className="form-field">
               <label htmlFor="username" className="label">
-                Username *
+                {t('auth.register.username')} *
               </label>
               <input
                 id="username"
                 name="username"
                 type="text"
-                placeholder="Enter your username"
+                placeholder={t('auth.register.usernamePlaceholder')}
                 autoComplete="username"
                 value={formik.values.username}
                 onChange={formik.handleChange}
@@ -221,13 +233,13 @@ const RegisterComponent = () => {
           <div className="form-row single">
             <div className="form-field">
               <label htmlFor="phoneNumber" className="label">
-                Phone Number *
+                {t('auth.register.phoneNumber')} *
               </label>
               <input
                 id="phoneNumber"
                 name="phoneNumber"
                 type="text"
-                placeholder="Enter your phone number"
+                placeholder={t('auth.register.phoneNumberPlaceholder')}
                 autoComplete="tel"
                 value={formik.values.phoneNumber}
                 onChange={formik.handleChange}
@@ -244,14 +256,14 @@ const RegisterComponent = () => {
           <div className="form-row">
             <div className="form-field">
               <label htmlFor="password" aria-label="Password" className="label">
-                Password *
+                {t('auth.register.password')} *
               </label>
               <div className="input-container">
                 <input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={t('auth.register.passwordPlaceholder')}
                   autoComplete="new-password"
                   value={formik.values.password}
                   onChange={formik.handleChange}
@@ -269,14 +281,14 @@ const RegisterComponent = () => {
 
             <div className="form-field">
               <label htmlFor="confirmPassword" aria-label="Confirm Password" className="label">
-                Confirm Password *
+                {t('auth.register.confirmPassword')} *
               </label>
               <div className="input-container">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
+                  placeholder={t('auth.register.confirmPasswordPlaceholder')}
                   autoComplete="new-password"
                   value={formik.values.confirmPassword}
                   onChange={formik.handleChange}
@@ -301,16 +313,16 @@ const RegisterComponent = () => {
             {submitting ? (
               <>
                 <Loader2 size={18} className="spinner" />
-                Creating Account...
+                {t('auth.register.creatingAccount')}
               </>
             ) : (
-              "Create Account"
+              t('auth.register.submit')
             )}
           </button>
         </form>
 
-        <Link to={PATH.LOGIN} className="link">
-          Already have an account? Sign In
+        <Link to={PATH.LOGIN} className="signin-link">
+          {t('auth.register.hasAccount')} {t('auth.register.signIn')}
         </Link>
       </div>
 
@@ -328,7 +340,7 @@ const RegisterComponent = () => {
       <ErrorModal
         isOpen={showError}
         onClose={() => setShowError(false)}
-        title="Registration Failed"
+        title={t('auth.register.title')}
         message={errorMessage}
       />
     </div>

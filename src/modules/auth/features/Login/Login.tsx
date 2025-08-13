@@ -7,11 +7,14 @@ import { Link, useNavigate } from "react-router-dom"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { useAppDispatch } from "../../../../modules/shared/store"
 import { login } from "../../data/authThunk"
 import { PATH } from "../../routes/paths"
 import ErrorModal from "../../components/ErrorModal"
+import LanguageSelector from "../../../shared/components/LanguageSelector/LanguageSelector"
 import "./_Login.scss"
+import logoImg from '/logo/astuceLogo.png'
 
 // Custom Input Component to match your original styling
 interface InputProps {
@@ -90,6 +93,7 @@ const LoginComponent = () => {
   const [submitting, setSubmitting] = useState(false)
   const [showError, setShowError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const { t } = useTranslation()
 
   const formik = useFormik({
     initialValues,
@@ -118,16 +122,24 @@ const LoginComponent = () => {
 
   return (
     <div className="login-module">
+      <div className="language-selector-container">
+        <LanguageSelector />
+      </div>
+      
       <div className="login-card-container">
-        <h1 className="title">Welcome Back</h1>
-        <p className="subtitle">Please sign in to your account</p>
+        <div className="logo-container">
+          <img src={logoImg} alt="Platform Logo" className="logo-image" />
+        </div>
+        
+        <h1 className="title">{t('auth.login.title')}</h1>
+        <p className="subtitle">{t('auth.login.subtitle')}</p>
 
         <form onSubmit={formik.handleSubmit} noValidate>
           <Input
             name="email"
             formik={formik}
-            placeholder="Your email"
-            label="Email"
+            placeholder={t('auth.login.emailPlaceholder')}
+            label={t('auth.login.email')}
             required
             autoComplete="email"
           />
@@ -139,8 +151,8 @@ const LoginComponent = () => {
             name="password"
             formik={formik}
             type="password"
-            placeholder="••••••••"
-            label="Password"
+            placeholder={t('auth.login.passwordPlaceholder')}
+            label={t('auth.login.password')}
             required
             autoComplete="current-password"
           />
@@ -148,18 +160,24 @@ const LoginComponent = () => {
             <div className="error-text">{formik.errors.password}</div>
           )}
 
-          <Button type="submit" label="Sign In" loading={submitting} />
+          <div className="forgot-password-link">
+            <Link to={PATH.FORGOT_PASSWORD} className="link">
+              {t('auth.login.forgot')}
+            </Link>
+          </div>
+
+          <Button type="submit" label={t('auth.login.submit')} loading={submitting} />
         </form>
 
-        <Link to={PATH.REGISTER} className="link">
-          Don't have an account? Sign Up
+        <Link to={PATH.REGISTER} className="signup-link">
+          {t('auth.login.noAccount')} {t('auth.login.createAccount')}
         </Link>
       </div>
       
       <ErrorModal 
          isOpen={showError} 
          onClose={() => setShowError(false)} 
-         title="Login Failed"
+         title={t('auth.login.title')}
          message={errorMessage} 
        />
     </div>

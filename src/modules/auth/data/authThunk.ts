@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { signIn, signUp, signOut, getCurrentUser, getUserWithLevel, onAuthStateChange, ensureStudentProfile } from '../../../lib/api/auth'
+import { signIn, signUp, signOut, getCurrentUser, getUserWithLevel, onAuthStateChange, ensureStudentProfile, resetPassword, updatePassword, getCurrentSession } from '../../../lib/api/auth'
 import { LoginPayload, RegisterPayload } from './authTypes'
+import { supabase } from '../../../lib/supabase'
 
 export const login = createAsyncThunk(
   'auth/login',
@@ -40,7 +41,9 @@ export const login = createAsyncThunk(
               firstName: updatedUserWithLevel.firstName || '',
               lastName: updatedUserWithLevel.lastName || '',
               level_id: updatedUserWithLevel.levelId || null,
-              level: updatedUserWithLevel.level || null
+              level: updatedUserWithLevel.level || null,
+              role: user.user_metadata?.role || null,
+              isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin'
             },
             session: {
               access_token: session.access_token,
@@ -62,7 +65,9 @@ export const login = createAsyncThunk(
           firstName: userWithLevel.firstName || '',
           lastName: userWithLevel.lastName || '',
           level_id: userWithLevel.levelId || null,
-          level: userWithLevel.level || null
+          level: userWithLevel.level || null,
+          role: user.user_metadata?.role || null,
+          isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin'
         },
         session: {
           access_token: session.access_token,
@@ -100,15 +105,16 @@ export const register = createAsyncThunk(
           firstName: userData.firstName || '',
           lastName: userData.lastName || '',
           level_id: userData.levelId || null,
-          level: null // Will be fetched on login
+          level: null,
+          role: user.user_metadata?.role || null,
+          isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin'
         },
         session: session ? {
           access_token: session.access_token,
           refresh_token: session.refresh_token,
           expires_at: session.expires_at
         } : null,
-        requiresVerification: requiresVerification || false,
-        levelId: userData.levelId // Store levelId for later profile creation
+        requiresVerification
       }
     } catch (err: any) {
       return rejectWithValue(err.message || 'Registration failed')
@@ -116,19 +122,20 @@ export const register = createAsyncThunk(
   }
 )
 
-export const logout = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
-  try {
-    const { error } = await signOut()
-
-    if (error) {
-      throw new Error(error.message)
+export const logout = createAsyncThunk(
+  'auth/logout',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { error } = await signOut()
+      if (error) {
+        throw new Error(error.message)
+      }
+      return {}
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Logout failed')
     }
-
-    return { success: true }
-  } catch (err: any) {
-    return rejectWithValue(err.message || 'Logout failed')
   }
-})
+)
 
 export const initializeAuth = createAsyncThunk(
   'auth/initialize',
@@ -143,10 +150,20 @@ export const initializeAuth = createAsyncThunk(
         }
       }
 
-      // Get user profile with level information from auth metadata
+      // Check if user is in recovery mode (password reset)
+      const session = await getCurrentSession()
+      if (session?.user?.aud === 'recovery') {
+        console.log('User is in recovery mode during auth initialization, not authenticating')
+        return {
+          isAuthenticated: false,
+          user: null
+        }
+      }
+
+      // Get user profile with level information
       const userWithLevel = await getUserWithLevel(user)
 
-      const userData = {
+      return {
         isAuthenticated: true,
         user: {
           id: user.id,
@@ -155,21 +172,22 @@ export const initializeAuth = createAsyncThunk(
           firstName: userWithLevel.firstName || '',
           lastName: userWithLevel.lastName || '',
           level_id: userWithLevel.levelId || null,
-          level: userWithLevel.level || null
+          level: userWithLevel.level || null,
+          role: user.user_metadata?.role || null,
+          isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin'
         }
       }
-      
-      return userData
     } catch (err: any) {
-      console.error('❌ Auth initialization failed:', err)
-      return rejectWithValue(err.message || 'Failed to initialize auth')
+      return rejectWithValue(err.message || 'Auth initialization failed')
     }
   }
 )
 
 // Auth state change listener (call this in your app initialization)
 export const setupAuthListener = (dispatch: any) => {
-  return onAuthStateChange((event, session) => {
+  return onAuthStateChange(async (event, session) => {
+    console.log('Auth state change:', event, session?.user?.aud)
+    
     if (event === 'SIGNED_OUT' || !session) {
       // Use the initialise action to reset auth state
       dispatch({
@@ -177,8 +195,71 @@ export const setupAuthListener = (dispatch: any) => {
         payload: { isAuthenticated: false, user: null }
       })
     } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-      // Re-initialize auth to get fresh user data
+      // Check if user is in recovery mode (password reset)
+      if (session?.user?.aud === 'recovery') {
+        console.log('User is in recovery mode, not initializing auth')
+        // Don't initialize auth for recovery mode - let the reset password component handle it
+        return
+      }
+      
+      // Re-initialize auth to get fresh user data for normal sign-ins
       dispatch(initializeAuth())
     }
   })
 }
+
+// Request password reset
+export const requestPasswordReset = createAsyncThunk(
+  'auth/requestPasswordReset',
+  async (email: string, { rejectWithValue }) => {
+    try {
+      const { error } = await resetPassword(email)
+      
+      if (error) {
+        throw new Error(error.message)
+      }
+      
+      return { success: true }
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Failed to send reset email')
+    }
+  }
+)
+
+// Reset user password
+export const resetUserPassword = createAsyncThunk(
+  'auth/resetUserPassword',
+  async (payload: { password: string; accessToken?: string; refreshToken?: string }, { rejectWithValue }) => {
+    try {
+      // Check if user is in recovery mode
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (session?.user?.aud === 'recovery') {
+        // User is in recovery mode, update password directly
+        const { error } = await updatePassword(payload.password)
+        
+        if (error) {
+          throw new Error(error.message)
+        }
+        
+        // Sign out the user after password reset to clear recovery session
+        await supabase.auth.signOut()
+        
+        return { success: true }
+      } else if (payload.accessToken) {
+        // Use access token for password reset
+        const { error } = await updatePassword(payload.password)
+        
+        if (error) {
+          throw new Error(error.message)
+        }
+        
+        return { success: true }
+      } else {
+        throw new Error('No valid recovery session or access token found')
+      }
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Failed to reset password')
+    }
+  }
+)

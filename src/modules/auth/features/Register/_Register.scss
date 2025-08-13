@@ -1,47 +1,54 @@
 .register-module {
   min-height: 100vh;
-  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  padding: 20px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  position: relative;
+
+  .language-selector-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+  }
 
   .register-card-container {
-    width: 580px;
-    max-width: 95vw;
-    padding: 36px 32px;
     background: #ffffff;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 720px;
     border: 2px solid #000000;
-    border-radius: 12px;
     box-shadow: 4px 4px 0px 0px #000000;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    transition: all 0.3s ease;
 
-    &:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 6px 6px 0px 0px #000000;
+    .logo-container {
+      text-align: center;
+      margin-bottom: 16px;
+
+      .logo-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+      }
     }
 
     .title {
-      font-size: 2rem;
+      font-size: 28px;
       font-weight: 700;
-      text-align: center;
       color: #000000;
-      margin-bottom: 2px;
-      transition: all 0.3s ease;
+      text-align: center;
+      margin-bottom: 8px;
     }
 
     .subtitle {
-      text-align: center;
-      font-size: 1rem;
-      font-weight: 400;
+      font-size: 16px;
       color: #666666;
-      margin-bottom: 4px;
-      transition: all 0.3s ease;
+      text-align: center;
+      margin-bottom: 32px;
+      line-height: 1.5;
     }
 
     form {
@@ -84,22 +91,21 @@
         border: 2px solid #000000;
         border-radius: 8px;
         background-color: #ffffff;
-        font-size: 0.95rem;
+        font-size: 16px;
         font-weight: 400;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         box-shadow: 2px 2px 0px 0px #000000;
         color: #000000;
 
         &:focus {
           outline: none;
+          border-color: #667eea;
           transform: translate(-1px, -1px);
-          box-shadow: 3px 3px 0px 0px #000000;
+          box-shadow: 3px 3px 0px 0px #667eea;
         }
 
         &::placeholder {
-          font-size: 0.92em;
           color: #999999;
-          opacity: 1;
         }
       }
 
@@ -118,11 +124,10 @@
         cursor: pointer;
         padding: 4px;
         border-radius: 4px;
-        transition: all 0.3s ease;
+        transition: color 0.2s ease;
 
         &:hover {
           color: #000000;
-          transform: scale(1.1);
         }
       }
 
@@ -134,37 +139,33 @@
       }
 
       .submit-button {
-        background: #ffffff;
-        color: #000000;
-        font-size: 1rem;
-        font-weight: 600;
-        padding: 14px 0;
+        width: 100%;
+        padding: 14px 20px;
+        background: #667eea;
+        color: #ffffff;
         border: 2px solid #000000;
         border-radius: 8px;
-        box-shadow: 2px 2px 0px 0px #000000;
-        transition: all 0.3s ease;
+        font-size: 16px;
+        font-weight: 600;
         cursor: pointer;
+        transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
         margin-top: 4px;
-        width: 100%;
+        box-shadow: 2px 2px 0px 0px #000000;
 
-        &:hover {
-          background: #000000;
-          color: #ffffff;
+        &:hover:not(:disabled) {
+          background: #5a6fd8;
           transform: translate(-1px, -1px);
           box-shadow: 3px 3px 0px 0px #000000;
         }
 
         &:disabled {
-          background: #f5f5f5;
-          color: #999999;
-          border-color: #cccccc;
-          box-shadow: 2px 2px 0px 0px #cccccc;
+          background: #cccccc;
           cursor: not-allowed;
-          transform: none;
+          opacity: 0.7;
         }
 
         .spinner {
@@ -176,7 +177,7 @@
     .link {
       font-size: 1rem;
       font-weight: 500;
-      color: #000000;
+      color: #667eea;
       text-align: center;
       text-decoration: none;
       margin-top: 6px;
@@ -185,34 +186,26 @@
       border-radius: 4px;
 
       &:hover {
-        background: #f5f5f5;
-        transform: translateY(-1px);
+        color: #5a6fd8;
+        text-decoration: underline;
       }
     }
-  }
 
-  @media (max-width: 700px) {
-    .register-card-container {
-      width: 90vw;
-      padding: 28px 20px;
-      gap: 16px;
-      box-shadow: 3px 3px 0px 0px #000000;
+    .signin-link {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #667eea;
+      text-align: center;
+      text-decoration: none;
+      margin-top: 32px;
+      transition: all 0.3s ease;
+      padding: 8px;
+      border-radius: 4px;
+      display: block;
 
       &:hover {
-        transform: translate(-1px, -1px);
-        box-shadow: 4px 4px 0px 0px #000000;
-      }
-
-      .title {
-        font-size: 1.6rem;
-      }
-
-      .subtitle {
-        font-size: 0.95rem;
-      }
-
-      form {
-        gap: 12px;
+        color: #5a6fd8;
+        text-decoration: underline;
       }
     }
   }
@@ -224,5 +217,34 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+// Responsive design
+@media (max-width: 700px) {
+  .register-module {
+    padding: 16px;
+
+    .register-card-container {
+      padding: 24px;
+      border-radius: 12px;
+
+      .title {
+        font-size: 24px;
+      }
+
+      .subtitle {
+        font-size: 14px;
+      }
+
+      form {
+        gap: 12px;
+      }
+    }
+
+    .language-selector-container {
+      top: 16px;
+      right: 16px;
+    }
   }
 }

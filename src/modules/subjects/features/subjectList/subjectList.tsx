@@ -7,6 +7,7 @@ import { getSubjectsWithLevel, getSubjectsByLevelWithLevel } from '@/lib/api/sub
 import { RootState } from '@/modules/shared/store'
 import Cap from '@/modules/shared/svgs/Cap'
 import HandDrawnArrow from '@/modules/shared/svgs/HandDrawnArrow'
+import Loader from '../../../shared/components/Loader/Loader'
 
 // Define the Subject interface with level information
 interface Subject {
@@ -65,7 +66,7 @@ const SubjectList: React.FC = () => {
   }
 
   if (loading) {
-    return <div style={{ padding: 32 }}>Loading...</div>
+    return <Loader fullScreen />
   }
 
   if (error) {
@@ -75,7 +76,7 @@ const SubjectList: React.FC = () => {
   return (
     <div className="subject-list-container">
       <h1 className="subject-list-title">
-        {user?.level_id ? t('subjects.titleWithLevel', { level: user.level?.title || 'Level' }) : t('subjects.title')}
+        {t('subjects.title')}
       </h1>
       <p className="subject-list-subtitle">{t('subjects.subtitle')}</p>
       <Cap className="subject-list-cap" />
@@ -103,10 +104,7 @@ const SubjectList: React.FC = () => {
                 <span className="default-icon">📘</span>
               )}
             </div>
-            <h2 className="subject-name">{subject.level ? `${subject.title} - ${subject.level.title}` : subject.title}</h2>
-            <p className="subject-description">
-              {subject.description || t('subjects.noDescription')}
-            </p>
+            <h2 className="subject-name">{subject.title}</h2>
             <div className="subject-meta">
               <button className="explore-button">{t('subjects.explore')}</button>
             </div>

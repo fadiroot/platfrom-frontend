@@ -1,0 +1,339 @@
+@use '../../../shared/assets/styles/abstracts/student-theme' as *;
+
+.student-management {
+  min-height: 100vh;
+
+  .page-header {
+    margin-bottom: 2rem;
+    
+    h1 {
+      @include student-title;
+      font-size: 2rem;
+      margin: 0 0 0.5rem 0;
+    }
+    
+    p {
+      @include student-subtitle;
+      margin: 0;
+    }
+  }
+
+  .ant-card {
+    @include student-card;
+    border-radius: 12px;
+    background: var(--student-bg-secondary);
+    border: 2px solid var(--student-border-primary);
+    box-shadow: 2px 2px 0px 0px #000;
+    
+    .ant-card-head {
+      background: var(--student-bg-secondary);
+      border-bottom: 2px solid var(--student-border-primary);
+      
+      .ant-card-head-title {
+        font-weight: 600;
+        color: var(--student-text-primary);
+        font-size: 1.125rem;
+      }
+    }
+    
+    .ant-card-body {
+      background: var(--student-bg-secondary);
+      color: var(--student-text-primary);
+    }
+  }
+
+  .ant-statistic {
+    .ant-statistic-title {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .ant-statistic-content {
+      font-size: 24px;
+      font-weight: 700;
+    }
+  }
+
+  .ant-table {
+    @include student-card;
+    border-radius: 12px;
+    overflow: hidden;
+    
+    .ant-table-thead > tr > th {
+      background: var(--student-bg-secondary);
+      font-weight: 600;
+      color: var(--student-text-primary);
+      border-bottom: 2px solid var(--student-border-primary);
+      padding: 16px 12px;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .ant-table-tbody > tr > td {
+      background: var(--student-bg-secondary);
+      color: var(--student-text-primary);
+      border-bottom: 1px solid var(--student-border-primary);
+      padding: 16px 12px;
+      transition: all 0.2s ease;
+    }
+    
+    .ant-table-tbody > tr:hover > td {
+      background: var(--student-hover-bg);
+      transform: translateY(-1px);
+    }
+  }
+
+  .ant-tag {
+    border-radius: 4px;
+    font-weight: 500;
+    padding: 2px 8px;
+    
+    &.ant-tag-green {
+      background: #f6ffed;
+      border-color: #b7eb8f;
+      color: #52c41a;
+    }
+    
+    &.ant-tag-red {
+      background: #fff2f0;
+      border-color: #ffccc7;
+      color: #ff4d4f;
+    }
+    
+    &.ant-tag-orange {
+      background: #fff7e6;
+      border-color: #ffd591;
+      color: #fa8c16;
+    }
+  }
+
+  .ant-btn {
+    @include student-button-primary;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    
+    &.ant-btn-primary {
+      background: var(--student-primary);
+      border-color: var(--student-primary);
+      color: white;
+      box-shadow: 2px 2px 0px 0px #000;
+      
+      &:hover {
+        background: var(--student-primary-dark);
+        border-color: var(--student-primary-dark);
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0px 0px #000;
+      }
+    }
+    
+    &.ant-btn-dangerous {
+      background: var(--student-danger);
+      border-color: var(--student-danger);
+      color: white;
+      box-shadow: 2px 2px 0px 0px #000;
+      
+      &:hover {
+        background: var(--student-danger-light);
+        border-color: var(--student-danger-light);
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0px 0px #000;
+      }
+    }
+    
+    &.ant-btn-default {
+      background: var(--student-bg-secondary);
+      border-color: var(--student-border-primary);
+      color: var(--student-text-primary);
+      box-shadow: 2px 2px 0px 0px #000;
+      
+      &:hover {
+        background: var(--student-hover-bg);
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0px 0px #000;
+      }
+    }
+  }
+
+  .ant-select {
+    .ant-select-selector {
+      @include student-select;
+      background: var(--student-bg-secondary);
+      color: var(--student-text-primary);
+      border: 2px solid var(--student-border-primary);
+      border-radius: 8px;
+      box-shadow: 2px 2px 0px 0px #000;
+      
+      &:hover {
+        border-color: var(--student-primary);
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0px 0px #000;
+      }
+      
+      &.ant-select-focused {
+        border-color: var(--student-primary);
+        box-shadow: 3px 3px 0px 0px #000;
+        transform: translate(-1px, -1px);
+      }
+    }
+  }
+
+  .ant-input {
+    background: var(--student-bg-secondary);
+    color: var(--student-text-primary);
+    border: 2px solid var(--student-border-primary);
+    border-radius: 8px;
+    box-shadow: 2px 2px 0px 0px #000;
+    padding: 12px 16px;
+    font-weight: 500;
+    
+    &:hover {
+      border-color: var(--student-primary);
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px 0px #000;
+    }
+    
+    &:focus {
+      border-color: var(--student-primary);
+      box-shadow: 3px 3px 0px 0px #000;
+      transform: translate(-1px, -1px);
+      outline: none;
+    }
+  }
+
+  .ant-input-number {
+    .ant-input-number-input {
+      border-radius: 6px;
+    }
+  }
+
+  .ant-modal {
+    .ant-modal-content {
+      background: var(--student-bg-secondary);
+      border: 2px solid var(--student-border-primary);
+      border-radius: 12px;
+      box-shadow: 4px 4px 0px 0px #000;
+    }
+    
+    .ant-modal-header {
+      background: var(--student-bg-secondary);
+      border-bottom: 2px solid var(--student-border-primary);
+      border-radius: 12px 12px 0 0;
+      
+      .ant-modal-title {
+        font-weight: 600;
+        color: var(--student-text-primary);
+        font-size: 1.25rem;
+      }
+    }
+    
+    .ant-modal-body {
+      background: var(--student-bg-secondary);
+      color: var(--student-text-primary);
+    }
+    
+    .ant-form-item-label > label {
+      font-weight: 600;
+      color: var(--student-text-primary);
+      font-size: 0.875rem;
+    }
+  }
+
+  .filters-section {
+    @include student-card;
+    background: var(--student-bg-secondary);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--student-border-primary);
+    box-shadow: 2px 2px 0px 0px #000;
+  }
+
+  .student-info {
+    .student-name {
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+    
+    .student-email {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .student-phone {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+
+  .subscription-info {
+    .subscription-date {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 2px;
+    }
+  }
+
+  .payment-info {
+    .payment-amount {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 16px;
+    
+    .page-header {
+      h1 {
+        font-size: 24px;
+      }
+      
+      p {
+        font-size: 14px;
+      }
+    }
+    
+    .ant-row {
+      margin-bottom: 16px;
+    }
+    
+    .ant-col {
+      margin-bottom: 16px;
+    }
+    
+    .ant-table {
+      .ant-table-thead > tr > th,
+      .ant-table-tbody > tr > td {
+        padding: 8px 4px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  @media (max-width: 576px) {
+    padding: 12px;
+    
+    .ant-card {
+      margin-bottom: 12px;
+    }
+    
+    .ant-table {
+      .ant-table-thead > tr > th,
+      .ant-table-tbody > tr > td {
+        padding: 6px 2px;
+        font-size: 11px;
+      }
+    }
+    
+    .ant-btn {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+  }
+}

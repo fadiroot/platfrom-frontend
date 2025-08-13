@@ -1,0 +1,110 @@
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  
+  &.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+  }
+}
+
+.loader-spinner {
+  position: relative;
+  display: inline-block;
+  
+  &.small {
+    width: 24px;
+    height: 24px;
+  }
+  
+  &.medium {
+    width: 40px;
+    height: 40px;
+  }
+  
+  &.large {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .spinner-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    animation: spin 1.2s linear infinite;
+    
+    &:nth-child(1) {
+      width: 100%;
+      height: 100%;
+      border-top-color: var(--student-primary, #007bff);
+      animation-delay: 0s;
+    }
+    
+    &:nth-child(2) {
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+      border-right-color: var(--student-primary, #007bff);
+      animation-delay: 0.2s;
+    }
+    
+    &:nth-child(3) {
+      width: 60%;
+      height: 60%;
+      top: 20%;
+      left: 20%;
+      border-bottom-color: var(--student-primary, #007bff);
+      animation-delay: 0.4s;
+    }
+  }
+  
+  &.primary .spinner-ring {
+    border-top-color: var(--student-primary, #007bff);
+    border-right-color: var(--student-primary, #007bff);
+    border-bottom-color: var(--student-primary, #007bff);
+  }
+  
+  &.secondary .spinner-ring {
+    border-top-color: var(--student-text-secondary, #6c757d);
+    border-right-color: var(--student-text-secondary, #6c757d);
+    border-bottom-color: var(--student-text-secondary, #6c757d);
+  }
+  
+  &.white .spinner-ring {
+    border-top-color: #ffffff;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+  }
+}
+
+.loader-text {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: var(--student-text-secondary, #6c757d);
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Dark theme support
+[data-theme="dark"] .loader-container.fullscreen {
+  background: rgba(0, 0, 0, 0.95);
+}
+
+[data-theme="dark"] .loader-text {
+  color: var(--student-text-secondary, #adb5bd);
+}

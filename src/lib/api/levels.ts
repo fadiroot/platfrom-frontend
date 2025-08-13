@@ -3,7 +3,7 @@ import type { Tables } from '../supabase'
 
 export type Level = Tables<'levels'>
 
-// Get all levels
+// Get all levels (for authenticated users)
 export const getLevels = async (): Promise<Level[]> => {
   const { data, error } = await supabase
     .from('levels')
@@ -12,6 +12,22 @@ export const getLevels = async (): Promise<Level[]> => {
 
   if (error) {
     throw new Error(`Failed to fetch levels: ${error.message}`)
+  }
+
+  return data || []
+}
+
+// Get all levels for public access (for signup process)
+export const getPublicLevels = async (): Promise<Level[]> => {
+  const { data, error } = await supabase
+    .from('levels')
+    .select('*')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching public levels:', error)
+    // Return empty array instead of throwing error for better UX
+    return []
   }
 
   return data || []
