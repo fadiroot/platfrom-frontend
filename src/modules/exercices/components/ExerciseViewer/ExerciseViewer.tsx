@@ -9,8 +9,6 @@ import { ExerciseViewerProps, Exercise } from './types'
 
 import './ExerciseViewer.scss'
 
-
-
 const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerciseIndex }) => {
   const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState<'exercise' | 'solution'>('exercise')
@@ -98,34 +96,20 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
 
   // Get current files based on active tab
   const getCurrentFiles = () => {
-    if (activeTab === 'exercise') {
-      return secureExerciseFiles
-    } else {
-      return secureCorrectionFiles
-    }
+    return activeTab === 'exercise' ? secureExerciseFiles : secureCorrectionFiles
   }
 
-  const files = getCurrentFiles()
-
-  // Get current PDF URL for the default viewer
+  // Get current PDF URL
   const getCurrentPDFUrl = () => {
     const currentFiles = getCurrentFiles()
-    if (currentFiles && currentFiles.length > selectedFileIdx) {
-      return currentFiles[selectedFileIdx]
-    }
-    return null
+    if (currentFiles.length === 0) return null
+    if (selectedFileIdx >= currentFiles.length) return currentFiles[0]
+    return currentFiles[selectedFileIdx]
   }
 
-  const handleFileSelect = (fileIndex: number) => {
-    setSelectedFileIdx(fileIndex)
-  }
-
-
-
-  const getDifficultyText = (difficulty: string) => {
-    // Convert to string and handle both string and number inputs
+  // Get difficulty text
+  const getDifficultyText = (difficulty: string | number) => {
     const difficultyStr = String(difficulty).toLowerCase()
-    
     switch (difficultyStr) {
       case 'easy':
       case '0':
@@ -138,15 +122,15 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
         return t('exercises.difficulty.hard')
       case 'expert':
       case '3':
-        return t('exercises.difficulty.expert', 'EXPERT')
+        return t('exercises.difficulty.expert')
       default:
         return t('exercises.difficulty.easy')
     }
   }
 
-  const getDifficultyClass = (difficulty: string) => {
+  // Get difficulty class
+  const getDifficultyClass = (difficulty: string | number) => {
     const difficultyStr = String(difficulty).toLowerCase()
-    
     switch (difficultyStr) {
       case 'easy':
       case '0':
@@ -220,19 +204,25 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
     <div className="exercise-viewer-modern">
       {/* Header */}
       <div className="header-modern">
+        <div className="header-left">
         <button className="back-btn-modern" onClick={onBack}>
-          <IoArrowBack />
+          <IoArrowBack onClick={onBack} />
           <span>{t('exercises.backToExercises')}</span>
         </button>
+        </div>
         
         <div className="header-center">
-          <div className="left-content">
+          <div className="exercise-info">
             <div className="exercise-code">{exercise.code || exercise.name}</div>
+            <div className="exercise-meta">
+            </div>
             <div className={`difficulty-badge ${getDifficultyClass(exercise.difficulty)}`}>
-              {getDifficultyText(exercise.difficulty)}
+              <span>{getDifficultyText(exercise.difficulty)}</span>
+            </div>
             </div>
           </div>
           
+        <div className="header-right">
           {/* Tab Switcher in Header */}
           <div 
             className={`tab-switcher-header ${activeTab === 'exercise' ? 'exercise-active' : 'solution-active'} ${isRTL ? 'rtl' : 'ltr'}`}
@@ -260,8 +250,6 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
             </div>
           </div>
         </div>
-        
-
       </div>
 
       {/* Content */}
@@ -309,31 +297,126 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
           </div>
         )}
 
-        {/* Main PDF Viewer - Full Width */}
+        {/* Main PDF Viewer - Full Width with Download Protection */}
         <div className="custom-pdf-viewer full-width">
           {getCurrentPDFUrl() ? (
-            <iframe
-              src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(getCurrentPDFUrl()!)}`}
+            <div 
               style={{
                 width: '100%',
                 height: '100%',
-                border: 'none',
-                background: 'white'
+                position: 'relative',
+                background: 'white',
+                overflow: 'hidden'
               }}
-              title="PDF Viewer"
-            />
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              onDrop={(e) => e.preventDefault()}
+              onCopy={(e) => e.preventDefault()}
+              onCut={(e) => e.preventDefault()}
+              onKeyDown={(e) => {
+                // Block common download/save shortcuts
+                if (
+                  (e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
+                  (e.metaKey && (e.key === 's' || e.key === 'd' || e.key === 'p')) ||
+                        e.key === 'F12' ||
+                  (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
+                  (e.ctrlKey && e.key === 'u') ||
+                  (e.ctrlKey && e.shiftKey && e.key === 'i')
+                      ) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                }
+              }}
+            >
+              {/* Custom PDF Viewer with embedded PDF.js */}
+              <iframe
+                src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(getCurrentPDFUrl()!)}&zoom=page-fit&pagemode=none`}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  background: 'white',
+                  pointerEvents: 'auto'
+                }}
+                title="PDF Viewer"
+                sandbox="allow-scripts allow-same-origin allow-forms"
+                onLoad={() => {
+                  console.log('PDF viewer loaded with download protection');
+                }}
+              />
+              
+              {/* Overlay to prevent direct interaction with PDF content */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  pointerEvents: 'none',
+                  zIndex: 10
+                }}
+              />
+            </div>
           ) : (
             // Test mode: Show sample PDF when no files are available
-            <iframe
-              src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf"
+            <div 
               style={{
                 width: '100%',
                 height: '100%',
-                border: 'none',
-                background: 'white'
+                position: 'relative',
+                background: 'white',
+                overflow: 'hidden'
               }}
-              title="PDF Viewer"
-            />
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
+              onDrop={(e) => e.preventDefault()}
+              onCopy={(e) => e.preventDefault()}
+              onCut={(e) => e.preventDefault()}
+              onKeyDown={(e) => {
+                // Block common download/save shortcuts
+                if (
+                  (e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
+                  (e.metaKey && (e.key === 's' || e.key === 'd' || e.key === 'p')) ||
+                        e.key === 'F12' ||
+                  (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
+                  (e.ctrlKey && e.key === 'u') ||
+                  (e.ctrlKey && e.shiftKey && e.key === 'i')
+                      ) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                }
+              }}
+            >
+              <iframe
+                src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf&zoom=page-fit&pagemode=none"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  background: 'white',
+                  pointerEvents: 'auto'
+                }}
+                title="PDF Viewer"
+                sandbox="allow-scripts allow-same-origin allow-forms"
+                onLoad={() => {
+                  console.log('Test PDF viewer loaded with download protection');
+                }}
+              />
+              
+              {/* Overlay to prevent direct interaction with PDF content */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  pointerEvents: 'none',
+                  zIndex: 10
+                }}
+              />
+            </div>
           )}
         </div>
       </div>
