@@ -138,16 +138,22 @@
     "title": "Exercices",
     "subtitle": "Pratiquez et améliorez vos compétences avec ces exercices",
     "backToChapters": "Retour aux Chapitres",
+    "backToExercises": "Retour aux Exercices",
     "start": "Commencer l'Exercice",
     "review": "Réviser l'Exercice",
     "premium": "PREMIUM",
     "available": "DISPONIBLE",
     "upgradeRequired": "Mise à Niveau Requise",
     "premiumContent": "Contenu Premium",
+    "exercise": "Exercice",
+    "solution": "Solution",
+    "files": "Fichiers",
+    "loadingPDF": "Chargement du PDF...",
     "difficulty": {
       "easy": "FACILE",
       "medium": "MOYEN",
-      "hard": "DIFFICILE"
+      "hard": "DIFFICILE",
+      "expert": "EXPERT"
     },
     "type": {
       "theory": "Théorie",
@@ -159,6 +165,11 @@
     "questions": "Questions",
     "noExercises": "Aucun exercice disponible dans ce chapitre",
     "loading": "Chargement des exercices..."
+  },
+  "exerciseViewer": {
+    "exerciseTab": "Exercice",
+    "correctionTab": "Solution",
+    "backToExercises": "Retour aux Exercices"
   },
   "premium": {
     "title": "Contenu Premium",

@@ -1,54 +1,67 @@
 'use client'
 
-import type React from 'react'
-import { useState, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-
-import './ExerciseViewer.scss'
-import type { Exercise } from '../../types/exercise'
+import { IoArrowBack, IoDocumentText, IoChevronBack, IoChevronForward } from 'react-icons/io5'
 import { getSecureExerciseFiles, getSecureFileUrl } from '@/lib/api/exercises'
+import './ExerciseViewer.scss'
 
 interface ExerciseViewerProps {
-  exercise: Exercise
-  onClose: () => void
-  exerciseIndex?: number // Add exercise index for temporary fix
+  exercise: {
+    id: string
+    code?: string
+    name: string
+    tag: number
+    exerciseFileUrls?: string[]
+    correctionFileUrls?: string[]
+  }
+  onBack: () => void
+  exerciseIndex?: number
 }
 
-const validUrl = (url: string) => url && url !== 'string'
-
-const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onClose, exerciseIndex }) => {
-  const { t } = useTranslation('translation')
-  const [activeTab, setActiveTab] = useState<'exercise' | 'correction'>('exercise')
+const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerciseIndex }) => {
+  const { t } = useTranslation()
+  const [activeTab, setActiveTab] = useState<'exercise' | 'solution'>('exercise')
   const [selectedFileIdx, setSelectedFileIdx] = useState(0)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  
-  // Secure file state
+  const [pdfDocument, setPdfDocument] = useState<any>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [scale, setScale] = useState(1.0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [secureExerciseFiles, setSecureExerciseFiles] = useState<string[]>([])
   const [secureCorrectionFiles, setSecureCorrectionFiles] = useState<string[]>([])
   const [hasAccess, setHasAccess] = useState(false)
   const [loadingFiles, setLoadingFiles] = useState(true)
-  const [fileError, setFileError] = useState<string | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   // Load secure files when component mounts
   useEffect(() => {
     const loadSecureFiles = async () => {
       try {
         setLoadingFiles(true)
-        setFileError(null)
+        setError(null)
+        
+        console.log('Loading secure files for exercise:', exercise.id, 'index:', exerciseIndex)
         
         const secureFiles = await getSecureExerciseFiles(exercise.id, exerciseIndex)
         
+        console.log('Secure files result:', secureFiles)
+        
         if (secureFiles.hasAccess) {
-          setSecureExerciseFiles(secureFiles.exerciseFiles.filter(validUrl))
-          setSecureCorrectionFiles(secureFiles.correctionFiles.filter(validUrl))
+          console.log('Setting exercise files:', secureFiles.exerciseFiles)
+          console.log('Setting correction files:', secureFiles.correctionFiles)
+          setSecureExerciseFiles(secureFiles.exerciseFiles)
+          setSecureCorrectionFiles(secureFiles.correctionFiles)
           setHasAccess(true)
         } else {
+          console.log('Access denied for exercise:', exercise.id)
           setHasAccess(false)
-          setFileError('Access denied: Premium content requires active subscription')
+          setError('Access denied: Premium content requires active subscription')
         }
       } catch (error) {
         console.error('Error loading secure files:', error)
-        setFileError('Failed to load exercise files')
+        setError('Failed to load exercise files')
         setHasAccess(false)
       } finally {
         setLoadingFiles(false)
@@ -59,96 +72,232 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onClose, exer
   }, [exercise.id, exerciseIndex])
 
   // Get current files based on active tab
-  const files = activeTab === 'exercise' ? secureExerciseFiles : secureCorrectionFiles
-  const fileLabel = activeTab === 'exercise' ? 'Exercise' : 'Solution'
-
-  const handleTabClick = (tab: 'exercise' | 'correction') => {
-    setActiveTab(tab)
-    setSelectedFileIdx(0)
+  const getCurrentFiles = () => {
+    if (activeTab === 'exercise') {
+      return secureExerciseFiles
+    } else {
+      return secureCorrectionFiles
+    }
   }
 
-  const handleFileClick = (idx: number) => {
-    setSelectedFileIdx(idx)
-  }
+  const files = getCurrentFiles()
+  
+  console.log('Current files for tab:', activeTab, 'Files:', files)
+  console.log('Selected file index:', selectedFileIdx)
+  console.log('Has access:', hasAccess)
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen)
-  }
-
-  const handleClose = () => {
-    onClose()
-  }
-
-  // Handle browser back button
+  // Load PDF using pdfjs-dist
   useEffect(() => {
-    const handlePopState = () => {
-      onClose()
+    const loadPDF = async () => {
+      if (!files[selectedFileIdx]) {
+        console.log('No file at index:', selectedFileIdx, 'Files:', files)
+        setError('No PDF file available')
+        return
+      }
+
+      const fileUrl = files[selectedFileIdx]
+      console.log('Loading PDF from URL:', fileUrl)
+
+      try {
+        setLoading(true)
+        setError(null)
+        
+        // Get signed URL for Supabase storage files
+        let finalUrl = fileUrl
+        if (fileUrl.includes('supabase.co')) {
+          console.log('Getting signed URL for Supabase file...')
+          const signedUrl = await getSecureFileUrl(fileUrl, exercise.id)
+          if (signedUrl) {
+            finalUrl = signedUrl
+            console.log('Using signed URL:', signedUrl)
+          } else {
+            throw new Error('Failed to get signed URL for file')
+          }
+        }
+        
+        // Dynamically import pdfjs-dist
+        const pdfjsLib = await import('pdfjs-dist')
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+        
+        console.log('PDF.js loaded, creating loading task...')
+        const loadingTask = pdfjsLib.getDocument(finalUrl)
+        
+        console.log('Loading task created, waiting for promise...')
+        const pdf = await loadingTask.promise
+        
+        console.log('PDF loaded successfully, pages:', pdf.numPages)
+        setPdfDocument(pdf)
+        setTotalPages(pdf.numPages)
+        setCurrentPage(1)
+      } catch (error: any) {
+        console.error('Error loading PDF:', error)
+        setError(`Failed to load PDF: ${error.message}`)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    // Add a history entry when component mounts
-    window.history.pushState({ exerciseViewer: true }, '', window.location.pathname)
-
-    window.addEventListener('popstate', handlePopState)
-    return () => {
-      window.removeEventListener('popstate', handlePopState)
+    if (hasAccess && files.length > 0) {
+      console.log('Starting PDF load - hasAccess:', hasAccess, 'files.length:', files.length)
+      loadPDF()
+    } else {
+      console.log('Not loading PDF - hasAccess:', hasAccess, 'files.length:', files.length)
     }
-  }, [onClose])
+  }, [selectedFileIdx, files, hasAccess, exercise.id])
 
-  const getFileTypeBadge = (url: string) => {
-    if (url.endsWith('.pdf')) return 'PDF'
-    if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) return 'Image'
-    if (url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)) return 'Video'
-    return 'File'
+  // Render PDF page
+  useEffect(() => {
+    const renderPage = async () => {
+      if (!pdfDocument || !canvasRef.current) return
+
+      try {
+        const page = await pdfDocument.getPage(currentPage)
+        const canvas = canvasRef.current
+        const context = canvas.getContext('2d')
+
+        const viewport = page.getViewport({ scale })
+        canvas.height = viewport.height
+        canvas.width = viewport.width
+
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        }
+
+        await page.render(renderContext).promise
+      } catch (error) {
+        console.error('Error rendering PDF page:', error)
+      }
+    }
+
+    renderPage()
+  }, [pdfDocument, currentPage, scale])
+
+  const handleNextFile = () => {
+    if (selectedFileIdx < files.length - 1) {
+      setSelectedFileIdx(selectedFileIdx + 1)
+    }
+  }
+
+  const handlePrevFile = () => {
+    if (selectedFileIdx > 0) {
+      setSelectedFileIdx(selectedFileIdx - 1)
+    }
+  }
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const handleZoomIn = () => {
+    setScale(prev => Math.min(prev + 0.2, 3.0))
+  }
+
+  const handleZoomOut = () => {
+    setScale(prev => Math.max(prev - 0.2, 0.5))
+  }
+
+  const getDifficultyColor = (difficulty: string | number) => {
+    // Convert to string and handle both string and number inputs
+    const difficultyStr = String(difficulty).toLowerCase()
+    
+    switch (difficultyStr) {
+      case 'easy':
+      case '0':
+        return '#10b981'
+      case 'medium':
+      case '1':
+        return '#f59e0b'
+      case 'hard':
+      case '2':
+        return '#ef4444'
+      case 'expert':
+      case '3':
+        return '#8b5cf6'
+      default:
+        return '#6b7280'
+    }
+  }
+
+  const getDifficultyText = (difficulty: string | number) => {
+    // Convert to string and handle both string and number inputs
+    const difficultyStr = String(difficulty).toLowerCase()
+    
+    switch (difficultyStr) {
+      case 'easy':
+      case '0':
+        return t('exercises.difficulty.easy')
+      case 'medium':
+      case '1':
+        return t('exercises.difficulty.medium')
+      case 'hard':
+      case '2':
+        return t('exercises.difficulty.hard')
+      case 'expert':
+      case '3':
+        return 'EXPERT'
+      default:
+        return 'UNKNOWN'
+    }
   }
 
   const getFileIcon = (url: string) => {
-    if (url.endsWith('.pdf')) {
-      return (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14,2 14,8 20,8" />
-        </svg>
-      )
+    const extension = url.split('.').pop()?.toLowerCase()
+    switch (extension) {
+      case 'pdf':
+        return '📄'
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp':
+        return '🖼️'
+      default:
+        return '📄'
     }
-    if (url.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-      return (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <polyline points="21,15 16,10 5,21" />
-        </svg>
-      )
-    }
-    return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
-        <polyline points="13,2 13,9 20,9" />
-      </svg>
-    )
+  }
+
+  const getFileName = (url: string) => {
+    return url.split('/').pop() || 'Unknown File'
+  }
+
+  const getFileType = (url: string) => {
+    const extension = url.split('.').pop()?.toUpperCase() || 'PDF'
+    return extension
   }
 
   if (loadingFiles) {
     return (
-      <div className="exercise-viewer">
+      <div className="exercise-viewer-modern">
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>{t('common.loading')}</p>
+          <p>Loading exercise files...</p>
+          <button onClick={onBack} className="back-btn-modern">
+            <IoArrowBack />
+            {t('exercises.backToExercises')}
+          </button>
         </div>
       </div>
     )
   }
 
-  if (fileError) {
+  if (!hasAccess) {
     return (
-      <div className="exercise-viewer">
+      <div className="exercise-viewer-modern">
         <div className="access-denied-container">
           <h3>Access Denied</h3>
-          <p>{fileError}</p>
-          <button onClick={handleClose} className="back-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Back to Exercises
+          <p>{error}</p>
+          <button onClick={onBack} className="back-btn-modern">
+            <IoArrowBack />
+            {t('exercises.backToExercises')}
           </button>
         </div>
       </div>
@@ -156,148 +305,193 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onClose, exer
   }
 
   return (
-    <div className={`exercise-viewer ${isFullscreen ? 'fullscreen' : ''}`}>
-      {/* Modern Header with Exercise Info and Navigation */}
-      {!isFullscreen && (
-        <div className="modern-header">
-          <div className="header-compact">
-            <div className="header-left">
-              <button onClick={handleClose} className="back-btn-modern">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="m15 18-6-6 6-6" />
-                </svg>
-                Back to Exercises
-              </button>
-              
-              <div className="exercise-info-compact">
-                <h1 className="exercise-title-compact">{exercise.name}</h1>
-                <span className="level-badge-compact">Niveau: Avancé</span>
-              </div>
-            </div>
-            
-            <div className="tab-switcher-modern">
-              <button
-                className={`tab-btn-modern ${activeTab === 'exercise' ? 'active' : ''}`}
-                onClick={() => handleTabClick('exercise')}
-                title="View Exercise Files"
-                aria-label="Switch to exercise files"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                  <polyline points="14,2 14,8 20,8" />
-                </svg>
-                <span>Exercise</span>
-              </button>
-              
-              <button
-                className={`tab-btn-modern ${activeTab === 'correction' ? 'active' : ''}`}
-                onClick={() => handleTabClick('correction')}
-                title="View Solution Files"
-                aria-label="Switch to solution files"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22,4 12,14.01 9,11.01" />
-                </svg>
-                <span>Solution</span>
-              </button>
-            </div>
+    <div className="exercise-viewer-modern">
+      {/* Header */}
+      <div className="header-modern">
+        <button className="back-btn-modern" onClick={onBack}>
+          <IoArrowBack />
+          <span>{t('exercises.backToExercises')}</span>
+        </button>
+        
+        <div className="header-center">
+          <span className="exercise-code">{exercise.code || exercise.name}</span>
+          <div 
+            className="difficulty-tag"
+            style={{ backgroundColor: getDifficultyColor(exercise.tag) }}
+          >
+            {getDifficultyText(exercise.tag)}
           </div>
         </div>
-      )}
+        
+        <button 
+          className={`solution-btn ${activeTab === 'solution' ? 'active' : ''}`}
+          onClick={() => setActiveTab('solution')}
+        >
+          {t('exercises.solution')}
+        </button>
+      </div>
 
-      {/* Fullscreen Controls - Only visible in fullscreen */}
-      {isFullscreen && (
-        <div className="fullscreen-controls">
-          <div className="fullscreen-header">
-            <div className="fullscreen-info">
-              <span className="file-name">{fileLabel} {selectedFileIdx + 1}</span>
-              <span className="file-type">{getFileTypeBadge(files[selectedFileIdx])}</span>
+      {/* Tab Switcher */}
+      <div className="tab-switcher-modern">
+        <button 
+          className={`tab-btn-modern ${activeTab === 'exercise' ? 'active' : ''}`}
+          onClick={() => {
+            setActiveTab('exercise')
+            setSelectedFileIdx(0)
+          }}
+        >
+          <IoDocumentText />
+          <span>{t('exercises.exercise')}</span>
+        </button>
+        <button 
+          className={`tab-btn-modern ${activeTab === 'solution' ? 'active' : ''}`}
+          onClick={() => {
+            setActiveTab('solution')
+            setSelectedFileIdx(0)
+          }}
+        >
+          <IoDocumentText />
+          <span>{t('exercises.solution')}</span>
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="content-card">
+        {/* File Navigation */}
+        {files.length > 1 && (
+          <div className="file-navigation">
+            <button 
+              className="nav-btn" 
+              onClick={handlePrevFile}
+              disabled={selectedFileIdx === 0}
+            >
+              <IoChevronBack />
+            </button>
+            <div className="file-indicator">
+              <span className="file-counter">
+                {selectedFileIdx + 1} / {files.length}
+              </span>
+              <span className="file-label">{getFileName(files[selectedFileIdx])}</span>
             </div>
-            <div className="fullscreen-actions">
-              <button onClick={toggleFullscreen} className="exit-fullscreen-btn" title="Exit Fullscreen">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
-                </svg>
-              </button>
-              <button onClick={handleClose} className="close-btn" title="Close">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18" />
-                  <path d="M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+            <button 
+              className="nav-btn" 
+              onClick={handleNextFile}
+              disabled={selectedFileIdx === files.length - 1}
+            >
+              <IoChevronForward />
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Main Content Area - Modern Card Layout */}
-      <div className="viewer-content-modern">
-        {files.length > 0 ? (
-          <div className="content-card">
-            <div className="file-viewer-modern">
-              {files[selectedFileIdx].endsWith('.pdf') ? (
-                <div className="pdf-container-modern">
-                  <iframe
-                    src={files[selectedFileIdx]}
-                    className="pdf-viewer-modern"
-                    title={`${fileLabel} ${selectedFileIdx + 1}`}
-                    width="100%"
-                    height="100%"
-                  />
-                  {!isFullscreen && (
-                    <button 
-                      onClick={toggleFullscreen} 
-                      className="fullscreen-btn-modern" 
-                      title="Enter Fullscreen"
-                      aria-label="Enter fullscreen mode"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                      </svg>
-                    </button>
+        {/* File Gallery */}
+        {files.length > 0 && (
+          <div className="file-gallery">
+            <div className="gallery-header">
+              <span>{t('exercises.files')} ({files.length})</span>
+            </div>
+            <div className="gallery-grid">
+              {files.map((fileUrl, index) => (
+                <div 
+                  key={index}
+                  className={`file-card ${selectedFileIdx === index ? 'active' : ''}`}
+                  onClick={() => setSelectedFileIdx(index)}
+                >
+                  <div className="file-icon">{getFileIcon(fileUrl)}</div>
+                  <div className="file-info">
+                    <span className="file-name">{getFileName(fileUrl)}</span>
+                    <span className="file-type">{getFileType(fileUrl)}</span>
+                  </div>
+                  {selectedFileIdx === index && (
+                    <div className="active-indicator"></div>
                   )}
                 </div>
-              ) : files[selectedFileIdx].match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                <img
-                  src={files[selectedFileIdx]}
-                  className="image-viewer-modern"
-                  alt={`${fileLabel} ${selectedFileIdx + 1}`}
-                />
-              ) : (
-                <div className="unsupported-file-modern">
-                  <div className="unsupported-content">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <polyline points="14,2 14,8 20,8" />
-                    </svg>
-                    <h3>File Type Not Supported</h3>
-                    <p>This file type cannot be previewed in the browser.</p>
-                    <a href={files[selectedFileIdx]} target="_blank" rel="noopener noreferrer" className="download-link-modern">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7,10 12,15 17,10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                      </svg>
-                      Download File
-                    </a>
-                  </div>
-                </div>
-              )}
+              ))}
             </div>
-          </div>
-        ) : (
-          <div className="no-files-modern">
-            <div className="no-files-content">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14,2 14,8 20,8" />
-              </svg>
-              <h3>No Files Available</h3>
-              <p>No {fileLabel.toLowerCase()} files are available for this exercise.</p>
+            <div className="debug-info" style={{padding: '0.5rem', fontSize: '0.8rem', color: '#666'}}>
+              Debug: {files.length} files loaded for {activeTab} tab
             </div>
           </div>
         )}
+
+        {/* Custom PDF Viewer */}
+        <div className="custom-pdf-viewer">
+          {loading ? (
+            <div className="loading-pdf">
+              <div className="loading-spinner"></div>
+              <span>{t('exercises.loadingPDF')}</span>
+            </div>
+          ) : error ? (
+            <div className="error-pdf">
+              <div className="error-icon">⚠️</div>
+              <span className="error-message">{error}</span>
+              <button 
+                className="retry-btn"
+                onClick={() => {
+                  setError(null)
+                  setPdfDocument(null)
+                }}
+              >
+                Retry
+              </button>
+            </div>
+          ) : pdfDocument ? (
+            <>
+              {/* PDF Controls */}
+              <div className="pdf-controls">
+                <div className="page-controls">
+                  <button 
+                    className="control-btn"
+                    onClick={handlePrevPage}
+                    disabled={currentPage <= 1}
+                  >
+                    <IoChevronBack />
+                  </button>
+                  <span className="page-info">
+                    {currentPage} / {totalPages}
+                  </span>
+                  <button 
+                    className="control-btn"
+                    onClick={handleNextPage}
+                    disabled={currentPage >= totalPages}
+                  >
+                    <IoChevronForward />
+                  </button>
+                </div>
+                
+                <div className="zoom-controls">
+                  <button 
+                    className="control-btn"
+                    onClick={handleZoomOut}
+                    disabled={scale <= 0.5}
+                  >
+                    -
+                  </button>
+                  <span className="zoom-level">{Math.round(scale * 100)}%</span>
+                  <button 
+                    className="control-btn"
+                    onClick={handleZoomIn}
+                    disabled={scale >= 3.0}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* PDF Canvas */}
+              <div className="pdf-canvas-container">
+                <canvas 
+                  ref={canvasRef}
+                  className="pdf-canvas"
+                />
+              </div>
+            </>
+          ) : (
+            <div className="no-pdf">
+              <div className="no-pdf-icon">📄</div>
+              <span>No PDF file available</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

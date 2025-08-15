@@ -4,7 +4,7 @@
   position: relative;
   background: #ffffff;
   border: 2px solid #000000;
-  border-radius: 12px;
+  border-radius: 3px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -62,56 +62,62 @@
     }
   }
 
-  // Available exercise state (green styling)
+  // Available exercise state (white styling)
   &.available {
-    border-color: #10b981 !important;
-    background: #f0fdf4 !important;
-    box-shadow: 4px 4px 0px 0px #10b981 !important;
+    border-color: #000000 !important;
+    background: #ffffff !important;
+    box-shadow: 4px 4px 0px 0px #000000 !important;
 
     &:hover {
-      background: #ecfdf5 !important;
-      border-color: #059669 !important;
-      box-shadow: 8px 8px 0px 0px #059669 !important;
+      background: #f8f9fa !important;
+      border-color: #000000 !important;
+      box-shadow: 8px 8px 0px 0px #000000 !important;
     }
 
     .card-header {
-      background: #f0fdf4 !important;
-      border-bottom-color: #10b981 !important;
+      background: #ffffff !important;
+      border-bottom-color: #000000 !important;
     }
 
     .card-content {
-      background: #f0fdf4 !important;
+      background: #ffffff !important;
     }
 
     .card-footer {
-      background: #f0fdf4 !important;
-      border-top-color: #10b981 !important;
+      background: #ffffff !important;
+      border-top-color: #000000 !important;
     }
 
     .start-btn {
-      background: #10b981 !important;
-      border-color: #10b981 !important;
-      color: #ffffff !important;
+      background: transparent !important;
+      border-color: #000000 !important;
+      color: #000000 !important;
 
       &:hover {
-        background: #059669 !important;
-        border-color: #059669 !important;
+        background: #000000 !important;
+        border-color: #000000 !important;
+        color: #ffffff !important;
       }
 
       span, .icon, .arrow-icon {
+        color: #000000 !important;
+        stroke: #000000 !important;
+      }
+
+      &:hover span, &:hover .icon, &:hover .arrow-icon {
         color: #ffffff !important;
         stroke: #ffffff !important;
       }
     }
 
     .available-badge {
-      background: #10b981 !important;
+      background: white !important;
       border-color: #10b981 !important;
-      color: #ffffff !important;
+      color: black !important;
     }
 
     .exercise-title {
-      color: #10b981 !important;
+      color: #000000 !important;
     }
   }
 
@@ -119,18 +125,18 @@
   &.premium-locked {
     opacity: 0.9;
     background: #fff5f0 !important;
-    border-color: #ff6b35 !important;
-    box-shadow: 4px 4px 0px 0px #ff6b35 !important;
+    border-color: #000000 !important;
+    box-shadow: 4px 4px 0px 0px #000000 !important;
 
     &:hover {
       transform: none;
-      box-shadow: 4px 4px 0px 0px #ff6b35 !important;
-      background: #fff5f0 !important;
+      box-shadow: 4px 4px 0px 0px #000000 !important;
+      background: #fef2f2 !important;
     }
 
     .card-header {
       background: #fff5f0 !important;
-      border-bottom-color: #ff6b35 !important;
+      border-bottom-color: #000000 !important;
     }
 
     .card-content {
@@ -139,17 +145,20 @@
 
     .card-footer {
       background: #fff5f0 !important;
-      border-top-color: #ff6b35 !important;
+      border-top-color: #000000 !important;
     }
 
     .start-btn {
       background: #ff6b35 !important;
       border-color: #ff6b35 !important;
       color: #ffffff !important;
+      box-shadow: 2px 2px 0px 0px #000000 !important;
 
       &:hover {
         background: #e55a2b !important;
         border-color: #e55a2b !important;
+        transform: translate(-1px, -1px) !important;
+        box-shadow: 3px 3px 0px 0px #000000 !important;
       }
 
       span, .icon, .arrow-icon {
@@ -162,10 +171,11 @@
       background: #ff6b35 !important;
       border-color: #ff6b35 !important;
       color: #ffffff !important;
+      box-shadow: 2px 2px 0px 0px #000000 !important;
     }
 
     .exercise-title {
-      color: #ff6b35 !important;
+      color: #000000 !important;
     }
   }
 }
@@ -210,7 +220,7 @@
       background: #000000;
       color: #ffffff;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: 3px;
       font-size: 11px;
       font-weight: 600;
       border: 1px solid #000000;
@@ -218,7 +228,7 @@
 
     .difficulty-badge {
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: 3px;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
@@ -244,7 +254,7 @@
       align-items: center;
       gap: 4px;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: 3px;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
@@ -264,18 +274,21 @@
       align-items: center;
       gap: 4px;
       padding: 4px 8px;
-      border-radius: 4px;
+      border-radius: 3px;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border: 2px solid #10b981;
-      background: #10b981;
-      color: white;
+      background: white;
+      color: black;
 
       .available-icon {
         width: 12px;
         height: 12px;
+        color: transparent;
+        stroke: black;
+        fill: transparent;
       }
     }
   }
@@ -309,16 +322,16 @@
     gap: 8px;
     font-size: 12px;
 
-    .stat-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      flex-shrink: 0;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border: 2px solid #000000;
+          .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 3px;
+        flex-shrink: 0;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid #000000;
 
       .icon {
         width: 14px;
@@ -376,7 +389,7 @@
       width: 32px;
       height: 32px;
       border: 2px solid #000000;
-      border-radius: 6px;
+      border-radius: 3px;
       background: #ffffff;
       color: #000000;
       cursor: pointer;
@@ -415,7 +428,7 @@
       background: #000000;
       color: #ffffff;
       border: 2px solid #000000;
-      border-radius: 6px;
+      border-radius: 3px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 2px 2px 0px 0px #000000;
@@ -481,7 +494,7 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
+  border-radius: 3px;
   pointer-events: none;
   z-index: 2;
   border: 2px solid #000000;
@@ -523,10 +536,10 @@
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
+  border-radius: 3px;
   pointer-events: none;
   z-index: 2;
-  border: 2px solid #ff6b35;
+  border: 2px solid #000000;
 
   .overlay-content {
     display: flex;
@@ -538,14 +551,14 @@
     .lock-icon {
       width: 32px;
       height: 32px;
-      color: #ff6b35;
+      color: #000000;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .overlay-text {
       font-size: 14px;
       font-weight: 600;
-      color: #ff6b35;
+      color: #000000;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
@@ -565,7 +578,7 @@
     }
     
     .overlay-text {
-      color: #ff6b35;
+      color: #000000;
       font-weight: 600;
     }
   }

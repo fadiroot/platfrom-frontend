@@ -164,6 +164,7 @@
     "title": "التمارين",
     "subtitle": "تدرب وحسّن مهاراتك من خلال هذه التمارين",
     "backToChapters": "العودة إلى الفصول",
+    "backToExercises": "العودة إلى التمارين",
     "start": "ابدأ التمرين",
     "review": "راجع التمرين",
     "complete": "إكمال",
@@ -172,10 +173,15 @@
     "upgradeRequired": "مطلوب ترقية",
     "premiumContent": "محتوى مميز",
     "available": "متاح",
+    "exercise": "التمرين",
+    "solution": "الحل",
+    "files": "الملفات",
+    "loadingPDF": "جاري تحميل PDF...",
     "difficulty": {
       "easy": "سهل",
       "medium": "متوسط",
-      "hard": "صعب"
+      "hard": "صعب",
+      "expert": "خبير"
     },
     "type": {
       "theory": "نظري",
@@ -187,6 +193,11 @@
     "questions": "الأسئلة",
     "noExercises": "لا توجد تمارين متاحة في هذا الفصل",
     "loading": "جاري تحميل التمارين..."
+  },
+  "exerciseViewer": {
+    "exerciseTab": "التمرين",
+    "correctionTab": "الحل",
+    "backToExercises": "العودة إلى التمارين"
   },
   "premium": {
     "title": "محتوى مميز",

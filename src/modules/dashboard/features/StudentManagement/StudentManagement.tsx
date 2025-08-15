@@ -14,7 +14,10 @@ import {
   Card,
   Row,
   Col,
-  Statistic
+  Statistic,
+  Avatar,
+  Badge,
+  Divider
 } from 'antd';
 import { 
   UserAddOutlined, 
@@ -24,7 +27,12 @@ import {
   ClockCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  SyncOutlined
+  SyncOutlined,
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  CalendarOutlined,
+  DollarOutlined
 } from '@ant-design/icons';
 import { 
   getStudentProfiles, 
@@ -126,28 +134,55 @@ const StudentManagement: React.FC = () => {
   const getStatusTag = (status: string) => {
     switch (status) {
       case 'active':
-        return <Tag color="green" icon={<CheckCircleOutlined />}>Active</Tag>;
+        return (
+          <Badge 
+            status="success" 
+            text={
+              <Tag color="#52c41a" icon={<CheckCircleOutlined />} className="status-tag">
+                Active
+              </Tag>
+            }
+          />
+        );
       case 'inactive':
-        return <Tag color="red" icon={<CloseCircleOutlined />}>Inactive</Tag>;
+        return (
+          <Badge 
+            status="error" 
+            text={
+              <Tag color="#ff4d4f" icon={<CloseCircleOutlined />} className="status-tag">
+                Inactive
+              </Tag>
+            }
+          />
+        );
       case 'expired':
-        return <Tag color="orange" icon={<ClockCircleOutlined />}>Expired</Tag>;
+        return (
+          <Badge 
+            status="warning" 
+            text={
+              <Tag color="#faad14" icon={<ClockCircleOutlined />} className="status-tag">
+                Expired
+              </Tag>
+            }
+          />
+        );
       default:
-        return <Tag>Unknown</Tag>;
+        return <Tag className="status-tag">Unknown</Tag>;
     }
   };
 
   const getPaymentStatusTag = (status: string) => {
     switch (status) {
       case 'paid':
-        return <Tag color="green">Paid</Tag>;
+        return <Tag color="#52c41a" className="payment-tag">Paid</Tag>;
       case 'pending':
-        return <Tag color="orange">Pending</Tag>;
+        return <Tag color="#faad14" className="payment-tag">Pending</Tag>;
       case 'failed':
-        return <Tag color="red">Failed</Tag>;
+        return <Tag color="#ff4d4f" className="payment-tag">Failed</Tag>;
       case 'refunded':
-        return <Tag color="blue">Refunded</Tag>;
+        return <Tag color="#1890ff" className="payment-tag">Refunded</Tag>;
       default:
-        return <Tag>Unknown</Tag>;
+        return <Tag className="payment-tag">Unknown</Tag>;
     }
   };
 
@@ -155,19 +190,29 @@ const StudentManagement: React.FC = () => {
     {
       title: 'Student',
       key: 'student',
+      width: 250,
       render: (record: AdminStudentProfile) => (
-        <div>
-          <div style={{ fontWeight: 'bold' }}>
-            {record.first_name} {record.last_name}
+        <div className="student-info">
+          <div className="student-avatar">
+            <Avatar 
+              size={48} 
+              icon={<UserOutlined />}
+              style={{ backgroundColor: '#1890ff' }}
+            />
           </div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
-            {record.email}
-          </div>
-          {record.phone_number && (
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              {record.phone_number}
+          <div className="student-details">
+            <div className="student-name">
+              {record.first_name} {record.last_name}
             </div>
-          )}
+            <div className="student-email">
+              <MailOutlined /> {record.email}
+            </div>
+            {record.phone_number && (
+              <div className="student-phone">
+                <PhoneOutlined /> {record.phone_number}
+              </div>
+            )}
+          </div>
         </div>
       ),
     },
@@ -175,22 +220,31 @@ const StudentManagement: React.FC = () => {
       title: 'Level',
       dataIndex: 'level_title',
       key: 'level',
-      render: (level: string) => level || 'Not assigned',
+      width: 150,
+      render: (level: string) => (
+        <div className="level-info">
+          <Tag color="#722ed1" className="level-tag">
+            {level || 'Not assigned'}
+          </Tag>
+        </div>
+      ),
     },
     {
       title: 'Status',
       key: 'status',
+      width: 120,
       render: (record: AdminStudentProfile) => getStatusTag(record.account_status),
     },
     {
       title: 'Payment',
       key: 'payment',
+      width: 150,
       render: (record: AdminStudentProfile) => (
-        <div>
+        <div className="payment-info">
           {getPaymentStatusTag(record.payment_status)}
           {record.payment_amount && (
-            <div style={{ fontSize: '12px', marginTop: '4px' }}>
-              ${record.payment_amount}
+            <div className="payment-amount">
+              <DollarOutlined /> ${record.payment_amount}
             </div>
           )}
         </div>
@@ -199,16 +253,17 @@ const StudentManagement: React.FC = () => {
     {
       title: 'Subscription',
       key: 'subscription',
+      width: 200,
       render: (record: AdminStudentProfile) => (
-        <div>
+        <div className="subscription-info">
           {record.subscription_start_date && (
-            <div style={{ fontSize: '12px' }}>
-              Start: {new Date(record.subscription_start_date).toLocaleDateString()}
+            <div className="subscription-date">
+              <CalendarOutlined /> Start: {new Date(record.subscription_start_date).toLocaleDateString()}
             </div>
           )}
           {record.subscription_end_date && (
-            <div style={{ fontSize: '12px' }}>
-              End: {new Date(record.subscription_end_date).toLocaleDateString()}
+            <div className="subscription-date">
+              <CalendarOutlined /> End: {new Date(record.subscription_end_date).toLocaleDateString()}
             </div>
           )}
         </div>
@@ -217,14 +272,17 @@ const StudentManagement: React.FC = () => {
     {
       title: 'Actions',
       key: 'actions',
+      width: 200,
+      fixed: 'right' as const,
       render: (record: AdminStudentProfile) => (
-        <Space>
+        <Space size="small" className="action-buttons">
           {record.account_status === 'inactive' && (
             <Tooltip title="Activate Account">
               <Button
                 type="primary"
                 icon={<UserAddOutlined />}
                 size="small"
+                className="activate-btn"
                 onClick={() => {
                   setSelectedStudent(record);
                   setActivateModalVisible(true);
@@ -240,6 +298,7 @@ const StudentManagement: React.FC = () => {
                 danger
                 icon={<UserDeleteOutlined />}
                 size="small"
+                className="deactivate-btn"
                 onClick={() => {
                   setSelectedStudent(record);
                   setDeactivateModalVisible(true);
@@ -253,8 +312,8 @@ const StudentManagement: React.FC = () => {
             <Button
               icon={<EyeOutlined />}
               size="small"
+              className="view-btn"
               onClick={() => {
-                // TODO: Implement student details view
                 message.info('Student details view coming soon');
               }}
             />
@@ -267,59 +326,65 @@ const StudentManagement: React.FC = () => {
   return (
     <div className="student-management">
       <div className="page-header">
-        <h1>Student Management</h1>
-        <p>Manage student accounts and subscriptions. Active students can access all exercises, inactive students can only access public exercises.</p>
+        <h1 className="page-title">Student Management</h1>
+        <p className="page-description">
+          Manage student accounts and subscriptions. Active students can access all exercises, inactive students can only access public exercises.
+        </p>
       </div>
 
       {/* Statistics Cards */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-          <Card>
+      <Row gutter={[16, 16]} className="stats-row">
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="stat-card total-card">
             <Statistic
               title="Total Students"
               value={stats.total}
               valueStyle={{ color: '#1890ff' }}
+              prefix={<UserOutlined />}
             />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="stat-card active-card">
             <Statistic
               title="Active Students"
               value={stats.active}
               valueStyle={{ color: '#52c41a' }}
+              prefix={<CheckCircleOutlined />}
             />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="stat-card inactive-card">
             <Statistic
               title="Inactive Students"
               value={stats.inactive}
               valueStyle={{ color: '#ff4d4f' }}
+              prefix={<CloseCircleOutlined />}
             />
           </Card>
         </Col>
-        <Col span={6}>
-          <Card>
+        <Col xs={24} sm={12} lg={6}>
+          <Card className="stat-card expired-card">
             <Statistic
               title="Expired Subscriptions"
               value={stats.expired}
               valueStyle={{ color: '#faad14' }}
+              prefix={<ClockCircleOutlined />}
             />
           </Card>
         </Col>
       </Row>
 
       {/* Filters */}
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={16} align="middle">
-          <Col span={6}>
+      <Card className="filters-card">
+        <Row gutter={[16, 16]} align="middle">
+          <Col xs={24} sm={12} lg={6}>
             <Select
               placeholder="Filter by status"
               value={filters.status}
               onChange={(value) => setFilters({ ...filters, status: value })}
-              style={{ width: '100%' }}
+              className="filter-select"
             >
               <Option value="all">All Status</Option>
               <Option value="active">Active</Option>
@@ -327,13 +392,13 @@ const StudentManagement: React.FC = () => {
               <Option value="expired">Expired</Option>
             </Select>
           </Col>
-          <Col span={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Select
               placeholder="Filter by payment"
               value={filters.payment_status}
               onChange={(value) => setFilters({ ...filters, payment_status: value as 'pending' | 'paid' | 'failed' | 'refunded' | undefined })}
               allowClear
-              style={{ width: '100%' }}
+              className="filter-select"
             >
               <Option value="paid">Paid</Option>
               <Option value="pending">Pending</Option>
@@ -341,77 +406,98 @@ const StudentManagement: React.FC = () => {
               <Option value="refunded">Refunded</Option>
             </Select>
           </Col>
-          <Col span={8}>
+          <Col xs={24} sm={12} lg={8}>
             <Input
               placeholder="Search by name or email"
               prefix={<SearchOutlined />}
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              className="search-input"
             />
           </Col>
-          <Col span={4}>
-            <Space>
-              <Button 
-                icon={<SyncOutlined />}
-                type="primary" 
-                onClick={fetchStudents}
-                loading={loading}
-              >
-                Refresh
-              </Button>
-            </Space>
+          <Col xs={24} sm={12} lg={4}>
+            <Button 
+              icon={<SyncOutlined />}
+              type="primary" 
+              onClick={fetchStudents}
+              loading={loading}
+              className="refresh-btn"
+              block
+            >
+              Refresh
+            </Button>
           </Col>
         </Row>
       </Card>
 
       {/* Students Table */}
-      <Card>
+      <Card className="table-card">
         <Table
           columns={columns}
           dataSource={students}
           rowKey="profile_id"
           loading={loading}
+          className="students-table"
+          scroll={{ x: 1200 }}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
             showQuickJumper: true,
             showTotal: (total, range) => 
               `${range[0]}-${range[1]} of ${total} students`,
+            className: 'table-pagination'
           }}
         />
       </Card>
 
       {/* Activate Student Modal */}
       <Modal
-        title="Activate Student Account"
+        title={
+          <div className="modal-title">
+            <UserAddOutlined className="modal-icon" />
+            Activate Student Account
+          </div>
+        }
         open={activateModalVisible}
         onCancel={() => {
           setActivateModalVisible(false);
           activateForm.resetFields();
         }}
         footer={null}
+        className="activate-modal"
+        width={600}
       >
         <Form
           form={activateForm}
           layout="vertical"
           onFinish={handleActivate}
+          className="modal-form"
         >
-          <Form.Item
-            label="Student"
-            name="student"
-          >
-            <Input
-              value={selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name} (${selectedStudent.email})` : ''}
-              disabled
+          <div className="student-summary">
+            <Avatar 
+              size={64} 
+              icon={<UserOutlined />}
+              style={{ backgroundColor: '#1890ff' }}
             />
-          </Form.Item>
+            <div className="student-info">
+              <h3>{selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name}` : ''}</h3>
+              <p>{selectedStudent?.email}</p>
+            </div>
+          </div>
+          
+          <Divider />
 
           <Form.Item
             label="Subscription Period (months)"
             name="subscription_months"
             rules={[{ required: true, message: 'Please enter subscription period' }]}
           >
-            <InputNumber min={1} max={12} style={{ width: '100%' }} />
+            <InputNumber 
+              min={1} 
+              max={12} 
+              className="form-input"
+              placeholder="Enter number of months"
+            />
           </Form.Item>
 
           <Form.Item
@@ -422,7 +508,8 @@ const StudentManagement: React.FC = () => {
               min={0}
               step={0.01}
               prefix="$"
-              style={{ width: '100%' }}
+              className="form-input"
+              placeholder="Enter payment amount"
             />
           </Form.Item>
 
@@ -430,7 +517,7 @@ const StudentManagement: React.FC = () => {
             label="Payment Method"
             name="payment_method"
           >
-            <Select placeholder="Select payment method">
+            <Select placeholder="Select payment method" className="form-select">
               <Option value="cash">Cash</Option>
               <Option value="bank_transfer">Bank Transfer</Option>
               <Option value="check">Check</Option>
@@ -442,18 +529,30 @@ const StudentManagement: React.FC = () => {
             label="Payment Notes"
             name="payment_notes"
           >
-            <TextArea rows={3} />
+            <TextArea 
+              rows={3} 
+              className="form-textarea"
+              placeholder="Add any additional notes about the payment"
+            />
           </Form.Item>
 
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
+          <Form.Item className="modal-actions">
+            <Space size="middle">
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                icon={<UserAddOutlined />}
+                className="submit-btn"
+              >
                 Activate Account
               </Button>
-              <Button onClick={() => {
-                setActivateModalVisible(false);
-                activateForm.resetFields();
-              }}>
+              <Button 
+                onClick={() => {
+                  setActivateModalVisible(false);
+                  activateForm.resetFields();
+                }}
+                className="cancel-btn"
+              >
                 Cancel
               </Button>
             </Space>
@@ -463,45 +562,69 @@ const StudentManagement: React.FC = () => {
 
       {/* Deactivate Student Modal */}
       <Modal
-        title="Deactivate Student Account"
+        title={
+          <div className="modal-title">
+            <UserDeleteOutlined className="modal-icon" />
+            Deactivate Student Account
+          </div>
+        }
         open={deactivateModalVisible}
         onCancel={() => {
           setDeactivateModalVisible(false);
           deactivateForm.resetFields();
         }}
         footer={null}
+        className="deactivate-modal"
+        width={600}
       >
         <Form
           form={deactivateForm}
           layout="vertical"
           onFinish={handleDeactivate}
+          className="modal-form"
         >
-          <Form.Item
-            label="Student"
-            name="student"
-          >
-            <Input
-              value={selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name} (${selectedStudent.email})` : ''}
-              disabled
+          <div className="student-summary">
+            <Avatar 
+              size={64} 
+              icon={<UserOutlined />}
+              style={{ backgroundColor: '#ff4d4f' }}
             />
-          </Form.Item>
+            <div className="student-info">
+              <h3>{selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name}` : ''}</h3>
+              <p>{selectedStudent?.email}</p>
+            </div>
+          </div>
+          
+          <Divider />
 
           <Form.Item
             label="Reason for Deactivation"
             name="reason"
           >
-            <TextArea rows={3} placeholder="Optional reason for deactivation" />
+            <TextArea 
+              rows={4} 
+              className="form-textarea"
+              placeholder="Please provide a reason for deactivation (optional)"
+            />
           </Form.Item>
 
-          <Form.Item>
-            <Space>
-              <Button danger htmlType="submit">
+          <Form.Item className="modal-actions">
+            <Space size="middle">
+              <Button 
+                danger 
+                htmlType="submit"
+                icon={<UserDeleteOutlined />}
+                className="submit-btn-danger"
+              >
                 Deactivate Account
               </Button>
-              <Button onClick={() => {
-                setDeactivateModalVisible(false);
-                deactivateForm.resetFields();
-              }}>
+              <Button 
+                onClick={() => {
+                  setDeactivateModalVisible(false);
+                  deactivateForm.resetFields();
+                }}
+                className="cancel-btn"
+              >
                 Cancel
               </Button>
             </Space>

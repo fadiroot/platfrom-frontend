@@ -132,7 +132,7 @@ const ExercisesList: React.FC = () => {
         <div className="exercise-viewer-fullscreen">
           <ExerciseViewer
             exercise={selectedExercise}
-            onClose={handleCloseViewer}
+            onBack={handleCloseViewer}
             exerciseIndex={exercises.findIndex(ex => ex.id === selectedExercise.id)}
           />
         </div>

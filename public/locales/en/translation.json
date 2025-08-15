@@ -138,17 +138,28 @@
     "title": "Exercises",
     "subtitle": "Practice and improve your skills with these exercises",
     "backToChapters": "Back to Chapters",
+    "backToExercises": "Back to Exercises",
     "start": "Start Exercise",
     "review": "Review Exercise",
     "premium": "PREMIUM",
     "available": "AVAILABLE",
     "upgradeRequired": "Upgrade Required",
     "premiumContent": "Premium Content",
+    "exercise": "Exercise",
+    "solution": "Solution",
+    "files": "Files",
+    "loadingPDF": "Loading PDF...",
     "difficulty": {
       "easy": "EASY",
       "medium": "MEDIUM", 
-      "hard": "HARD"
+      "hard": "HARD",
+      "expert": "EXPERT"
     }
+  },
+  "exerciseViewer": {
+    "exerciseTab": "Exercise",
+    "correctionTab": "Solution",
+    "backToExercises": "Back to Exercises"
   },
   "premium": {
     "title": "Premium Content",

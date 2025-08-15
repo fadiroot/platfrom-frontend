@@ -4,6 +4,7 @@
 .subject-list-container {
   @include student-container;
   position: relative;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 .subject-list-cap{
     width: 80px;
@@ -25,6 +26,7 @@
   text-align: center;
   font-size: 2.5rem;
   font-weight: 700;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .subject-list-subtitle {
@@ -33,6 +35,7 @@
   font-size: 1rem;
   font-weight: 500;
   text-align: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 // Subject Grid
@@ -57,7 +60,8 @@
   padding: 1rem 1.5rem;
   flex-direction: column;
   align-items: flex-start;
-  border-radius: 12px;
+  border-radius: 3px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   &:hover {
     transform: translate(-1px, -1px);
@@ -106,6 +110,7 @@
   color: var(--student-text-primary);
   letter-spacing: 0.01em;
   transition: color 0.3s ease;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .subject-description {
@@ -114,6 +119,7 @@
   line-height: 1.5;
   font-size: 1rem;
   transition: color 0.3s ease;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .subject-meta {
@@ -127,6 +133,7 @@
 .chapter-count {
   color: var(--student-text-secondary);
   font-size: 0.9rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .explore-button {
@@ -144,7 +151,8 @@
   cursor: pointer;
   padding: 0.5rem 1.2rem;
   font-size: 1rem;
-  border-radius: 4px;
+  border-radius: 3px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   &:hover {
     transform: translate(-1px, -1px);
