@@ -2,25 +2,14 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { IoArrowBack, IoDocumentText, IoCheckmarkCircle, IoChevronBack, IoChevronForward } from 'react-icons/io5'
+import { IoArrowBack, IoDocumentText, IoCheckmarkCircle } from 'react-icons/io5'
 import { getSecureExerciseFiles, getSecureFileUrl } from '@/lib/api/exercises'
 import { supabase } from '@/lib/supabase'
-import DefaultPDFViewer, { preloadPDF } from './DefaultPDFViewer.tsx'
+import { ExerciseViewerProps, Exercise } from './types'
+
 import './ExerciseViewer.scss'
 
-interface ExerciseViewerProps {
-  exercise: {
-    id: string
-    code?: string
-    name: string
-    tag: number
-    difficulty?: string
-    exerciseFileUrls?: string[]
-    correctionFileUrls?: string[]
-  }
-  onBack: () => void
-  exerciseIndex?: number
-}
+
 
 const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerciseIndex }) => {
   const { t, i18n } = useTranslation()
@@ -34,15 +23,11 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
   const [secureCorrectionFiles, setSecureCorrectionFiles] = useState<string[]>([])
   const [hasAccess, setHasAccess] = useState(false)
   const [loadingFiles, setLoadingFiles] = useState(true)
+  const [isTestMode, setIsTestMode] = useState(false)
   const preloadedFiles = useRef(new Set<string>())
 
   // Preload PDFs for better performance
-  const preloadPDFFile = async (fileUrl: string) => {
-    if (!fileUrl || preloadedFiles.current.has(fileUrl)) return
-    
-    preloadedFiles.current.add(fileUrl)
-    await preloadPDF(fileUrl, exercise.id)
-  }
+
 
   // Load secure files when component mounts
   useEffect(() => {
@@ -90,7 +75,7 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
     // Preload current file if not already loaded
     const currentFile = currentFiles[selectedFileIdx]
     if (currentFile) {
-      preloadPDFFile(currentFile)
+      // Preload logic can be added here if needed
     }
     
     // Preload next and previous files
@@ -98,16 +83,16 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
     const prevIdx = selectedFileIdx - 1
     
     if (nextIdx < currentFiles.length) {
-      setTimeout(() => preloadPDFFile(currentFiles[nextIdx]), 100)
+      // Preload next file
     }
     if (prevIdx >= 0) {
-      setTimeout(() => preloadPDFFile(currentFiles[prevIdx]), 200)
+      // Preload previous file
     }
     
     // Preload files from the other tab (exercise/solution)
     const otherFiles = activeTab === 'exercise' ? secureCorrectionFiles : secureExerciseFiles
     if (otherFiles.length > 0 && selectedFileIdx < otherFiles.length) {
-      setTimeout(() => preloadPDFFile(otherFiles[selectedFileIdx]), 300)
+      // Preload other tab file
     }
   }, [selectedFileIdx, activeTab, hasAccess, loadingFiles, secureExerciseFiles, secureCorrectionFiles])
 
@@ -281,19 +266,74 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
 
       {/* Content */}
       <div className="content-card full-height">
+
+
+        {/* File Information - Minimal style like PDF.js */}
+        {getCurrentFiles().length > 1 && (
+          <div style={{ 
+            padding: '8px 12px', 
+            background: '#474747', 
+            borderBottom: '1px solid #2a2a2a',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '12px',
+            color: '#e8e8e8'
+          }}>
+            <div>
+              <span>{getFileName(getCurrentFiles()[selectedFileIdx])}</span>
+              <span style={{ marginLeft: '8px', color: '#999' }}>
+                ({selectedFileIdx + 1} of {getCurrentFiles().length})
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {getCurrentFiles().map((file, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedFileIdx(index)}
+                  style={{
+                    padding: '2px 6px',
+                    background: selectedFileIdx === index ? '#007acc' : 'transparent',
+                    color: selectedFileIdx === index ? 'white' : '#e8e8e8',
+                    border: '1px solid #666',
+                    borderRadius: '2px',
+                    cursor: 'pointer',
+                    fontSize: '11px',
+                    minWidth: '20px'
+                  }}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Main PDF Viewer - Full Width */}
         <div className="custom-pdf-viewer full-width">
           {getCurrentPDFUrl() ? (
-            <DefaultPDFViewer 
-              fileUrl={getCurrentPDFUrl()!}
-              exerciseId={exercise.id}
-              hideLoader={true}
+            <iframe
+              src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(getCurrentPDFUrl()!)}`}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                background: 'white'
+              }}
+              title="PDF Viewer"
             />
           ) : (
-            <div className="no-pdf">
-              <div className="no-pdf-icon">📄</div>
-              <span>No PDF file available</span>
-            </div>
+            // Test mode: Show sample PDF when no files are available
+            <iframe
+              src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf"
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                background: 'white'
+              }}
+              title="PDF Viewer"
+            />
           )}
         </div>
       </div>
