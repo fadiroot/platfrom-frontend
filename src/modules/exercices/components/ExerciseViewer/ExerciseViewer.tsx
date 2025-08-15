@@ -2,8 +2,10 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { IoArrowBack, IoDocumentText, IoChevronBack, IoChevronForward } from 'react-icons/io5'
+import { IoArrowBack, IoDocumentText, IoCheckmarkCircle, IoChevronBack, IoChevronForward } from 'react-icons/io5'
 import { getSecureExerciseFiles, getSecureFileUrl } from '@/lib/api/exercises'
+import { supabase } from '@/lib/supabase'
+import DefaultPDFViewer, { preloadPDF } from './DefaultPDFViewer.tsx'
 import './ExerciseViewer.scss'
 
 interface ExerciseViewerProps {
@@ -12,6 +14,7 @@ interface ExerciseViewerProps {
     code?: string
     name: string
     tag: number
+    difficulty?: string
     exerciseFileUrls?: string[]
     correctionFileUrls?: string[]
   }
@@ -20,20 +23,26 @@ interface ExerciseViewerProps {
 }
 
 const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerciseIndex }) => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState<'exercise' | 'solution'>('exercise')
+  
+  // Determine if current language is RTL
+  const isRTL = i18n.language === 'ar'
   const [selectedFileIdx, setSelectedFileIdx] = useState(0)
-  const [pdfDocument, setPdfDocument] = useState<any>(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(0)
-  const [scale, setScale] = useState(1.0)
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [secureExerciseFiles, setSecureExerciseFiles] = useState<string[]>([])
   const [secureCorrectionFiles, setSecureCorrectionFiles] = useState<string[]>([])
   const [hasAccess, setHasAccess] = useState(false)
   const [loadingFiles, setLoadingFiles] = useState(true)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const preloadedFiles = useRef(new Set<string>())
+
+  // Preload PDFs for better performance
+  const preloadPDFFile = async (fileUrl: string) => {
+    if (!fileUrl || preloadedFiles.current.has(fileUrl)) return
+    
+    preloadedFiles.current.add(fileUrl)
+    await preloadPDF(fileUrl, exercise.id)
+  }
 
   // Load secure files when component mounts
   useEffect(() => {
@@ -71,6 +80,37 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
     loadSecureFiles()
   }, [exercise.id, exerciseIndex])
 
+  // Preload adjacent files for faster switching
+  useEffect(() => {
+    if (!hasAccess || loadingFiles) return
+    
+    const currentFiles = getCurrentFiles()
+    if (currentFiles.length === 0) return
+    
+    // Preload current file if not already loaded
+    const currentFile = currentFiles[selectedFileIdx]
+    if (currentFile) {
+      preloadPDFFile(currentFile)
+    }
+    
+    // Preload next and previous files
+    const nextIdx = selectedFileIdx + 1
+    const prevIdx = selectedFileIdx - 1
+    
+    if (nextIdx < currentFiles.length) {
+      setTimeout(() => preloadPDFFile(currentFiles[nextIdx]), 100)
+    }
+    if (prevIdx >= 0) {
+      setTimeout(() => preloadPDFFile(currentFiles[prevIdx]), 200)
+    }
+    
+    // Preload files from the other tab (exercise/solution)
+    const otherFiles = activeTab === 'exercise' ? secureCorrectionFiles : secureExerciseFiles
+    if (otherFiles.length > 0 && selectedFileIdx < otherFiles.length) {
+      setTimeout(() => preloadPDFFile(otherFiles[selectedFileIdx]), 300)
+    }
+  }, [selectedFileIdx, activeTab, hasAccess, loadingFiles, secureExerciseFiles, secureCorrectionFiles])
+
   // Get current files based on active tab
   const getCurrentFiles = () => {
     if (activeTab === 'exercise') {
@@ -81,153 +121,23 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
   }
 
   const files = getCurrentFiles()
-  
-  console.log('Current files for tab:', activeTab, 'Files:', files)
-  console.log('Selected file index:', selectedFileIdx)
-  console.log('Has access:', hasAccess)
 
-  // Load PDF using pdfjs-dist
-  useEffect(() => {
-    const loadPDF = async () => {
-      if (!files[selectedFileIdx]) {
-        console.log('No file at index:', selectedFileIdx, 'Files:', files)
-        setError('No PDF file available')
-        return
-      }
-
-      const fileUrl = files[selectedFileIdx]
-      console.log('Loading PDF from URL:', fileUrl)
-
-      try {
-        setLoading(true)
-        setError(null)
-        
-        // Get signed URL for Supabase storage files
-        let finalUrl = fileUrl
-        if (fileUrl.includes('supabase.co')) {
-          console.log('Getting signed URL for Supabase file...')
-          const signedUrl = await getSecureFileUrl(fileUrl, exercise.id)
-          if (signedUrl) {
-            finalUrl = signedUrl
-            console.log('Using signed URL:', signedUrl)
-          } else {
-            throw new Error('Failed to get signed URL for file')
-          }
-        }
-        
-        // Dynamically import pdfjs-dist
-        const pdfjsLib = await import('pdfjs-dist')
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
-        
-        console.log('PDF.js loaded, creating loading task...')
-        const loadingTask = pdfjsLib.getDocument(finalUrl)
-        
-        console.log('Loading task created, waiting for promise...')
-        const pdf = await loadingTask.promise
-        
-        console.log('PDF loaded successfully, pages:', pdf.numPages)
-        setPdfDocument(pdf)
-        setTotalPages(pdf.numPages)
-        setCurrentPage(1)
-      } catch (error: any) {
-        console.error('Error loading PDF:', error)
-        setError(`Failed to load PDF: ${error.message}`)
-      } finally {
-        setLoading(false)
-      }
+  // Get current PDF URL for the default viewer
+  const getCurrentPDFUrl = () => {
+    const currentFiles = getCurrentFiles()
+    if (currentFiles && currentFiles.length > selectedFileIdx) {
+      return currentFiles[selectedFileIdx]
     }
-
-    if (hasAccess && files.length > 0) {
-      console.log('Starting PDF load - hasAccess:', hasAccess, 'files.length:', files.length)
-      loadPDF()
-    } else {
-      console.log('Not loading PDF - hasAccess:', hasAccess, 'files.length:', files.length)
-    }
-  }, [selectedFileIdx, files, hasAccess, exercise.id])
-
-  // Render PDF page
-  useEffect(() => {
-    const renderPage = async () => {
-      if (!pdfDocument || !canvasRef.current) return
-
-      try {
-        const page = await pdfDocument.getPage(currentPage)
-        const canvas = canvasRef.current
-        const context = canvas.getContext('2d')
-
-        const viewport = page.getViewport({ scale })
-        canvas.height = viewport.height
-        canvas.width = viewport.width
-
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport
-        }
-
-        await page.render(renderContext).promise
-      } catch (error) {
-        console.error('Error rendering PDF page:', error)
-      }
-    }
-
-    renderPage()
-  }, [pdfDocument, currentPage, scale])
-
-  const handleNextFile = () => {
-    if (selectedFileIdx < files.length - 1) {
-      setSelectedFileIdx(selectedFileIdx + 1)
-    }
+    return null
   }
 
-  const handlePrevFile = () => {
-    if (selectedFileIdx > 0) {
-      setSelectedFileIdx(selectedFileIdx - 1)
-    }
+  const handleFileSelect = (fileIndex: number) => {
+    setSelectedFileIdx(fileIndex)
   }
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1)
-    }
-  }
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1)
-    }
-  }
 
-  const handleZoomIn = () => {
-    setScale(prev => Math.min(prev + 0.2, 3.0))
-  }
-
-  const handleZoomOut = () => {
-    setScale(prev => Math.max(prev - 0.2, 0.5))
-  }
-
-  const getDifficultyColor = (difficulty: string | number) => {
-    // Convert to string and handle both string and number inputs
-    const difficultyStr = String(difficulty).toLowerCase()
-    
-    switch (difficultyStr) {
-      case 'easy':
-      case '0':
-        return '#10b981'
-      case 'medium':
-      case '1':
-        return '#f59e0b'
-      case 'hard':
-      case '2':
-        return '#ef4444'
-      case 'expert':
-      case '3':
-        return '#8b5cf6'
-      default:
-        return '#6b7280'
-    }
-  }
-
-  const getDifficultyText = (difficulty: string | number) => {
+  const getDifficultyText = (difficulty: string) => {
     // Convert to string and handle both string and number inputs
     const difficultyStr = String(difficulty).toLowerCase()
     
@@ -243,9 +153,30 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
         return t('exercises.difficulty.hard')
       case 'expert':
       case '3':
-        return 'EXPERT'
+        return t('exercises.difficulty.expert', 'EXPERT')
       default:
-        return 'UNKNOWN'
+        return t('exercises.difficulty.easy')
+    }
+  }
+
+  const getDifficultyClass = (difficulty: string) => {
+    const difficultyStr = String(difficulty).toLowerCase()
+    
+    switch (difficultyStr) {
+      case 'easy':
+      case '0':
+        return 'difficulty-easy'
+      case 'medium':
+      case '1':
+        return 'difficulty-medium'
+      case 'hard':
+      case '2':
+        return 'difficulty-hard'
+      case 'expert':
+      case '3':
+        return 'difficulty-expert'
+      default:
+        return 'difficulty-easy'
     }
   }
 
@@ -280,10 +211,6 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
         <div className="loading-container">
           <div className="loading-spinner"></div>
           <p>Loading exercise files...</p>
-          <button onClick={onBack} className="back-btn-modern">
-            <IoArrowBack />
-            {t('exercises.backToExercises')}
-          </button>
         </div>
       </div>
     )
@@ -314,177 +241,54 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
         </button>
         
         <div className="header-center">
-          <span className="exercise-code">{exercise.code || exercise.name}</span>
+          <div className="left-content">
+            <div className="exercise-code">{exercise.code || exercise.name}</div>
+            <div className={`difficulty-badge ${getDifficultyClass(exercise.difficulty)}`}>
+              {getDifficultyText(exercise.difficulty)}
+            </div>
+          </div>
+          
+          {/* Tab Switcher in Header */}
           <div 
-            className="difficulty-tag"
-            style={{ backgroundColor: getDifficultyColor(exercise.tag) }}
+            className={`tab-switcher-header ${activeTab === 'exercise' ? 'exercise-active' : 'solution-active'} ${isRTL ? 'rtl' : 'ltr'}`}
+            dir={isRTL ? 'rtl' : 'ltr'}
           >
-            {getDifficultyText(exercise.tag)}
+            <div 
+              className={`tab-btn-header ${activeTab === 'exercise' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('exercise')
+                setSelectedFileIdx(0)
+              }}
+            >
+              <IoDocumentText style={{ strokeWidth: '2.5px' }} />
+              <span>{t('exerciseViewer.exerciseTab')}</span>
+            </div>
+            <div 
+              className={`tab-btn-header ${activeTab === 'solution' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('solution')
+                setSelectedFileIdx(0)
+              }}
+            >
+              <IoCheckmarkCircle style={{ strokeWidth: '2.5px' }} />
+              <span>{t('exerciseViewer.correctionTab')}</span>
+            </div>
           </div>
         </div>
         
-        <button 
-          className={`solution-btn ${activeTab === 'solution' ? 'active' : ''}`}
-          onClick={() => setActiveTab('solution')}
-        >
-          {t('exercises.solution')}
-        </button>
-      </div>
 
-      {/* Tab Switcher */}
-      <div className="tab-switcher-modern">
-        <button 
-          className={`tab-btn-modern ${activeTab === 'exercise' ? 'active' : ''}`}
-          onClick={() => {
-            setActiveTab('exercise')
-            setSelectedFileIdx(0)
-          }}
-        >
-          <IoDocumentText />
-          <span>{t('exercises.exercise')}</span>
-        </button>
-        <button 
-          className={`tab-btn-modern ${activeTab === 'solution' ? 'active' : ''}`}
-          onClick={() => {
-            setActiveTab('solution')
-            setSelectedFileIdx(0)
-          }}
-        >
-          <IoDocumentText />
-          <span>{t('exercises.solution')}</span>
-        </button>
       </div>
 
       {/* Content */}
-      <div className="content-card">
-        {/* File Navigation */}
-        {files.length > 1 && (
-          <div className="file-navigation">
-            <button 
-              className="nav-btn" 
-              onClick={handlePrevFile}
-              disabled={selectedFileIdx === 0}
-            >
-              <IoChevronBack />
-            </button>
-            <div className="file-indicator">
-              <span className="file-counter">
-                {selectedFileIdx + 1} / {files.length}
-              </span>
-              <span className="file-label">{getFileName(files[selectedFileIdx])}</span>
-            </div>
-            <button 
-              className="nav-btn" 
-              onClick={handleNextFile}
-              disabled={selectedFileIdx === files.length - 1}
-            >
-              <IoChevronForward />
-            </button>
-          </div>
-        )}
-
-        {/* File Gallery */}
-        {files.length > 0 && (
-          <div className="file-gallery">
-            <div className="gallery-header">
-              <span>{t('exercises.files')} ({files.length})</span>
-            </div>
-            <div className="gallery-grid">
-              {files.map((fileUrl, index) => (
-                <div 
-                  key={index}
-                  className={`file-card ${selectedFileIdx === index ? 'active' : ''}`}
-                  onClick={() => setSelectedFileIdx(index)}
-                >
-                  <div className="file-icon">{getFileIcon(fileUrl)}</div>
-                  <div className="file-info">
-                    <span className="file-name">{getFileName(fileUrl)}</span>
-                    <span className="file-type">{getFileType(fileUrl)}</span>
-                  </div>
-                  {selectedFileIdx === index && (
-                    <div className="active-indicator"></div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="debug-info" style={{padding: '0.5rem', fontSize: '0.8rem', color: '#666'}}>
-              Debug: {files.length} files loaded for {activeTab} tab
-            </div>
-          </div>
-        )}
-
-        {/* Custom PDF Viewer */}
-        <div className="custom-pdf-viewer">
-          {loading ? (
-            <div className="loading-pdf">
-              <div className="loading-spinner"></div>
-              <span>{t('exercises.loadingPDF')}</span>
-            </div>
-          ) : error ? (
-            <div className="error-pdf">
-              <div className="error-icon">⚠️</div>
-              <span className="error-message">{error}</span>
-              <button 
-                className="retry-btn"
-                onClick={() => {
-                  setError(null)
-                  setPdfDocument(null)
-                }}
-              >
-                Retry
-              </button>
-            </div>
-          ) : pdfDocument ? (
-            <>
-              {/* PDF Controls */}
-              <div className="pdf-controls">
-                <div className="page-controls">
-                  <button 
-                    className="control-btn"
-                    onClick={handlePrevPage}
-                    disabled={currentPage <= 1}
-                  >
-                    <IoChevronBack />
-                  </button>
-                  <span className="page-info">
-                    {currentPage} / {totalPages}
-                  </span>
-                  <button 
-                    className="control-btn"
-                    onClick={handleNextPage}
-                    disabled={currentPage >= totalPages}
-                  >
-                    <IoChevronForward />
-                  </button>
-                </div>
-                
-                <div className="zoom-controls">
-                  <button 
-                    className="control-btn"
-                    onClick={handleZoomOut}
-                    disabled={scale <= 0.5}
-                  >
-                    -
-                  </button>
-                  <span className="zoom-level">{Math.round(scale * 100)}%</span>
-                  <button 
-                    className="control-btn"
-                    onClick={handleZoomIn}
-                    disabled={scale >= 3.0}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-
-              {/* PDF Canvas */}
-              <div className="pdf-canvas-container">
-                <canvas 
-                  ref={canvasRef}
-                  className="pdf-canvas"
-                />
-              </div>
-            </>
+      <div className="content-card full-height">
+        {/* Main PDF Viewer - Full Width */}
+        <div className="custom-pdf-viewer full-width">
+          {getCurrentPDFUrl() ? (
+            <DefaultPDFViewer 
+              fileUrl={getCurrentPDFUrl()!}
+              exerciseId={exercise.id}
+              hideLoader={true}
+            />
           ) : (
             <div className="no-pdf">
               <div className="no-pdf-icon">📄</div>
