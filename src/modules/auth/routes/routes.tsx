@@ -49,6 +49,20 @@ const routes: RouteConfig[] = [
     component: lazy(() => import('../features/ResetPassword/ResetPassword')),
     layout: GuestLayout,
   },
+  {
+    exact: true,
+    guard: GuestGuard,
+    path: PATH.EMAIL_CONFIRMATION,
+    component: lazy(() => import('../features/EmailConfirmation/EmailConfirmation')),
+    layout: GuestLayout,
+  },
+  {
+    exact: true,
+    guard: GuestGuard,
+    path: PATH.AUTH_CONFIRM,
+    component: lazy(() => import('../features/EmailConfirmation/EmailConfirmation')),
+    layout: GuestLayout,
+  },
 ]
 
 export default routes

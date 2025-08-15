@@ -257,11 +257,16 @@ export const getUserWithLevel = async (user: User): Promise<UserProfile & { leve
         )
       `)
       .eq('user_id', user.id)
-      .single()
+      .maybeSingle() // Use maybeSingle() instead of single() to handle missing records
     
     if (!error && data) {
       levelId = data.level_id // Already a UUID string
       level = Array.isArray(data.levels) ? data.levels[0] : data.levels
+    } else if (error && error.code === 'PGRST116') {
+      // Student profile doesn't exist, this is normal for new users
+      console.log('Student profile not found for user:', user.id, '- this is normal for new users')
+    } else if (error) {
+      console.error('Error fetching student profile:', error)
     }
   } catch (error) {
     console.error('💥 Exception in getUserWithLevel:', error)
@@ -313,7 +318,7 @@ export const ensureStudentProfile = async (userId: string, levelId: string): Pro
       .from('student_profile')
       .select('*')
       .eq('user_id', userId)
-      .single()
+      .maybeSingle()
     
     if (!checkError && existingProfile) {
       console.log('✅ Student profile already exists:', existingProfile)
@@ -351,7 +356,7 @@ export const ensureStudentProfile = async (userId: string, levelId: string): Pro
           .from('student_profile')
           .select('*')
           .eq('user_id', userId)
-          .single()
+          .maybeSingle()
         return { error: null, data: existingData }
       }
       

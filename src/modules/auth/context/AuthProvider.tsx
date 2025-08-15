@@ -13,7 +13,42 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    // Initialize Supabase auth state
+    // Check if we're on a magic link page (password reset or email confirmation)
+    const isMagicLinkPage = () => {
+      const currentPath = window.location.pathname
+      const searchParams = new URLSearchParams(window.location.search)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1))
+      
+      // Check for magic link indicators
+      const hasTokenHash = searchParams.has('token_hash') || hashParams.has('token_hash')
+      const hasAccessToken = searchParams.has('access_token') || hashParams.has('access_token')
+      const hasCode = searchParams.has('code') || hashParams.has('code')
+      const isRecovery = searchParams.get('type') === 'recovery' || hashParams.get('type') === 'recovery'
+      const isEmailConfirmation = searchParams.get('type') === 'email' || hashParams.get('type') === 'email'
+      
+      return (
+        currentPath === '/reset-password' ||
+        currentPath === '/auth/confirm' ||
+        hasTokenHash ||
+        hasAccessToken ||
+        hasCode ||
+        isRecovery ||
+        isEmailConfirmation
+      )
+    }
+
+    // If we're on a magic link page, don't initialize auth automatically
+    if (isMagicLinkPage()) {
+      console.log('🔗 Magic link detected, skipping automatic auth initialization')
+      // Set initialized to true but don't authenticate
+      dispatch({
+        type: 'auth/initialise',
+        payload: { isAuthenticated: false, user: null }
+      })
+      return
+    }
+
+    // Initialize Supabase auth state for normal pages
     dispatch(initializeAuth())
 
     // Set up auth state change listener

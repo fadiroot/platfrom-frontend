@@ -4,6 +4,30 @@ import { signIn, signUp, signOut, getCurrentUser, getUserWithLevel, onAuthStateC
 import { LoginPayload, RegisterPayload } from './authTypes'
 import { supabase } from '../../../lib/supabase'
 
+// Helper function to check if we're on a magic link page
+const isMagicLinkPage = () => {
+  const currentPath = window.location.pathname
+  const searchParams = new URLSearchParams(window.location.search)
+  const hashParams = new URLSearchParams(window.location.hash.substring(1))
+  
+  // Check for magic link indicators
+  const hasTokenHash = searchParams.has('token_hash') || hashParams.has('token_hash')
+  const hasAccessToken = searchParams.has('access_token') || hashParams.has('access_token')
+  const hasCode = searchParams.has('code') || hashParams.has('code')
+  const isRecovery = searchParams.get('type') === 'recovery' || hashParams.get('type') === 'recovery'
+  const isEmailConfirmation = searchParams.get('type') === 'email' || hashParams.get('type') === 'email'
+  
+  return (
+    currentPath === '/reset-password' ||
+    currentPath === '/auth/confirm' ||
+    hasTokenHash ||
+    hasAccessToken ||
+    hasCode ||
+    isRecovery ||
+    isEmailConfirmation
+  )
+}
+
 export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginPayload, { rejectWithValue }) => {
@@ -141,6 +165,15 @@ export const initializeAuth = createAsyncThunk(
   'auth/initialize',
   async (_, { rejectWithValue }) => {
     try {
+      // Don't initialize auth if we're on a magic link page
+      if (isMagicLinkPage()) {
+        console.log('🔗 Magic link page detected, skipping auth initialization')
+        return {
+          isAuthenticated: false,
+          user: null
+        }
+      }
+
       const user = await getCurrentUser()
       
       if (!user) {
@@ -187,6 +220,12 @@ export const initializeAuth = createAsyncThunk(
 export const setupAuthListener = (dispatch: any) => {
   return onAuthStateChange(async (event, session) => {
     console.log('Auth state change:', event, session?.user?.aud)
+    
+    // Don't handle auth state changes on magic link pages
+    if (isMagicLinkPage()) {
+      console.log('🔗 Magic link page detected, skipping auth state change handling')
+      return
+    }
     
     if (event === 'SIGNED_OUT' || !session) {
       // Use the initialise action to reset auth state

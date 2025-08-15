@@ -1,0 +1,135 @@
+.email-confirmation-module {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  
+  .language-selector-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
+  
+  .email-confirmation-card-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    
+    .logo-container {
+      margin-bottom: 30px;
+      
+      .logo-image {
+        width: 120px;
+        height: auto;
+      }
+    }
+    
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      
+      .spinner {
+        animation: spin 1s linear infinite;
+        color: #ffffff;
+      }
+      
+      p {
+        color: #ffffff;
+        font-size: 16px;
+        margin: 0;
+      }
+    }
+    
+    .back-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+    }
+    
+    .status-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      
+      .success-icon {
+        color: #10b981;
+        margin-bottom: 16px;
+      }
+      
+      .error-icon {
+        color: #ef4444;
+        margin-bottom: 16px;
+      }
+      
+      .title {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0 0 16px 0;
+        color: #1f2937;
+      }
+      
+      .message {
+        font-size: 16px;
+        color: #6b7280;
+        margin: 0;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .email-confirmation-module {
+    .email-confirmation-card-container {
+      .status-container {
+        background: rgba(31, 41, 55, 0.95);
+        
+        .title {
+          color: #f9fafb;
+        }
+        
+        .message {
+          color: #d1d5db;
+        }
+      }
+    }
+  }
+}

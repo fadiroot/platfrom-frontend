@@ -261,13 +261,14 @@ export const studentsApi = {
         )
       `)
       .eq('user_id', userId)
-      .single();
+      .maybeSingle(); // Use maybeSingle() to handle missing records
 
-    if (error) {
+    if (error && error.code !== 'PGRST116') {
+      // Only throw error if it's not a "no rows" error
       throw new Error(`Failed to fetch student profile: ${error.message}`);
     }
 
-    return data;
+    return data; // Returns null if no profile exists
   },
 
   // Update exercise public/private status
