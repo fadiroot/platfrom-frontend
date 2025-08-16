@@ -209,7 +209,13 @@
     "subMessage": "To access this premium content, please contact the administrator to activate your account. You can try the free general exercises while waiting for activation.",
     "cancel": "Cancel",
     "contactAdmin": "Contact Administrator",
-    "contactInfo": "Please contact your administrator to activate your account. You can reach them at admin@example.com or call +1234567890."
+    "contactInfo": "Please contact your administrator to activate your account. You can reach them at astuce.elerning@gmail.com or call 29191239.",
+    "contactTitle": "Contact Information",
+    "phoneLabel": "Phone Number",
+    "emailLabel": "Email",
+    "facebookLabel": "Facebook",
+    "facebookLink": "Visit our Facebook page",
+    "contactFacebook": "Contact on Facebook"
   },
   "permissionDenied": {
     "title": "Access Denied",

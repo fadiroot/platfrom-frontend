@@ -201,7 +201,13 @@
     "subMessage": "Pour accéder à ce contenu premium, veuillez contacter l'administrateur pour activer votre compte. Vous pouvez essayer les exercices généraux gratuits en attendant l'activation.",
     "cancel": "Annuler",
     "contactAdmin": "Contacter l'administrateur",
-    "contactInfo": "Veuillez contacter votre administrateur pour activer votre compte. Vous pouvez les joindre à admin@example.com ou appeler au +1234567890."
+    "contactInfo": "Veuillez contacter votre administrateur pour activer votre compte. Vous pouvez les joindre à astuce.elerning@gmail.com ou appeler au 29191239.",
+    "contactTitle": "Informations de Contact",
+    "phoneLabel": "Numéro de Téléphone",
+    "emailLabel": "Email",
+    "facebookLabel": "Facebook",
+    "facebookLink": "Visitez notre page Facebook",
+    "contactFacebook": "Contacter sur Facebook"
   },
   "permissionDenied": {
     "title": "Accès Refusé",

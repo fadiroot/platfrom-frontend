@@ -76,7 +76,7 @@ export const studentsApi = {
 
       // Transform student_profile data to match AdminStudentList interface
       let transformedData: AdminStudentList[] = (profiles || []).map((profile: any) => {
-        const user = users?.users?.find(u => u.id === profile.user_id);
+        const user = users?.users?.find((u: any) => u.id === profile.user_id);
         const userMetadata = user?.user_metadata || {};
         
         return {

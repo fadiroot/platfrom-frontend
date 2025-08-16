@@ -77,7 +77,8 @@ export const signUp = async (registerData: RegisterData): Promise<AuthResponse> 
           age: age,
           birth_date: birthDate,
           levelId: levelId // Store levelId in metadata for later profile creation
-        }
+        },
+        emailRedirectTo: `${window.location.origin}/auth/confirm`
       }
     })
 

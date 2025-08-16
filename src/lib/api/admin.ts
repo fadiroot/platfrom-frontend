@@ -98,7 +98,7 @@ export const setUserAsAdmin = async (userEmail: string): Promise<boolean> => {
       return false
     }
     
-    const user = users.users.find(u => u.email === userEmail)
+    const user = users.users.find((u: any) => u.email === userEmail)
     if (!user) {
       console.error('User not found:', userEmail)
       return false
@@ -204,7 +204,7 @@ export const removeAdminRole = async (userEmail: string): Promise<boolean> => {
       return false
     }
     
-    const user = users.users.find(u => u.email === userEmail)
+    const user = users.users.find((u: any) => u.email === userEmail)
     if (!user) {
       console.error('User not found:', userEmail)
       return false
@@ -352,7 +352,7 @@ export const getStudentProfiles = async (filters?: StudentFilters): Promise<Admi
 
     // Transform student_profile data to match AdminStudentProfile interface
     let transformedData: AdminStudentProfile[] = (profiles || []).map((profile: any) => {
-      const user = users?.users?.find(u => u.id === profile.user_id)
+      const user = users?.users?.find((u: any) => u.id === profile.user_id)
       const userMetadata = user?.user_metadata || {}
       
       // Determine account status

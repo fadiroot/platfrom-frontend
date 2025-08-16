@@ -309,7 +309,7 @@ export const getExercisesWithDetails = async (): Promise<(ExerciseWithoutFiles &
     throw new Error(`Failed to fetch exercises with details: ${error.message}`)
   }
 
-  return data || []
+  return (data as any) || []
 }
 
 // Get exercises with user progress (without file URLs)

@@ -1,130 +1,144 @@
-import React, { useState } from 'react'
+"use client"
+
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useAppDispatch } from '../../../shared/store'
+import { requestPasswordReset } from '../../data/authThunk'
+import { PATH } from '../../routes/paths'
+import LanguageSelector from '../../../shared/components/LanguageSelector/LanguageSelector'
 import { supabase } from '../../../../lib/supabase'
 import './_TestPasswordReset.scss'
+import logoImg from '/logo/astuceLogo.png'
 
-const TestPasswordReset = () => {
+const TestPasswordResetComponent = () => {
   const { t } = useTranslation()
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState('')
-  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+  const [messageType, setMessageType] = useState<'success' | 'error' | ''>('')
 
-  const testPasswordReset = async () => {
-    if (!email) {
-      setError('Please enter an email address')
-      return
-    }
-
-    setIsLoading(true)
-    setError('')
-    setResult('')
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setMessage('')
+    setMessageType('')
 
     try {
-      console.log('🧪 Testing password reset for:', email)
-      console.log('🔗 Redirect URL:', `${window.location.origin}/reset-password`)
+      const result = await dispatch(requestPasswordReset(email))
       
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      })
-
-      if (error) {
-        console.error('❌ Test failed:', error)
-        setError(`Test failed: ${error.message}`)
-        setResult('❌ FAILED')
+      if (requestPasswordReset.fulfilled.match(result)) {
+        setMessage('Password reset email sent successfully! Check your email.')
+        setMessageType('success')
       } else {
-        console.log('✅ Test successful')
-        setResult('✅ SUCCESS - Check your email for the reset link')
+        setMessage(result.payload as string || 'Failed to send reset email')
+        setMessageType('error')
       }
-    } catch (err: any) {
-      console.error('❌ Unexpected error:', err)
-      setError(`Unexpected error: ${err.message}`)
-      setResult('❌ FAILED')
+    } catch (error) {
+      setMessage('An error occurred while sending the reset email')
+      setMessageType('error')
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
   }
 
-  const checkSupabaseConfig = () => {
-    console.log('🔍 Checking Supabase configuration...')
-    console.log('📍 Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
-    console.log('🔑 Anon Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY)
-    console.log('🌐 Current origin:', window.location.origin)
-    console.log('🔗 Expected redirect:', `${window.location.origin}/reset-password`)
+  const handleBackToLogin = () => {
+    navigate(PATH.LOGIN)
+  }
+
+  const testMagicLink = () => {
+    // Test different magic link formats
+    const testLinks = [
+      'http://localhost:4000/reset-password?access_token=test&refresh_token=test',
+      'http://localhost:4000/reset-password?token_hash=test&type=recovery',
+      'http://localhost:4000/auth/confirm?access_token=test&refresh_token=test',
+      'http://localhost:4000/auth/confirm?token_hash=test&type=email',
+    ]
     
-    setResult('🔍 Configuration logged to console')
+    console.log('Test magic links:')
+    testLinks.forEach((link, index) => {
+      console.log(`${index + 1}. ${link}`)
+    })
   }
 
   return (
-    <div className="test-password-reset">
-      <h2>🧪 Password Reset Test</h2>
-      <p>This component helps debug password reset configuration issues.</p>
-      
-      <div className="test-section">
-        <h3>1. Check Configuration</h3>
-        <button onClick={checkSupabaseConfig} className="test-btn">
-          Check Supabase Config
-        </button>
+    <div className="test-password-reset-module">
+      <div className="language-selector-container">
+        <LanguageSelector />
       </div>
-
-      <div className="test-section">
-        <h3>2. Test Password Reset</h3>
-        <div className="input-group">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter email to test"
-            className="email-input"
-          />
-          <button 
-            onClick={testPasswordReset} 
-            disabled={isLoading}
-            className="test-btn"
-          >
-            {isLoading ? 'Testing...' : 'Send Test Reset'}
-          </button>
+      <div className="test-password-reset-card-container">
+        <div className="logo-container">
+          <img src={logoImg} alt="Platform Logo" className="logo-image" />
         </div>
-      </div>
+        
+        <button 
+          type="button" 
+          className="back-link"
+          onClick={handleBackToLogin}
+        >
+          ← Back to Login
+        </button>
+        
+        <h1 className="title">Test Password Reset</h1>
+        <p className="subtitle">
+          This page helps test the password reset flow and debug magic links.
+        </p>
 
-      {result && (
-        <div className="result-section">
-          <h3>Result:</h3>
-          <div className={`result ${result.includes('✅') ? 'success' : 'error'}`}>
-            {result}
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label htmlFor="email" className="label">
+              Email Address *
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="input"
+              required
+            />
+          </div>
+
+          {message && (
+            <div className={`message ${messageType}`}>
+              {message}
+            </div>
+          )}
+
+          <button 
+            type="submit" 
+            className="submit-button" 
+            disabled={loading}
+          >
+            {loading ? 'Sending...' : 'Send Reset Email'}
+          </button>
+        </form>
+
+        <div className="test-section">
+          <h3>Debug Information</h3>
+          <button 
+            type="button" 
+            className="debug-button"
+            onClick={testMagicLink}
+          >
+            Log Test Magic Links
+          </button>
+          
+          <div className="debug-info">
+            <h4>Current URL Parameters:</h4>
+            <pre>{JSON.stringify({
+              search: window.location.search,
+              hash: window.location.hash,
+              pathname: window.location.pathname
+            }, null, 2)}</pre>
           </div>
         </div>
-      )}
-
-      {error && (
-        <div className="error-section">
-          <h3>Error:</h3>
-          <div className="error">{error}</div>
-        </div>
-      )}
-
-      <div className="instructions">
-        <h3>📋 Instructions:</h3>
-        <ol>
-          <li>Click "Check Supabase Config" to verify your setup</li>
-          <li>Enter a test email and click "Send Test Reset"</li>
-          <li>Check your email for the reset link</li>
-          <li>Examine the URL - it should contain tokens</li>
-          <li>Check browser console for detailed logs</li>
-        </ol>
-        
-        <h3>🔗 Expected URL Format:</h3>
-        <code>http://localhost:4000/reset-password?access_token=xxx&refresh_token=yyy</code>
-        
-        <h3>⚠️ If URL has no tokens:</h3>
-        <ul>
-          <li>Check Supabase project settings</li>
-          <li>Verify redirect URLs are configured</li>
-          <li>Check email templates</li>
-        </ul>
       </div>
     </div>
   )
 }
 
-export default TestPasswordReset
+export default TestPasswordResetComponent

@@ -281,8 +281,9 @@ export const resetUserPassword = createAsyncThunk(
           throw new Error(error.message)
         }
         
-        // Sign out the user after password reset to clear recovery session
-        await supabase.auth.signOut()
+        // Don't sign out the user - keep the session for direct login
+        // The session will automatically become 'authenticated' after password update
+        console.log('✅ Password updated successfully, maintaining session for direct login')
         
         return { success: true }
       } else if (payload.accessToken) {

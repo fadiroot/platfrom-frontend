@@ -12,15 +12,16 @@
   justify-content: center;
   z-index: 10000;
   backdrop-filter: blur(4px);
+  padding: 16px;
 }
 
 .premium-modal {
   background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  max-width: 480px;
-  width: 90%;
-  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
   overflow: hidden;
   border: 2px solid #000000;
   animation: modalSlideIn 0.3s ease-out;
@@ -39,7 +40,7 @@
 
 .modal-header {
   background: linear-gradient(135deg, #ff6b35, #f7931e);
-  padding: 24px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,21 +49,21 @@
   .header-content {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 
     .premium-icon {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       background: rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
+      border-radius: 6px;
       border: 2px solid rgba(255, 255, 255, 0.3);
 
       .star-icon {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         color: #ffffff;
         fill: #ffffff;
       }
@@ -70,7 +71,7 @@
 
     .modal-title {
       color: #ffffff;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       margin: 0;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -80,9 +81,9 @@
   .close-button {
     background: rgba(255, 255, 255, 0.2);
     border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    width: 32px;
-    height: 32px;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,25 +96,25 @@
     }
 
     .close-icon {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       color: #ffffff;
     }
   }
 }
 
 .modal-content {
-  padding: 32px 24px;
+  padding: 20px;
   text-align: center;
 
   .lock-icon-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 
     .lock-icon {
-      width: 64px;
-      height: 64px;
+      width: 48px;
+      height: 48px;
       color: #ff6b35;
       opacity: 0.8;
     }
@@ -121,40 +122,125 @@
 
   .content-text {
     .main-message {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       color: #333333;
-      margin: 0 0 16px 0;
+      margin: 0 0 12px 0;
       line-height: 1.4;
     }
 
     .sub-message {
-      font-size: 14px;
+      font-size: 13px;
       color: #666666;
-      margin: 0;
+      margin: 0 0 16px 0;
       line-height: 1.5;
+    }
+  }
+
+  .contact-info {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    text-align: left;
+
+    .contact-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333333;
+      margin: 0 0 12px 0;
+      text-align: center;
+    }
+
+    .contact-details {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 0;
+
+        .contact-icon {
+          width: 16px;
+          height: 16px;
+          color: #ff6b35;
+          flex-shrink: 0;
+        }
+
+        .contact-text {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+          flex: 1;
+
+          .contact-label {
+            font-size: 11px;
+            color: #666666;
+            font-weight: 500;
+          }
+
+          .contact-value {
+            font-size: 12px;
+            color: #333333;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            padding: 3px 6px;
+            border-radius: 3px;
+            border: 1px solid #e9ecef;
+            display: inline-block;
+            min-width: 100px;
+            word-break: break-all;
+            
+            &.facebook-link {
+              font-family: inherit;
+              color: #25d366;
+              text-decoration: underline;
+              cursor: pointer;
+              background: transparent;
+              border: none;
+              padding: 0;
+              min-width: auto;
+              
+              &:hover {
+                color: #128c7e;
+                text-decoration: none;
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
 
 .modal-actions {
-  padding: 24px;
+  padding: 16px 20px;
   display: flex;
-  gap: 12px;
+  gap: 10px;
   border-top: 2px solid #000000;
   background: #f8f9fa;
 
   .cancel-button,
-  .contact-button {
+  .contact-button,
+  .facebook-button {
     flex: 1;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     border: 2px solid #000000;
     box-shadow: 2px 2px 0px 0px #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 
     &:hover {
       transform: translate(-1px, -1px);
@@ -184,46 +270,205 @@
       background: #e55a2b;
     }
   }
+
+  .facebook-button {
+    background: #25d366;
+    color: #ffffff;
+
+    &:hover {
+      background: #128c7e;
+    }
+
+    .facebook-icon {
+      width: 14px;
+      height: 14px;
+    }
+  }
 }
 
 // Responsive design
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .premium-modal-overlay {
+    padding: 12px;
+  }
+
   .premium-modal {
-    width: 95%;
-    margin: 20px;
+    max-width: 100%;
+    max-height: 90vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .premium-modal-overlay {
+    padding: 8px;
+  }
+
+  .premium-modal {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 8px;
   }
 
   .modal-header {
-    padding: 20px;
+    padding: 12px 16px;
 
     .header-content {
+      gap: 8px;
+
+      .premium-icon {
+        width: 24px;
+        height: 24px;
+
+        .star-icon {
+          width: 14px;
+          height: 14px;
+        }
+      }
+
       .modal-title {
-        font-size: 18px;
+        font-size: 16px;
+      }
+    }
+
+    .close-button {
+      width: 24px;
+      height: 24px;
+
+      .close-icon {
+        width: 12px;
+        height: 12px;
       }
     }
   }
 
   .modal-content {
-    padding: 24px 20px;
+    padding: 16px;
+
+    .lock-icon-container {
+      margin-bottom: 12px;
+
+      .lock-icon {
+        width: 40px;
+        height: 40px;
+      }
+    }
 
     .content-text {
       .main-message {
-        font-size: 16px;
+        font-size: 15px;
+        margin-bottom: 10px;
       }
 
       .sub-message {
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+    }
+
+    .contact-info {
+      padding: 12px;
+      margin-top: 12px;
+
+      .contact-title {
         font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .contact-details {
+        gap: 6px;
+
+        .contact-item {
+          gap: 8px;
+          padding: 3px 0;
+
+          .contact-icon {
+            width: 14px;
+            height: 14px;
+          }
+
+          .contact-text {
+            .contact-label {
+              font-size: 10px;
+            }
+
+            .contact-value {
+              font-size: 11px;
+              padding: 2px 4px;
+              min-width: 80px;
+            }
+          }
+        }
       }
     }
   }
 
   .modal-actions {
-    padding: 20px;
+    padding: 12px 16px;
+    gap: 8px;
     flex-direction: column;
 
     .cancel-button,
-    .contact-button {
+    .contact-button,
+    .facebook-button {
       width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      gap: 8px;
+
+      .facebook-icon {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .premium-modal-overlay {
+    padding: 4px;
+  }
+
+  .premium-modal {
+    border-radius: 6px;
+  }
+
+  .modal-header {
+    padding: 10px 12px;
+
+    .header-content {
+      .modal-title {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .modal-content {
+    padding: 12px;
+
+    .contact-info {
+      padding: 10px;
+
+      .contact-details {
+        .contact-item {
+          .contact-text {
+            .contact-value {
+              font-size: 10px;
+              min-width: 70px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .modal-actions {
+    padding: 10px 12px;
+
+    .cancel-button,
+    .contact-button,
+    .facebook-button {
+      padding: 10px 12px;
+      font-size: 13px;
     }
   }
 }
