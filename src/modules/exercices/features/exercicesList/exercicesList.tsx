@@ -101,9 +101,8 @@ const ExercisesList: React.FC = () => {
   }, [exerciseIdFromUrl, exercises, accessibleExercises, searchParams, setSearchParams, selectedExercise]);
 
   const handleExerciseClick = async (exercise: Exercise) => {
-    // Check if user has access to this exercise (including temporary fix for first exercise)
-    const exerciseIndex = exercises.findIndex(ex => ex.id === exercise.id);
-    const hasAccess = accessibleExercises.includes(exercise.id) || exerciseIndex === 0;
+    // Check if user has access to this exercise
+    const hasAccess = accessibleExercises.includes(exercise.id);
     
     if (!hasAccess) {
       setPremiumExerciseId(exercise.id);

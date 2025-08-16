@@ -147,15 +147,10 @@ ALTER TABLE exercises ENABLE ROW LEVEL SECURITY;
 GRANT EXECUTE ON FUNCTION public.can_access_exercise(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_user_accessible_exercises(UUID) TO authenticated;
 
--- Step 6: Mark some exercises as private for testing
--- Update exercises to be private by default (except first few for testing)
+-- Step 6: Mark ALL exercises as private for testing
+-- Update exercises to be private by default (no exceptions)
 UPDATE exercises 
-SET is_public = false 
-WHERE id NOT IN (
-  SELECT id FROM exercises 
-  ORDER BY created_at 
-  LIMIT 2
-);
+SET is_public = false;
 
 -- Step 7: Verify the functions exist
 SELECT 
