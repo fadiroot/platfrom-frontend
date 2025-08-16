@@ -290,7 +290,8 @@ export const createStudentProfile = async (userId: string, levelId: string): Pro
       .from('student_profile')
       .insert({
         user_id: userId,
-        level_id: levelId // Keep as UUID string, don't convert to integer
+        level_id: levelId, // Keep as UUID string, don't convert to integer
+        is_active: false // Explicitly set to false - student accounts are deactivated by default
       })
       .select()
       .single()

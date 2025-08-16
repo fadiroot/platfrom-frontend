@@ -93,7 +93,10 @@ const LoginComponent = () => {
   const [submitting, setSubmitting] = useState(false)
   const [showError, setShowError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  
+  // Add Arabic font class when Arabic language is selected
+  const isArabic = i18n?.language === 'ar'
 
   const formik = useFormik({
     initialValues,
@@ -121,7 +124,7 @@ const LoginComponent = () => {
   })
 
   return (
-    <div className="login-module">
+    <div className={`login-module ${isArabic ? 'arabic-fonts' : ''}`}>
       <div className="language-selector-container">
         <LanguageSelector />
       </div>

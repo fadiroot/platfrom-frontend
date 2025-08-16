@@ -33,7 +33,7 @@
   },
   "auth": {
     "login": {
-      "title": "Bon Retour",
+      "title": "Bienvenue à vous",
       "subtitle": "Veuillez vous connecter à votre compte",
       "email": "Email",
       "emailPlaceholder": "Votre email",
@@ -44,7 +44,12 @@
       "submit": "Se Connecter",
       "noAccount": "Vous n'avez pas de compte ?",
       "createAccount": "S'inscrire",
-      "signIn": "Se Connecter"
+      "signIn": "Se Connecter",
+      "loginFailed": "Échec de la connexion",
+      "invalidCredentials": "Identifiants invalides",
+      "accountNotVerified": "Compte non vérifié. Veuillez vérifier votre email",
+      "tooManyAttempts": "Trop de tentatives. Veuillez réessayer plus tard",
+      "networkError": "Erreur réseau. Veuillez vérifier votre connexion internet"
     },
     "register": {
       "title": "Créer un Compte",
@@ -97,6 +102,22 @@
       "rememberPassword": "Vous vous souvenez de votre mot de passe ?",
       "signIn": "Se Connecter",
       "checkingLink": "Vérification du lien de réinitialisation..."
+    },
+    "emailConfirmation": {
+      "confirming": "Confirmation de votre email...",
+      "backToLogin": "Retour à la Connexion",
+      "successTitle": "Email Confirmé !",
+      "errorTitle": "Échec de la Confirmation",
+      "successMessage": "Votre email a été confirmé avec succès. Vous allez être redirigé dans quelques instants...",
+      "errorMessage": "Une erreur s'est produite lors de la confirmation de votre email. Veuillez réessayer ou contacter le support."
+    },
+    "emailVerificationModal": {
+      "title": "Vérification d'Email Requise",
+      "accountCreated": "Compte créé avec succès !",
+      "emailSent": "Nous avons envoyé un email de vérification à",
+      "checkEmail": "Veuillez vérifier votre email et cliquer sur le lien de vérification pour activer votre compte.",
+      "spamNote": "Note : Vérifiez votre dossier spam si vous ne voyez pas l'email dans votre boîte de réception.",
+      "gotIt": "Compris !"
     }
   },
   "subjects": {
@@ -105,6 +126,9 @@
     "subtitle": "Sélectionnez une matière pour commencer votre parcours d'apprentissage",
     "explore": "Explorer",
     "noSubjects": "Aucune matière disponible actuellement",
+    "noSubjectsForLevel": "Aucune matière disponible pour le niveau {{level}} pour le moment",
+    "noSubjectsMessage": "Les matières apparaîtront ici une fois qu'elles seront disponibles.",
+    "noSubjectsForLevelMessage": "Les matières pour ce niveau apparaîtront ici une fois qu'elles seront ajoutées par votre instructeur.",
     "noDescription": "Aucune description disponible",
     "loading": "Chargement des matières..."
   },

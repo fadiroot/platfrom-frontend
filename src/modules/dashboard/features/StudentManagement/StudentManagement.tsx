@@ -1,40 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Table, 
-  Button, 
-  Modal, 
-  Form, 
-  Input, 
-  Select, 
-  InputNumber, 
-  message, 
-  Space, 
-  Tag, 
-  Tooltip,
-  Card,
-  Row,
-  Col,
-  Statistic,
-  Avatar,
-  Badge,
-  Divider
-} from 'antd';
-import { 
-  UserAddOutlined, 
-  UserDeleteOutlined, 
-  SearchOutlined,
-  EyeOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  SyncOutlined,
-  UserOutlined,
-  MailOutlined,
-  PhoneOutlined,
-  CalendarOutlined,
-  DollarOutlined
-} from '@ant-design/icons';
-import { 
   getStudentProfiles, 
   activateStudentAccount, 
   deactivateStudentAccount,
@@ -43,10 +8,8 @@ import {
   DeactivateStudentRequest,
   StudentFilters
 } from '../../../../lib/api/admin';
+import CustomSelect from '../../../shared/components/CustomSelect/CustomSelect';
 import './StudentManagement.scss';
-
-const { Option } = Select;
-const { TextArea } = Input;
 
 const StudentManagement: React.FC = () => {
   const [students, setStudents] = useState<AdminStudentProfile[]>([]);
@@ -60,8 +23,16 @@ const StudentManagement: React.FC = () => {
     search: ''
   });
 
-  const [activateForm] = Form.useForm();
-  const [deactivateForm] = Form.useForm();
+  const [activateForm, setActivateForm] = useState({
+    subscription_months: '',
+    payment_amount: '',
+    payment_method: '',
+    payment_notes: ''
+  });
+
+  const [deactivateForm, setDeactivateForm] = useState({
+    reason: ''
+  });
 
   // Statistics
   const stats = {
@@ -77,7 +48,7 @@ const StudentManagement: React.FC = () => {
       const data = await getStudentProfiles(filters);
       setStudents(data);
     } catch (error: any) {
-      message.error(`Failed to fetch students: ${error.message || 'Unknown error'}`);
+      alert(`Failed to fetch students: ${error.message || 'Unknown error'}`);
       console.error('Fetch error:', error);
     } finally {
       setLoading(false);
@@ -88,240 +59,118 @@ const StudentManagement: React.FC = () => {
     fetchStudents();
   }, [filters]);
 
-  const handleActivate = async (values: any) => {
+  const handleActivate = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedStudent) return;
 
     try {
       const request: ActivateStudentRequest = {
         student_profile_id: selectedStudent.profile_id,
-        subscription_months: values.subscription_months,
-        payment_amount: values.payment_amount,
-        payment_method: values.payment_method,
-        payment_notes: values.payment_notes
+        subscription_months: parseInt(activateForm.subscription_months),
+        payment_amount: activateForm.payment_amount ? parseFloat(activateForm.payment_amount) : undefined,
+        payment_method: activateForm.payment_method || undefined,
+        payment_notes: activateForm.payment_notes || undefined
       };
 
       await activateStudentAccount(request);
-      message.success('Student account activated successfully');
+      alert('Student account activated successfully');
       setActivateModalVisible(false);
-      activateForm.resetFields();
+      setActivateForm({
+        subscription_months: '',
+        payment_amount: '',
+        payment_method: '',
+        payment_notes: ''
+      });
       fetchStudents();
     } catch (error: any) {
-      message.error(`Failed to activate student account: ${error.message || 'Unknown error'}`);
+      alert(`Failed to activate student account: ${error.message || 'Unknown error'}`);
       console.error(error);
     }
   };
 
-  const handleDeactivate = async (values: any) => {
+  const handleDeactivate = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!selectedStudent) return;
 
     try {
       const request: DeactivateStudentRequest = {
         student_profile_id: selectedStudent.profile_id,
-        reason: values.reason
+        reason: deactivateForm.reason || undefined
       };
 
       await deactivateStudentAccount(request);
-      message.success('Student account deactivated successfully');
+      alert('Student account deactivated successfully');
       setDeactivateModalVisible(false);
-      deactivateForm.resetFields();
+      setDeactivateForm({ reason: '' });
       fetchStudents();
     } catch (error: any) {
-      message.error(`Failed to deactivate student account: ${error.message || 'Unknown error'}`);
+      alert(`Failed to deactivate student account: ${error.message || 'Unknown error'}`);
       console.error(error);
     }
   };
 
-  const getStatusTag = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return (
-          <Badge 
-            status="success" 
-            text={
-              <Tag color="#52c41a" icon={<CheckCircleOutlined />} className="status-tag">
-                Active
-              </Tag>
-            }
-          />
-        );
+        return <span className="status-badge active">✅ Active</span>;
       case 'inactive':
-        return (
-          <Badge 
-            status="error" 
-            text={
-              <Tag color="#ff4d4f" icon={<CloseCircleOutlined />} className="status-tag">
-                Inactive
-              </Tag>
-            }
-          />
-        );
+        return <span className="status-badge inactive">❌ Inactive</span>;
       case 'expired':
-        return (
-          <Badge 
-            status="warning" 
-            text={
-              <Tag color="#faad14" icon={<ClockCircleOutlined />} className="status-tag">
-                Expired
-              </Tag>
-            }
-          />
-        );
+        return <span className="status-badge expired">⏰ Expired</span>;
       default:
-        return <Tag className="status-tag">Unknown</Tag>;
+        return <span className="status-badge unknown">❓ Unknown</span>;
     }
   };
 
-  const getPaymentStatusTag = (status: string) => {
+  const getPaymentStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
-        return <Tag color="#52c41a" className="payment-tag">Paid</Tag>;
+        return <span className="payment-badge paid">💰 Paid</span>;
       case 'pending':
-        return <Tag color="#faad14" className="payment-tag">Pending</Tag>;
+        return <span className="payment-badge pending">⏳ Pending</span>;
       case 'failed':
-        return <Tag color="#ff4d4f" className="payment-tag">Failed</Tag>;
+        return <span className="payment-badge failed">💥 Failed</span>;
       case 'refunded':
-        return <Tag color="#1890ff" className="payment-tag">Refunded</Tag>;
+        return <span className="payment-badge refunded">↩️ Refunded</span>;
       default:
-        return <Tag className="payment-tag">Unknown</Tag>;
+        return <span className="payment-badge unknown">❓ Unknown</span>;
     }
   };
 
-  const columns = [
-    {
-      title: 'Student',
-      key: 'student',
-      width: 250,
-      render: (record: AdminStudentProfile) => (
-        <div className="student-info">
-          <div className="student-avatar">
-            <Avatar 
-              size={48} 
-              icon={<UserOutlined />}
-              style={{ backgroundColor: '#1890ff' }}
-            />
-          </div>
-          <div className="student-details">
-            <div className="student-name">
-              {record.first_name} {record.last_name}
-            </div>
-            <div className="student-email">
-              <MailOutlined /> {record.email}
-            </div>
-            {record.phone_number && (
-              <div className="student-phone">
-                <PhoneOutlined /> {record.phone_number}
-              </div>
-            )}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: 'Level',
-      dataIndex: 'level_title',
-      key: 'level',
-      width: 150,
-      render: (level: string) => (
-        <div className="level-info">
-          <Tag color="#722ed1" className="level-tag">
-            {level || 'Not assigned'}
-          </Tag>
-        </div>
-      ),
-    },
-    {
-      title: 'Status',
-      key: 'status',
-      width: 120,
-      render: (record: AdminStudentProfile) => getStatusTag(record.account_status),
-    },
-    {
-      title: 'Payment',
-      key: 'payment',
-      width: 150,
-      render: (record: AdminStudentProfile) => (
-        <div className="payment-info">
-          {getPaymentStatusTag(record.payment_status)}
-          {record.payment_amount && (
-            <div className="payment-amount">
-              <DollarOutlined /> ${record.payment_amount}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: 'Subscription',
-      key: 'subscription',
-      width: 200,
-      render: (record: AdminStudentProfile) => (
-        <div className="subscription-info">
-          {record.subscription_start_date && (
-            <div className="subscription-date">
-              <CalendarOutlined /> Start: {new Date(record.subscription_start_date).toLocaleDateString()}
-            </div>
-          )}
-          {record.subscription_end_date && (
-            <div className="subscription-date">
-              <CalendarOutlined /> End: {new Date(record.subscription_end_date).toLocaleDateString()}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      width: 200,
-      fixed: 'right' as const,
-      render: (record: AdminStudentProfile) => (
-        <Space size="small" className="action-buttons">
-          {record.account_status === 'inactive' && (
-            <Tooltip title="Activate Account">
-              <Button
-                type="primary"
-                icon={<UserAddOutlined />}
-                size="small"
-                className="activate-btn"
-                onClick={() => {
-                  setSelectedStudent(record);
-                  setActivateModalVisible(true);
-                }}
-              >
-                Activate
-              </Button>
-            </Tooltip>
-          )}
-          {(record.account_status === 'active' || record.account_status === 'expired') && (
-            <Tooltip title="Deactivate Account">
-              <Button
-                danger
-                icon={<UserDeleteOutlined />}
-                size="small"
-                className="deactivate-btn"
-                onClick={() => {
-                  setSelectedStudent(record);
-                  setDeactivateModalVisible(true);
-                }}
-              >
-                Deactivate
-              </Button>
-            </Tooltip>
-          )}
-          <Tooltip title="View Details">
-            <Button
-              icon={<EyeOutlined />}
-              size="small"
-              className="view-btn"
-              onClick={() => {
-                message.info('Student details view coming soon');
-              }}
-            />
-          </Tooltip>
-        </Space>
-      ),
-    },
-  ];
+  const clearFilters = () => {
+    setFilters({
+      status: 'all',
+      payment_status: undefined,
+      search: ''
+    });
+  };
+
+  const getFilteredStudents = () => {
+    return students.filter(student => {
+      // Status filter
+      if (filters.status !== 'all' && student.account_status !== filters.status) {
+        return false;
+      }
+      
+      // Payment status filter
+      if (filters.payment_status && student.payment_status !== filters.payment_status) {
+        return false;
+      }
+      
+      // Search filter
+      if (filters.search) {
+        const searchTerm = filters.search.toLowerCase();
+        const fullName = `${student.first_name} ${student.last_name}`.toLowerCase();
+        const email = student.email.toLowerCase();
+        
+        if (!fullName.includes(searchTerm) && !email.includes(searchTerm)) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  };
 
   return (
     <div className="student-management">
@@ -333,304 +182,292 @@ const StudentManagement: React.FC = () => {
       </div>
 
       {/* Statistics Cards */}
-      <Row gutter={[16, 16]} className="stats-row">
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card total-card">
-            <Statistic
-              title="Total Students"
-              value={stats.total}
-              valueStyle={{ color: '#1890ff' }}
-              prefix={<UserOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card active-card">
-            <Statistic
-              title="Active Students"
-              value={stats.active}
-              valueStyle={{ color: '#52c41a' }}
-              prefix={<CheckCircleOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card inactive-card">
-            <Statistic
-              title="Inactive Students"
-              value={stats.inactive}
-              valueStyle={{ color: '#ff4d4f' }}
-              prefix={<CloseCircleOutlined />}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <Card className="stat-card expired-card">
-            <Statistic
-              title="Expired Subscriptions"
-              value={stats.expired}
-              valueStyle={{ color: '#faad14' }}
-              prefix={<ClockCircleOutlined />}
-            />
-          </Card>
-        </Col>
-      </Row>
+      <div className="stats-row">
+        <div className="stat-card total-card">
+          <div className="stat-content">
+            <h3>Total Students</h3>
+            <p>{stats.total}</p>
+            <span className="stat-icon">👥</span>
+          </div>
+        </div>
+        <div className="stat-card active-card">
+          <div className="stat-content">
+            <h3>Active Students</h3>
+            <p>{stats.active}</p>
+            <span className="stat-icon">✅</span>
+          </div>
+        </div>
+        <div className="stat-card inactive-card">
+          <div className="stat-content">
+            <h3>Inactive Students</h3>
+            <p>{stats.inactive}</p>
+            <span className="stat-icon">❌</span>
+          </div>
+        </div>
+        <div className="stat-card expired-card">
+          <div className="stat-content">
+            <h3>Expired Subscriptions</h3>
+            <p>{stats.expired}</p>
+            <span className="stat-icon">⏰</span>
+          </div>
+        </div>
+      </div>
 
       {/* Filters */}
-      <Card className="filters-card">
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={12} lg={6}>
-            <Select
+      <div className="filters-card">
+        <div className="filters-content">
+          <div className="filter-item">
+            <CustomSelect
               placeholder="Filter by status"
               value={filters.status}
-              onChange={(value) => setFilters({ ...filters, status: value })}
-              className="filter-select"
-            >
-              <Option value="all">All Status</Option>
-              <Option value="active">Active</Option>
-              <Option value="inactive">Inactive</Option>
-              <Option value="expired">Expired</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Select
+              onChange={(value: string) => setFilters({ ...filters, status: value as 'all' | 'active' | 'inactive' | 'expired' })}
+              onBlur={() => {}}
+              options={[
+                { value: 'all', label: 'All Status' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+                { value: 'expired', label: 'Expired' }
+              ]}
+            />
+          </div>
+          <div className="filter-item">
+            <CustomSelect
               placeholder="Filter by payment"
-              value={filters.payment_status}
-              onChange={(value) => setFilters({ ...filters, payment_status: value as 'pending' | 'paid' | 'failed' | 'refunded' | undefined })}
-              allowClear
-              className="filter-select"
-            >
-              <Option value="paid">Paid</Option>
-              <Option value="pending">Pending</Option>
-              <Option value="failed">Failed</Option>
-              <Option value="refunded">Refunded</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={12} lg={8}>
-            <Input
+              value={filters.payment_status || ''}
+              onChange={(value: string) => setFilters({ ...filters, payment_status: value as 'pending' | 'paid' | 'failed' | 'refunded' | undefined })}
+              onBlur={() => {}}
+              options={[
+                { value: '', label: 'All Payments' },
+                { value: 'paid', label: 'Paid' },
+                { value: 'pending', label: 'Pending' },
+                { value: 'failed', label: 'Failed' },
+                { value: 'refunded', label: 'Refunded' }
+              ]}
+            />
+          </div>
+          <div className="filter-item search-filter">
+            <input
+              type="text"
               placeholder="Search by name or email"
-              prefix={<SearchOutlined />}
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="search-input"
             />
-          </Col>
-          <Col xs={24} sm={12} lg={4}>
-            <Button 
-              icon={<SyncOutlined />}
-              type="primary" 
-              onClick={fetchStudents}
-              loading={loading}
-              className="refresh-btn"
-              block
-            >
-              Refresh
-            </Button>
-          </Col>
-        </Row>
-      </Card>
+            <span className="search-icon">🔍</span>
+          </div>
+          <div className="filter-item clear-filters">
+            <button onClick={clearFilters} disabled={filters.status === 'all' && filters.payment_status === undefined && filters.search === ''}>
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Students Table */}
-      <Card className="table-card">
-        <Table
-          columns={columns}
-          dataSource={students}
-          rowKey="profile_id"
-          loading={loading}
-          className="students-table"
-          scroll={{ x: 1200 }}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => 
-              `${range[0]}-${range[1]} of ${total} students`,
-            className: 'table-pagination'
-          }}
-        />
-      </Card>
+      <div className="table-card">
+        <table className="students-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Level</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Subscription</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {getFilteredStudents().map(student => (
+              <tr key={student.profile_id}>
+                <td className="student-cell">
+                  <div className="student-info">
+                    <div className="student-details">
+                      <div className="student-name">{student.first_name} {student.last_name}</div>
+                      <div className="student-email"><span className="icon-text">📧</span> {student.email}</div>
+                      {student.phone_number && <div className="student-phone"><span className="icon-text">📞</span> {student.phone_number}</div>}
+                    </div>
+                  </div>
+                </td>
+                <td className="level-cell">
+                  <div className="level-info">
+                    <span className="level-badge">
+                      {student.level_title || 'Not assigned'}
+                    </span>
+                  </div>
+                </td>
+                <td className="status-cell">
+                  <div className="status-info">
+                    {getStatusBadge(student.account_status)}
+                  </div>
+                </td>
+                <td className="payment-cell">
+                  <div className="payment-info">
+                    {getPaymentStatusBadge(student.payment_status)}
+                    {student.payment_amount && (
+                      <div className="payment-amount">
+                        <span className="icon-text">💰</span> ${student.payment_amount}
+                      </div>
+                    )}
+                  </div>
+                </td>
+                <td className="subscription-cell">
+                  <div className="subscription-info">
+                    {student.subscription_start_date && (
+                      <div className="subscription-date">
+                        <span className="icon-text">📅</span> Start: {new Date(student.subscription_start_date).toLocaleDateString()}
+                      </div>
+                    )}
+                    {student.subscription_end_date && (
+                      <div className="subscription-date">
+                        <span className="icon-text">📅</span> End: {new Date(student.subscription_end_date).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                </td>
+                <td className="actions-cell">
+                  <div className="action-buttons">
+                    {student.account_status === 'inactive' && (
+                      <button className="activate-btn" onClick={() => {
+                        setSelectedStudent(student);
+                        setActivateModalVisible(true);
+                      }}>
+                        Activate
+                      </button>
+                    )}
+                    {(student.account_status === 'active' || student.account_status === 'expired') && (
+                      <button className="deactivate-btn" onClick={() => {
+                        setSelectedStudent(student);
+                        setDeactivateModalVisible(true);
+                      }}>
+                        Deactivate
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Activate Student Modal */}
-      <Modal
-        title={
-          <div className="modal-title">
-            <UserAddOutlined className="modal-icon" />
-            Activate Student Account
-          </div>
-        }
-        open={activateModalVisible}
-        onCancel={() => {
-          setActivateModalVisible(false);
-          activateForm.resetFields();
-        }}
-        footer={null}
-        className="activate-modal"
-        width={600}
-      >
-        <Form
-          form={activateForm}
-          layout="vertical"
-          onFinish={handleActivate}
-          className="modal-form"
-        >
+      <div className={`modal-overlay ${activateModalVisible ? 'active' : ''}`}>
+        <div className="modal-content">
+          <h2>Activate Student Account</h2>
           <div className="student-summary">
-            <Avatar 
-              size={64} 
-              icon={<UserOutlined />}
-              style={{ backgroundColor: '#1890ff' }}
-            />
             <div className="student-info">
               <h3>{selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name}` : ''}</h3>
               <p>{selectedStudent?.email}</p>
             </div>
           </div>
           
-          <Divider />
+          <div className="divider"></div>
 
-          <Form.Item
-            label="Subscription Period (months)"
-            name="subscription_months"
-            rules={[{ required: true, message: 'Please enter subscription period' }]}
-          >
-            <InputNumber 
-              min={1} 
-              max={12} 
-              className="form-input"
-              placeholder="Enter number of months"
-            />
-          </Form.Item>
+          <form onSubmit={handleActivate} className="modal-form">
+            <div className="form-group">
+              <label>Subscription Period (months)</label>
+              <input
+                type="number"
+                min="1"
+                max="12"
+                value={activateForm.subscription_months}
+                onChange={(e) => setActivateForm({ ...activateForm, subscription_months: e.target.value })}
+                required
+              />
+            </div>
 
-          <Form.Item
-            label="Payment Amount"
-            name="payment_amount"
-          >
-            <InputNumber
-              min={0}
-              step={0.01}
-              prefix="$"
-              className="form-input"
-              placeholder="Enter payment amount"
-            />
-          </Form.Item>
+            <div className="form-group">
+              <label>Payment Amount</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={activateForm.payment_amount}
+                onChange={(e) => setActivateForm({ ...activateForm, payment_amount: e.target.value })}
+              />
+            </div>
 
-          <Form.Item
-            label="Payment Method"
-            name="payment_method"
-          >
-            <Select placeholder="Select payment method" className="form-select">
-              <Option value="cash">Cash</Option>
-              <Option value="bank_transfer">Bank Transfer</Option>
-              <Option value="check">Check</Option>
-              <Option value="other">Other</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            label="Payment Notes"
-            name="payment_notes"
-          >
-            <TextArea 
-              rows={3} 
-              className="form-textarea"
-              placeholder="Add any additional notes about the payment"
-            />
-          </Form.Item>
-
-          <Form.Item className="modal-actions">
-            <Space size="middle">
-              <Button 
-                type="primary" 
-                htmlType="submit"
-                icon={<UserAddOutlined />}
-                className="submit-btn"
+            <div className="form-group">
+              <label>Payment Method</label>
+              <select
+                value={activateForm.payment_method}
+                onChange={(e) => setActivateForm({ ...activateForm, payment_method: e.target.value })}
               >
+                <option value="">Select payment method</option>
+                <option value="cash">Cash</option>
+                <option value="bank_transfer">Bank Transfer</option>
+                <option value="check">Check</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Payment Notes</label>
+              <textarea
+                rows={3}
+                value={activateForm.payment_notes}
+                onChange={(e) => setActivateForm({ ...activateForm, payment_notes: e.target.value })}
+                placeholder="Add any additional notes about the payment"
+              ></textarea>
+            </div>
+
+            <div className="modal-actions">
+              <button type="submit" className="submit-btn">
                 Activate Account
-              </Button>
-              <Button 
-                onClick={() => {
-                  setActivateModalVisible(false);
-                  activateForm.resetFields();
-                }}
-                className="cancel-btn"
-              >
+              </button>
+              <button type="button" className="cancel-btn" onClick={() => {
+                setActivateModalVisible(false);
+                setActivateForm({
+                  subscription_months: '',
+                  payment_amount: '',
+                  payment_method: '',
+                  payment_notes: ''
+                });
+              }}>
                 Cancel
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       {/* Deactivate Student Modal */}
-      <Modal
-        title={
-          <div className="modal-title">
-            <UserDeleteOutlined className="modal-icon" />
-            Deactivate Student Account
-          </div>
-        }
-        open={deactivateModalVisible}
-        onCancel={() => {
-          setDeactivateModalVisible(false);
-          deactivateForm.resetFields();
-        }}
-        footer={null}
-        className="deactivate-modal"
-        width={600}
-      >
-        <Form
-          form={deactivateForm}
-          layout="vertical"
-          onFinish={handleDeactivate}
-          className="modal-form"
-        >
+      <div className={`modal-overlay ${deactivateModalVisible ? 'active' : ''}`}>
+        <div className="modal-content">
+          <h2>Deactivate Student Account</h2>
           <div className="student-summary">
-            <Avatar 
-              size={64} 
-              icon={<UserOutlined />}
-              style={{ backgroundColor: '#ff4d4f' }}
-            />
             <div className="student-info">
               <h3>{selectedStudent ? `${selectedStudent.first_name} ${selectedStudent.last_name}` : ''}</h3>
               <p>{selectedStudent?.email}</p>
             </div>
           </div>
           
-          <Divider />
+          <div className="divider"></div>
 
-          <Form.Item
-            label="Reason for Deactivation"
-            name="reason"
-          >
-            <TextArea 
-              rows={4} 
-              className="form-textarea"
-              placeholder="Please provide a reason for deactivation (optional)"
-            />
-          </Form.Item>
+          <form onSubmit={handleDeactivate} className="modal-form">
+            <div className="form-group">
+              <label>Reason for Deactivation</label>
+              <textarea
+                rows={4}
+                value={deactivateForm.reason}
+                onChange={(e) => setDeactivateForm({ reason: e.target.value })}
+                placeholder="Please provide a reason for deactivation (optional)"
+              ></textarea>
+            </div>
 
-          <Form.Item className="modal-actions">
-            <Space size="middle">
-              <Button 
-                danger 
-                htmlType="submit"
-                icon={<UserDeleteOutlined />}
-                className="submit-btn-danger"
-              >
+            <div className="modal-actions">
+              <button type="submit" className="submit-btn-danger">
                 Deactivate Account
-              </Button>
-              <Button 
-                onClick={() => {
-                  setDeactivateModalVisible(false);
-                  deactivateForm.resetFields();
-                }}
-                className="cancel-btn"
-              >
+              </button>
+              <button type="button" className="cancel-btn" onClick={() => {
+                setDeactivateModalVisible(false);
+                setDeactivateForm({ reason: '' });
+              }}>
                 Cancel
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

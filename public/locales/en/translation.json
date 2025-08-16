@@ -29,11 +29,23 @@
     "register": "Register",
     "start": "Start",
     "continue": "Continue",
-    "review": "Review"
+    "review": "Review",
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Try again",
+    "contactSupport": "Contact support",
+    "networkError": "Network error",
+    "serverError": "Server error",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "notFound": "Not found",
+    "timeout": "Request timeout",
+    "invalidInput": "Invalid input",
+    "required": "Required",
+    "optional": "Optional"
   },
   "auth": {
     "login": {
-      "title": "Welcome Back",
+      "title": "Welcome to you back",
       "subtitle": "Please sign in to your account",
       "email": "Email",
       "emailPlaceholder": "Your email",
@@ -44,7 +56,12 @@
       "submit": "Sign In",
       "noAccount": "Don't have an account?",
       "createAccount": "Sign Up",
-      "signIn": "Sign In"
+      "signIn": "Sign In",
+      "loginFailed": "Login failed",
+      "invalidCredentials": "Invalid credentials",
+      "accountNotVerified": "Account not verified. Please check your email",
+      "tooManyAttempts": "Too many attempts. Please try again later",
+      "networkError": "Network error. Please check your internet connection"
     },
     "register": {
       "title": "Create Account",
@@ -70,7 +87,13 @@
       "creatingAccount": "Creating Account...",
       "hasAccount": "Already have an account?",
       "signIn": "Sign In",
-      "success": "Account created successfully! Please check your email for verification before logging in."
+      "success": "Account created successfully! Please check your email for verification before logging in.",
+      "registrationFailed": "Registration failed",
+      "emailAlreadyExists": "Email already exists",
+      "weakPassword": "Password is too weak",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "invalidEmail": "Invalid email address",
+      "requiredFields": "Please fill in all required fields"
     },
     "forgotPassword": {
       "title": "Forgot Password",
@@ -97,6 +120,22 @@
       "rememberPassword": "Remember your password?",
       "signIn": "Sign In",
       "checkingLink": "Checking reset link..."
+    },
+    "emailConfirmation": {
+      "confirming": "Confirming your email...",
+      "backToLogin": "Back to Login",
+      "successTitle": "Email Confirmed!",
+      "errorTitle": "Confirmation Failed",
+      "successMessage": "Your email has been successfully confirmed. You will be redirected shortly...",
+      "errorMessage": "There was an error confirming your email. Please try again or contact support."
+    },
+    "emailVerificationModal": {
+      "title": "Email Verification Required",
+      "accountCreated": "Account created successfully!",
+      "emailSent": "We've sent a verification email to",
+      "checkEmail": "Please check your email and click the verification link to activate your account.",
+      "spamNote": "Note: Check your spam folder if you don't see the email in your inbox.",
+      "gotIt": "Got it!"
     }
   },
   "subjects": {
@@ -105,6 +144,9 @@
     "subtitle": "Select a subject to start your learning journey",
     "explore": "Explore",
     "noSubjects": "No subjects available currently",
+    "noSubjectsForLevel": "No subjects available for {{level}} level yet",
+    "noSubjectsMessage": "Subjects will appear here once they are available.",
+    "noSubjectsForLevelMessage": "Subjects for this level will appear here once they are added by your instructor.",
     "noDescription": "No description available",
     "loading": "Loading subjects..."
   },

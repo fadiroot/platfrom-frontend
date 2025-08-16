@@ -7,7 +7,7 @@ interface ISidebarProps {
 const Sidebar: React.FC<ISidebarProps> = ({ collapseSidebar }) => {
   return (
     <div className={`sidebar ${collapseSidebar ? 'collapse' : ''}`}>
-      <div className="sidebar-logo-container">{collapseSidebar ? 'L' : 'Logo'}</div>
+      <div className="sidebar-logo-container">{collapseSidebar ? 'A' : 'Astuce'}</div>
 
       <div className="sidebar-content">
         <div className="sidebar-nav-items">

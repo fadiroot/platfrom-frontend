@@ -12,13 +12,16 @@ import './_EmailConfirmation.scss'
 import logoImg from '/logo/astuceLogo.png'
 
 const EmailConfirmationComponent = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
+  
+  // Add Arabic font class when Arabic language is selected
+  const isArabic = i18n?.language === 'ar'
   
   // Get URL parameters
   const tokenHash = searchParams.get('token_hash')
@@ -48,15 +51,15 @@ const EmailConfirmationComponent = () => {
         })
 
         if (error) {
-          console.error('Email confirmation error:', error)
-          setStatus('error')
-          setMessage(error.message || 'Failed to confirm email')
+                  console.error('Email confirmation error:', error)
+        setStatus('error')
+        setMessage(error.message || t('auth.emailConfirmation.errorMessage'))
           return
         }
 
         console.log('✅ Email confirmed successfully')
         setStatus('success')
-        setMessage('Email confirmed successfully! Redirecting...')
+        setMessage(t('auth.emailConfirmation.successMessage'))
         
         // Redirect after a short delay
         setTimeout(() => {
@@ -66,7 +69,7 @@ const EmailConfirmationComponent = () => {
       } catch (err) {
         console.error('Error in email confirmation:', err)
         setStatus('error')
-        setMessage('An unexpected error occurred')
+        setMessage(t('auth.emailConfirmation.errorMessage'))
       } finally {
         setLoading(false)
       }
@@ -81,7 +84,7 @@ const EmailConfirmationComponent = () => {
 
   if (loading) {
     return (
-      <div className="email-confirmation-module">
+      <div className={`email-confirmation-module ${isArabic ? 'arabic-fonts' : ''}`}>
         <div className="language-selector-container">
           <LanguageSelector />
         </div>
@@ -91,7 +94,7 @@ const EmailConfirmationComponent = () => {
           </div>
           <div className="loading-state">
             <Loader2 size={24} className="spinner" />
-            <p>{t('auth.emailConfirmation.confirming', 'Confirming your email...')}</p>
+            <p>{t('auth.emailConfirmation.confirming')}</p>
           </div>
         </div>
       </div>
@@ -99,7 +102,7 @@ const EmailConfirmationComponent = () => {
   }
 
   return (
-    <div className="email-confirmation-module">
+    <div className={`email-confirmation-module ${isArabic ? 'arabic-fonts' : ''}`}>
       <div className="language-selector-container">
         <LanguageSelector />
       </div>
@@ -114,20 +117,20 @@ const EmailConfirmationComponent = () => {
           onClick={handleBackToLogin}
         >
           <ArrowLeft size={16} />
-          {t('auth.emailConfirmation.backToLogin', 'Back to Login')}
+          {t('auth.emailConfirmation.backToLogin')}
         </button>
         
         <div className="status-container">
           {status === 'success' ? (
             <>
               <CheckCircle size={48} className="success-icon" />
-              <h1 className="title">{t('auth.emailConfirmation.successTitle', 'Email Confirmed!')}</h1>
+              <h1 className="title">{t('auth.emailConfirmation.successTitle')}</h1>
               <p className="message">{message}</p>
             </>
           ) : (
             <>
               <XCircle size={48} className="error-icon" />
-              <h1 className="title">{t('auth.emailConfirmation.errorTitle', 'Confirmation Failed')}</h1>
+              <h1 className="title">{t('auth.emailConfirmation.errorTitle')}</h1>
               <p className="message">{message}</p>
             </>
           )}

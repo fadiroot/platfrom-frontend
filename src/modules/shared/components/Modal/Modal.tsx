@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Modal.scss';
 
 interface ModalProps {
@@ -18,6 +19,8 @@ const Modal: React.FC<ModalProps> = ({
   type = 'info',
   showCloseButton = true 
 }) => {
+  const { i18n } = useTranslation();
+  const isArabic = i18n?.language === 'ar';
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add('modal-open');
@@ -43,7 +46,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className={`modal-content modal-content--${type}`} onClick={e => e.stopPropagation()}>
+      <div className={`modal-content modal-content--${type} ${isArabic ? 'arabic-fonts' : ''}`} onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2 className="modal-title">
             <span className="modal-icon">{getIcon()}</span>

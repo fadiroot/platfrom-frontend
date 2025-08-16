@@ -49,6 +49,8 @@
     border: 2px solid transparent;
     margin: 4px 0;
     box-shadow: 2px 2px 0px 0px transparent;
+    text-decoration: none;
+    pointer-events: auto;
 
     .icon_color {
       color: var(--sidebar-item-icon);
@@ -80,27 +82,27 @@
   }
 
   .active {
-    background-color: var(--sidebar-item-bg-active);
-    color: var(--sidebar-item-text-active);
+    background-color: #f8f9fa;
+    color: #000000;
     font-weight: 600;
     border: 2px solid #000000;
     box-shadow: 2px 2px 0px 0px #000000;
     transform: translate(-1px, -1px);
 
     &:hover {
-      background-color: var(--sidebar-item-bg-active);
-      color: var(--sidebar-item-text-active);
+      background-color: #f8f9fa;
+      color: #000000;
       border: 2px solid #000000;
       box-shadow: 3px 3px 0px 0px #000000;
       transform: translate(-2px, -2px);
 
       .icon_color {
-        color: var(--sidebar-item-icon-active);
+        color: #000000;
       }
     }
 
     .icon_color {
-      color: var(--sidebar-item-icon-active);
+      color: #000000;
     }
 
     &::before {
@@ -111,7 +113,7 @@
       transform: translateY(-50%);
       width: 3px;
       height: 20px;
-      background-color: var(--sidebar-item-text-active);
+      background-color: #000000;
       border-radius: 0 2px 2px 0;
     }
   }

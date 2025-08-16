@@ -83,33 +83,43 @@ const SubjectList: React.FC = () => {
       <HandDrawnArrow className="subject-list-arrow" />
 
       <div className="subject-grid">
-        {subjects.length === 0 && (
-          <div className="no-subjects-message">
-            {user?.level_id 
-              ? t('subjects.noSubjectsForLevel', { level: user.level?.title || 'your level' })
-              : t('subjects.noSubjects')
-            }
+        {subjects.length === 0 ? (
+          <div className="no-subjects-container">
+            <div className="no-subjects-icon">📚</div>
+            <h3 className="no-subjects-title">
+              {user?.level_id 
+                ? t('subjects.noSubjectsForLevel', { level: user.level?.title || 'your level' })
+                : t('subjects.noSubjects')
+              }
+            </h3>
+            <p className="no-subjects-message">
+              {user?.level_id 
+                ? t('subjects.noSubjectsForLevelMessage', 'Subjects for this level will appear here once they are added by your instructor.')
+                : t('subjects.noSubjectsMessage', 'Subjects will appear here once they are available.')
+              }
+            </p>
           </div>
+        ) : (
+          subjects.map((subject) => (
+            <div
+              className="subject-card"
+              key={subject.id}
+              onClick={() => handleSubjectClick(subject.id)}
+            >
+              <div className="subject-icon">
+                {subject.image_url ? (
+                  <img src={subject.image_url} alt={subject.title} className="subject-icon-img" />
+                ) : (
+                  <span className="default-icon">📘</span>
+                )}
+              </div>
+              <h2 className="subject-name">{subject.title}</h2>
+              <div className="subject-meta">
+                <button className="explore-button">{t('subjects.explore')}</button>
+              </div>
+            </div>
+          ))
         )}
-        {subjects.map((subject) => (
-          <div
-            className="subject-card"
-            key={subject.id}
-            onClick={() => handleSubjectClick(subject.id)}
-          >
-            <div className="subject-icon">
-              {subject.image_url ? (
-                <img src={subject.image_url} alt={subject.title} className="subject-icon-img" />
-              ) : (
-                <span className="default-icon">📘</span>
-              )}
-            </div>
-            <h2 className="subject-name">{subject.title}</h2>
-            <div className="subject-meta">
-              <button className="explore-button">{t('subjects.explore')}</button>
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   )

@@ -10,9 +10,23 @@ const SidebarItems: React.FC<ISidebarItemsProps> = ({ collapseSidebar }) => {
   const { pathname } = useLocation()
   const { t } = useTranslation('sidebar')
 
+  const getTranslationKey = (label: string) => {
+    // Map the French labels to their translation keys
+    const labelMap: { [key: string]: string } = {
+      'Dashboard': 'dashboard',
+      'Niveaux': 'niveaux',
+      'Matières': 'matières',
+      'Chapitres': 'chapitres',
+      'Exercices': 'exercices',
+      'Étudiants': 'étudiants'
+    }
+    return labelMap[label] || label.toLowerCase()
+  }
+
   return (
     <div className="sidebar-items">
       {SIDEBARITEMS?.map((route, index) => {
+        const translationKey = getTranslationKey(route?.label)
         return (
           <Link
             to={route?.link}
@@ -26,7 +40,7 @@ const SidebarItems: React.FC<ISidebarItemsProps> = ({ collapseSidebar }) => {
             >
               {route?.icon}
             </div>
-            {!collapseSidebar ? t(`sidebar.${route?.label.toLowerCase()}`).toUpperCase() : null}
+            {!collapseSidebar ? t(`sidebar.${translationKey}`).toUpperCase() : null}
           </Link>
         )
       })}

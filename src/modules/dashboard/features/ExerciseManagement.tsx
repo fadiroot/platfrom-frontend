@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { getExercises, createExercise, updateExercise, deleteExercise } from '@/lib/api/exercises'
 import { getChapters } from '@/lib/api/chapters'
+import { getSubjects } from '@/lib/api/subjects'
+import { getLevels } from '@/lib/api/levels'
 import { uploadExercisePDF } from '@/lib/api/storage'
 import type { Tables } from '@/lib/supabase'
 import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
@@ -19,18 +21,23 @@ const uploadInfoStyle: React.CSSProperties = {
 
 type Exercise = Tables<'exercises'>
 type Chapter = Tables<'chapters'>
+type Subject = Tables<'subjects'>
+type Level = Tables<'levels'>
 
 interface ExerciseFormData {
   name: string
   difficulty: 'Easy' | 'Medium' | 'Hard' | null
+  level_id: string | null
+  subject_id: string | null
   chapter_id: string | null
-  tag: number | null
   exercise_file_urls: string[]
   correction_file_urls: string[]
 }
 
 const ExerciseManagement: React.FC = () => {
   const [exercises, setExercises] = useState<Exercise[]>([])
+  const [levels, setLevels] = useState<Level[]>([])
+  const [subjects, setSubjects] = useState<Subject[]>([])
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -38,13 +45,23 @@ const ExerciseManagement: React.FC = () => {
   const [formData, setFormData] = useState<ExerciseFormData>({
     name: '',
     difficulty: null,
+    level_id: null,
+    subject_id: null,
     chapter_id: null,
-    tag: null,
     exercise_file_urls: [],
     correction_file_urls: []
   })
   const [submitting, setSubmitting] = useState(false)
   const [uploadingFiles, setUploadingFiles] = useState(false)
+  
+  // Filter state
+  const [filters, setFilters] = useState({
+    level_id: '',
+    subject_id: '',
+    chapter_id: '',
+    difficulty: '',
+    search: ''
+  })
   
   // Ref to track if component is mounted
   const isMountedRef = useRef(true)
@@ -88,17 +105,166 @@ const ExerciseManagement: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const [exercisesData, chaptersData] = await Promise.all([
+      const [exercisesData, levelsData, subjectsData, chaptersData] = await Promise.all([
         getExercises(),
+        getLevels(),
+        getSubjects(),
         getChapters()
       ])
       setExercises(exercisesData)
+      setLevels(levelsData)
+      setSubjects(subjectsData)
       setChapters(chaptersData)
     } catch (error) {
       console.error('Error fetching data:', error)
       alert('Erreur lors du chargement des données')
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Filter functions
+  const handleFilterLevelChange = (levelId: string) => {
+    setFilters(prev => ({
+      ...prev,
+      level_id: levelId,
+      subject_id: '',
+      chapter_id: ''
+    }))
+  }
+
+  const handleFilterSubjectChange = (subjectId: string) => {
+    setFilters(prev => ({
+      ...prev,
+      subject_id: subjectId,
+      chapter_id: ''
+    }))
+  }
+
+  const handleFilterChapterChange = (chapterId: string) => {
+    setFilters(prev => ({
+      ...prev,
+      chapter_id: chapterId
+    }))
+  }
+
+  const handleFilterDifficultyChange = (difficulty: string) => {
+    setFilters(prev => ({
+      ...prev,
+      difficulty
+    }))
+  }
+
+  const handleSearchChange = (search: string) => {
+    setFilters(prev => ({
+      ...prev,
+      search
+    }))
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      level_id: '',
+      subject_id: '',
+      chapter_id: '',
+      difficulty: '',
+      search: ''
+    })
+  }
+
+  // Get filtered exercises
+  const getFilteredExercises = () => {
+    return exercises.filter(exercise => {
+      // Get chapter and subject info for this exercise
+      const chapter = chapters.find(c => c.id === exercise.chapter_id)
+      const subject = chapter ? subjects.find(s => s.id === chapter.subject_id) : null
+      
+      // Level filter
+      if (filters.level_id && subject?.level_id !== filters.level_id) {
+        return false
+      }
+      
+      // Subject filter
+      if (filters.subject_id && chapter?.subject_id !== filters.subject_id) {
+        return false
+      }
+      
+      // Chapter filter
+      if (filters.chapter_id && exercise.chapter_id !== filters.chapter_id) {
+        return false
+      }
+      
+      // Difficulty filter
+      if (filters.difficulty && exercise.difficulty !== filters.difficulty) {
+        return false
+      }
+      
+      // Search filter
+      if (filters.search && !exercise.name.toLowerCase().includes(filters.search.toLowerCase())) {
+        return false
+      }
+      
+      return true
+    })
+  }
+
+  // Get filtered subjects for filter dropdown
+  const getFilteredSubjects = () => {
+    if (!filters.level_id) return subjects
+    return subjects.filter(subject => subject.level_id === filters.level_id)
+  }
+
+  // Get filtered chapters for filter dropdown
+  const getFilteredChapters = () => {
+    if (!filters.subject_id) return chapters
+    return chapters.filter(chapter => chapter.subject_id === filters.subject_id)
+  }
+
+  // Fetch subjects when level changes
+  const handleLevelChange = async (levelId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      level_id: levelId,
+      subject_id: null,
+      chapter_id: null
+    }))
+    
+    if (levelId) {
+      try {
+        const subjectsData = await getSubjects()
+        const filteredSubjects = subjectsData.filter(subject => subject.level_id === levelId)
+        setSubjects(filteredSubjects)
+      } catch (error) {
+        console.error('Error fetching subjects:', error)
+        setSubjects([])
+      }
+    } else {
+      setSubjects([])
+    }
+    
+    // Clear chapters when level changes
+    setChapters([])
+  }
+
+  // Fetch chapters when subject changes
+  const handleSubjectChange = async (subjectId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      subject_id: subjectId,
+      chapter_id: null
+    }))
+    
+    if (subjectId) {
+      try {
+        const chaptersData = await getChapters()
+        const filteredChapters = chaptersData.filter(chapter => chapter.subject_id === subjectId)
+        setChapters(filteredChapters)
+      } catch (error) {
+        console.error('Error fetching chapters:', error)
+        setChapters([])
+      }
+    } else {
+      setChapters([])
     }
   }
 
@@ -175,14 +341,35 @@ const ExerciseManagement: React.FC = () => {
       return
     }
 
+    if (!formData.level_id) {
+      alert('Veuillez sélectionner un niveau')
+      return
+    }
+
+    if (!formData.subject_id) {
+      alert('Veuillez sélectionner une matière')
+      return
+    }
+
+    if (!formData.chapter_id) {
+      alert('Veuillez sélectionner un chapitre')
+      return
+    }
+
     try {
       setSubmitting(true)
       
+      // Add default tag value for API compatibility
+      const exerciseData = {
+        ...formData,
+        tag: 0 // Default tag value
+      }
+      
       if (editingExercise) {
-        await updateExercise(editingExercise.id, formData)
+        await updateExercise(editingExercise.id, exerciseData)
         alert('Exercice mis à jour avec succès!')
       } else {
-        await createExercise(formData)
+        await createExercise(exerciseData)
         alert('Exercice créé avec succès!')
       }
 
@@ -201,12 +388,47 @@ const ExerciseManagement: React.FC = () => {
     setFormData({
       name: exercise.name,
       difficulty: exercise.difficulty,
+      level_id: null, // Will be set after fetching chapter details
+      subject_id: null, // Will be set after fetching chapter details
       chapter_id: exercise.chapter_id,
-      tag: exercise.tag,
       exercise_file_urls: exercise.exercise_file_urls || [],
       correction_file_urls: exercise.correction_file_urls || []
     })
     setShowForm(true)
+    
+    // Fetch chapter details to get level and subject information
+    if (exercise.chapter_id) {
+      fetchChapterDetails(exercise.chapter_id)
+    }
+  }
+
+  // Fetch chapter details to populate level and subject dropdowns
+  const fetchChapterDetails = async (chapterId: string) => {
+    try {
+      const chaptersData = await getChapters()
+      const chapter = chaptersData.find(c => c.id === chapterId)
+      
+      if (chapter) {
+        // Fetch subjects to find the one that contains this chapter
+        const subjectsData = await getSubjects()
+        const subject = subjectsData.find(s => s.id === chapter.subject_id)
+        
+        if (subject) {
+          // Set the level and subject in form data
+          setFormData(prev => ({
+            ...prev,
+            level_id: subject.level_id,
+            subject_id: subject.id
+          }))
+          
+          // Populate the dropdowns
+          await handleLevelChange(subject.level_id)
+          await handleSubjectChange(subject.id)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching chapter details:', error)
+    }
   }
 
   const handleDelete = async (exercise: Exercise) => {
@@ -228,19 +450,51 @@ const ExerciseManagement: React.FC = () => {
     setFormData({
       name: '',
       difficulty: null,
+      level_id: null,
+      subject_id: null,
       chapter_id: null,
-      tag: null,
       exercise_file_urls: [],
       correction_file_urls: []
     })
     setEditingExercise(null)
     setShowForm(false)
+    setSubjects([])
+    setChapters([])
   }
 
   const getChapterName = (chapterId: string | null) => {
     if (!chapterId) return 'Aucun chapitre'
     const chapter = chapters.find(c => c.id === chapterId)
     return chapter ? chapter.title : 'Chapitre inconnu'
+  }
+
+  const getSubjectName = (subjectId: string | null) => {
+    if (!subjectId) return 'Aucune matière'
+    const subject = subjects.find(s => s.id === subjectId)
+    return subject ? subject.title : 'Matière inconnue'
+  }
+
+  const getLevelName = (levelId: string | null) => {
+    if (!levelId) return 'Aucun niveau'
+    const level = levels.find(l => l.id === levelId)
+    return level ? level.title : 'Niveau inconnu'
+  }
+
+  const getExerciseLevelName = (exercise: Exercise) => {
+    const chapter = chapters.find(c => c.id === exercise.chapter_id)
+    if (!chapter) return 'Niveau inconnu'
+    
+    const subject = subjects.find(s => s.id === chapter.subject_id)
+    if (!subject) return 'Niveau inconnu'
+    
+    return getLevelName(subject.level_id)
+  }
+
+  const getExerciseSubjectName = (exercise: Exercise) => {
+    const chapter = chapters.find(c => c.id === exercise.chapter_id)
+    if (!chapter) return 'Matière inconnue'
+    
+    return getSubjectName(chapter.subject_id)
   }
 
   const getDifficultyColor = (difficulty: string | null) => {
@@ -264,12 +518,108 @@ const ExerciseManagement: React.FC = () => {
     <div className="exercise-management">
       <div className="management-header">
         <h1>✏️ Gestion des Exercices</h1>
-        <button 
-          className="btn-primary"
-          onClick={() => setShowForm(true)}
-        >
-          ➕ Nouvel Exercice
-        </button>
+        <div className="header-controls">
+          <div className="filters-section">
+            <div className="filter-row">
+              <div className="filter-group">
+                <label>Niveau:</label>
+                <CustomSelect
+                  options={[
+                    { value: '', label: 'Tous les niveaux' },
+                    ...levels.map(level => ({
+                      value: level.id,
+                      label: level.title
+                    }))
+                  ]}
+                  value={filters.level_id}
+                  onChange={(value: string) => handleFilterLevelChange(value)}
+                  onBlur={() => {}}
+                  placeholder="Filtrer par niveau"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label>Matière:</label>
+                <CustomSelect
+                  options={[
+                    { value: '', label: 'Toutes les matières' },
+                    ...getFilteredSubjects().map(subject => ({
+                      value: subject.id,
+                      label: subject.title
+                    }))
+                  ]}
+                  value={filters.subject_id}
+                  onChange={(value: string) => handleFilterSubjectChange(value)}
+                  onBlur={() => {}}
+                  placeholder="Filtrer par matière"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label>Chapitre:</label>
+                <CustomSelect
+                  options={[
+                    { value: '', label: 'Tous les chapitres' },
+                    ...getFilteredChapters().map(chapter => ({
+                      value: chapter.id,
+                      label: chapter.title
+                    }))
+                  ]}
+                  value={filters.chapter_id}
+                  onChange={(value: string) => handleFilterChapterChange(value)}
+                  onBlur={() => {}}
+                  placeholder="Filtrer par chapitre"
+                />
+              </div>
+
+              <div className="filter-group">
+                <label>Difficulté:</label>
+                <CustomSelect
+                  options={[
+                    { value: '', label: 'Toutes les difficultés' },
+                    { value: 'Easy', label: 'Facile' },
+                    { value: 'Medium', label: 'Moyen' },
+                    { value: 'Hard', label: 'Difficile' }
+                  ]}
+                  value={filters.difficulty}
+                  onChange={(value: string) => handleFilterDifficultyChange(value)}
+                  onBlur={() => {}}
+                  placeholder="Filtrer par difficulté"
+                />
+              </div>
+            </div>
+
+            <div className="filter-row">
+              <div className="filter-group search-group">
+                <label>Rechercher:</label>
+                <input
+                  type="text"
+                  value={filters.search}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Rechercher par nom d'exercice..."
+                  className="search-input"
+                />
+              </div>
+
+              <div className="filter-actions">
+                <button 
+                  onClick={clearFilters}
+                  className="btn-clear-filters"
+                  title="Effacer tous les filtres"
+                >
+                  🗑️ Effacer les filtres
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button 
+            className="btn-primary"
+            onClick={() => setShowForm(true)}
+          >
+            ➕ Nouvel Exercice
+          </button>
+        </div>
       </div>
 
       {/* Form Modal */}
@@ -294,16 +644,41 @@ const ExerciseManagement: React.FC = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="level_id">Niveau *</label>
+                  <CustomSelect
+                  options={[
+                    { value: '', label: 'Sélectionner un niveau' },
+                    ...levels.map(level => ({
+                      value: level.id,
+                      label: level.title
+                    }))
+                  ]}
+                  value={formData.level_id || ''}
+                  onChange={(value: string) => handleLevelChange(value)}
+                  onBlur={() => {}}
+                  placeholder="Sélectionner un niveau"
+                />
+                </div>
 
                 <div className="form-group">
-                  <label htmlFor="tag">Tag (numéro)</label>
-                  <input
-                    type="number"
-                    id="tag"
-                    value={formData.tag || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, tag: e.target.value ? parseInt(e.target.value) : null }))}
-                    placeholder="1, 2, 3..."
-                  />
+                  <label htmlFor="subject_id">Matière *</label>
+                  <CustomSelect
+                  options={[
+                    { value: '', label: 'Sélectionner une matière' },
+                    ...subjects.map(subject => ({
+                      value: subject.id,
+                      label: subject.title
+                    }))
+                  ]}
+                  value={formData.subject_id || ''}
+                  onChange={(value: string) => handleSubjectChange(value)}
+                  onBlur={() => {}}
+                  placeholder="Sélectionner une matière"
+                />
                 </div>
               </div>
 
@@ -420,76 +795,113 @@ const ExerciseManagement: React.FC = () => {
 
       {/* Exercises List */}
       <div className="exercises-grid">
-        {exercises.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">✏️</div>
-            <h3>Aucun exercice trouvé</h3>
-            <p>Commencez par créer votre premier exercice</p>
-            <button className="btn-primary" onClick={() => setShowForm(true)}>
-              Créer un exercice
-            </button>
-          </div>
-        ) : (
-          exercises.map(exercise => (
-            <div key={exercise.id} className="exercise-card">
-              <div className="card-header">
-                <h3>{exercise.name}</h3>
-                <div className="card-actions">
-                  <button 
-                    onClick={() => handleEdit(exercise)}
-                    className="btn-edit"
-                    title="Modifier"
-                  >
-                    ✏️
+        {(() => {
+          const filteredExercises = getFilteredExercises()
+          
+          if (filteredExercises.length === 0) {
+            return (
+              <div className="empty-state">
+                <div className="empty-icon">✏️</div>
+                <h3>
+                  {exercises.length === 0 
+                    ? 'Aucun exercice trouvé' 
+                    : 'Aucun exercice ne correspond aux filtres'
+                  }
+                </h3>
+                <p>
+                  {exercises.length === 0 
+                    ? 'Commencez par créer votre premier exercice' 
+                    : 'Essayez de modifier vos critères de recherche'
+                  }
+                </p>
+                {exercises.length === 0 && (
+                  <button className="btn-primary" onClick={() => setShowForm(true)}>
+                    Créer un exercice
                   </button>
-                  <button 
-                    onClick={() => handleDelete(exercise)}
-                    className="btn-delete"
-                    title="Supprimer"
-                  >
-                    🗑️
+                )}
+                {exercises.length > 0 && (
+                  <button className="btn-secondary" onClick={clearFilters}>
+                    Effacer les filtres
                   </button>
-                </div>
+                )}
               </div>
+            )
+          }
 
-              <div className="card-content">
-                <div className="card-meta">
-                  <span className="chapter-badge">
-                    📖 {getChapterName(exercise.chapter_id)}
-                  </span>
-                  {exercise.difficulty && (
-                    <span className={`difficulty-badge ${getDifficultyColor(exercise.difficulty)}`}>
-                      {exercise.difficulty === 'Easy' ? 'Facile' : 
-                       exercise.difficulty === 'Medium' ? 'Moyen' : 'Difficile'}
-                    </span>
-                  )}
-                  {exercise.tag && (
-                    <span className="tag-badge">
-                      #{exercise.tag}
-                    </span>
-                  )}
-                </div>
-
-                <div className="files-info">
-                  <div className="file-count">
-                    📄 {(exercise.exercise_file_urls || []).length} fichier(s) d'exercice
+          return (
+            <>
+              <div className="filter-results-info">
+                <span>
+                  📊 {filteredExercises.length} exercice{filteredExercises.length > 1 ? 's' : ''} trouvé{filteredExercises.length > 1 ? 's' : ''}
+                  {filters.level_id || filters.subject_id || filters.chapter_id || filters.difficulty || filters.search ? 
+                    ` (sur ${exercises.length} total)` : ''
+                  }
+                </span>
+              </div>
+              
+              {filteredExercises.map(exercise => (
+                <div key={exercise.id} className="exercise-card">
+                  <div className="card-header">
+                    <h3>{exercise.name}</h3>
+                    <div className="card-actions">
+                      <button 
+                        onClick={() => handleEdit(exercise)}
+                        className="btn-edit"
+                        title="Modifier"
+                      >
+                        ✏️
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(exercise)}
+                        className="btn-delete"
+                        title="Supprimer"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
-                  <div className="file-count">
-                    ✅ {(exercise.correction_file_urls || []).length} fichier(s) de correction
+
+                  <div className="card-content">
+                    <div className="card-meta">
+                      <span className="level-badge">
+                        📚 {getExerciseLevelName(exercise)}
+                      </span>
+                      <span className="subject-badge">
+                        📖 {getExerciseSubjectName(exercise)}
+                      </span>
+                      <span className="chapter-badge">
+                        📄 {getChapterName(exercise.chapter_id)}
+                      </span>
+                      {exercise.difficulty && (
+                        <span className={`difficulty-badge ${getDifficultyColor(exercise.difficulty)}`}>
+                          {exercise.difficulty === 'Easy' ? 'Facile' : 
+                           exercise.difficulty === 'Medium' ? 'Moyen' : 'Difficile'}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="files-info">
+                      <div className="file-count">
+                        📄 {(exercise.exercise_file_urls || []).length} fichier(s) d'exercice
+                      </div>
+                      <div className="file-count">
+                        ✅ {(exercise.correction_file_urls || []).length} fichier(s) de correction
+                      </div>
+                    </div>
+
+                    <div className="date-info">
+                      Créé le {new Date(exercise.created_at).toLocaleDateString('fr-FR')}
+                    </div>
+                  </div>
+
+                  <div className="card-footer">
+                    <span className="exercise-id">ID: {exercise.id.slice(0, 8)}...</span>
                   </div>
                 </div>
-
-                <div className="date-info">
-                  Créé le {new Date(exercise.created_at).toLocaleDateString('fr-FR')}
-                </div>
-              </div>
-
-              <div className="card-footer">
-                <span className="exercise-id">ID: {exercise.id.slice(0, 8)}...</span>
-              </div>
-            </div>
-          ))
-        )}
+              ))}
+            </>
+          )
+        })()}
       </div>
     </div>
   )
