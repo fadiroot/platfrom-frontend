@@ -32,6 +32,7 @@ interface ExerciseFormData {
   chapter_id: string | null
   exercise_file_urls: string[]
   correction_file_urls: string[]
+  is_public: boolean
 }
 
 const ExerciseManagement: React.FC = () => {
@@ -49,7 +50,8 @@ const ExerciseManagement: React.FC = () => {
     subject_id: null,
     chapter_id: null,
     exercise_file_urls: [],
-    correction_file_urls: []
+    correction_file_urls: [],
+    is_public: false
   })
   const [submitting, setSubmitting] = useState(false)
   const [uploadingFiles, setUploadingFiles] = useState(false)
@@ -341,16 +343,6 @@ const ExerciseManagement: React.FC = () => {
       return
     }
 
-    if (!formData.level_id) {
-      alert('Veuillez sélectionner un niveau')
-      return
-    }
-
-    if (!formData.subject_id) {
-      alert('Veuillez sélectionner une matière')
-      return
-    }
-
     if (!formData.chapter_id) {
       alert('Veuillez sélectionner un chapitre')
       return
@@ -361,7 +353,12 @@ const ExerciseManagement: React.FC = () => {
       
       // Add default tag value for API compatibility
       const exerciseData = {
-        ...formData,
+        name: formData.name,
+        difficulty: formData.difficulty,
+        chapter_id: formData.chapter_id,
+        exercise_file_urls: formData.exercise_file_urls,
+        correction_file_urls: formData.correction_file_urls,
+        is_public: formData.is_public,
         tag: 0 // Default tag value
       }
       
@@ -392,7 +389,8 @@ const ExerciseManagement: React.FC = () => {
       subject_id: null, // Will be set after fetching chapter details
       chapter_id: exercise.chapter_id,
       exercise_file_urls: exercise.exercise_file_urls || [],
-      correction_file_urls: exercise.correction_file_urls || []
+      correction_file_urls: exercise.correction_file_urls || [],
+      is_public: (exercise as any).is_public || false
     })
     setShowForm(true)
     
@@ -454,7 +452,8 @@ const ExerciseManagement: React.FC = () => {
       subject_id: null,
       chapter_id: null,
       exercise_file_urls: [],
-      correction_file_urls: []
+      correction_file_urls: [],
+      is_public: false
     })
     setEditingExercise(null)
     setShowForm(false)
@@ -717,6 +716,32 @@ const ExerciseManagement: React.FC = () => {
                 </div>
               </div>
 
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="is_public">Visibilité</label>
+                  <div className="visibility-toggle">
+                    <label className="toggle-label">
+                      <input
+                        type="checkbox"
+                        checked={formData.is_public}
+                        onChange={(e) => setFormData(prev => ({ ...prev, is_public: e.target.checked }))}
+                        className="toggle-input"
+                      />
+                      <span className="toggle-slider"></span>
+                      <span className="toggle-text">
+                        {formData.is_public ? '🌍 Public' : '🔒 Privé'}
+                      </span>
+                    </label>
+                    <small className="visibility-help">
+                      {formData.is_public 
+                        ? 'Accessible à tous les utilisateurs' 
+                        : 'Accessible uniquement aux étudiants actifs'
+                      }
+                    </small>
+                  </div>
+                </div>
+              </div>
+
               {/* File Upload Sections */}
               <div className="file-sections">
                 <div className="file-section">
@@ -878,6 +903,9 @@ const ExerciseManagement: React.FC = () => {
                            exercise.difficulty === 'Medium' ? 'Moyen' : 'Difficile'}
                         </span>
                       )}
+                      <span className={`visibility-badge ${(exercise as any).is_public ? 'public' : 'private'}`}>
+                        {(exercise as any).is_public ? '🌍 Public' : '🔒 Privé'}
+                      </span>
                     </div>
 
                     <div className="files-info">

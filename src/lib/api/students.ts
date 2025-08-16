@@ -236,11 +236,6 @@ export const studentsApi = {
     });
 
     if (error) {
-      // Fallback: If function doesn't exist, allow access (temporary)
-      if (error.message.includes('function') && error.message.includes('does not exist')) {
-        console.warn('Database function can_access_exercise not found, allowing access (run migration to fix)');
-        return true;
-      }
       console.error('Error checking exercise access:', error);
       return false;
     }

@@ -78,7 +78,7 @@ const ExercisesList: React.FC = () => {
       if (exercise) {
         // Check if user has access to this exercise
         const exerciseIndex = exercises.findIndex(ex => ex.id === exercise.id);
-        const hasAccess = accessibleExercises.includes(exercise.id) || exerciseIndex === 0;
+        const hasAccess = accessibleExercises.includes(exercise.id);
         
         if (hasAccess) {
           setSelectedExercise(exercise);
@@ -215,7 +215,7 @@ const ExercisesList: React.FC = () => {
           <div className="exercises-grid">
             {exercises.map((exercise, index) => {
               // Check if user has access to this exercise
-              const hasAccess = accessibleExercises.includes(exercise.id) || index === 0; // Temporary fix for first exercise
+              const hasAccess = accessibleExercises.includes(exercise.id);
               const isPremium = !hasAccess; // Premium if user doesn't have access
 
               return (

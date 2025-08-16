@@ -1,26 +1,28 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { getChapters, createChapter, updateChapter, deleteChapter } from '@/lib/api/chapters'
-import { getSubjects } from '@/lib/api/subjects'
+import { getSubjects, getSubjectsByLevel } from '@/lib/api/subjects'
+import { getLevels } from '@/lib/api/levels'
 import type { Tables } from '@/lib/supabase'
 import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
 import './ChapterManagement.scss'
 
 type Chapter = Tables<'chapters'>
 type Subject = Tables<'subjects'>
+type Level = Tables<'levels'>
 
 interface ChapterFormData {
   title: string
   description: string | null
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | null
-  type: 'Theory' | 'Practical' | 'Assessment' | null
-  estimated_time: string | null
+  level_id: string | null
   subject_id: string | null
   exercise_count: number | null
 }
 
 const ChapterManagement: React.FC = () => {
   const [chapters, setChapters] = useState<Chapter[]>([])
+  const [levels, setLevels] = useState<Level[]>([])
   const [subjects, setSubjects] = useState<Subject[]>([])
+  const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([])
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -28,9 +30,7 @@ const ChapterManagement: React.FC = () => {
   const [formData, setFormData] = useState<ChapterFormData>({
     title: '',
     description: '',
-    difficulty: null,
-    type: null,
-    estimated_time: '',
+    level_id: null,
     subject_id: null,
     exercise_count: null
   })
@@ -78,14 +78,16 @@ const ChapterManagement: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const [chaptersData, subjectsData] = await Promise.all([
+      const [chaptersData, levelsData, subjectsData] = await Promise.all([
         getChapters(),
+        getLevels(),
         getSubjects()
       ])
       
       // Only update state if component is still mounted
       if (isMountedRef.current) {
         setChapters(chaptersData)
+        setLevels(levelsData)
         setSubjects(subjectsData)
       }
     } catch (error) {
@@ -102,6 +104,38 @@ const ChapterManagement: React.FC = () => {
     }
   }
 
+  // Handle level selection - fetch subjects for the selected level
+  const handleLevelChange = async (levelId: string | null) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      level_id: levelId,
+      subject_id: null // Reset subject when level changes
+    }))
+    
+    if (levelId) {
+      try {
+        const subjectsForLevel = await getSubjectsByLevel(levelId)
+        if (isMountedRef.current) {
+          setFilteredSubjects(subjectsForLevel)
+        }
+      } catch (error) {
+        console.error('Error fetching subjects for level:', error)
+        if (isMountedRef.current) {
+          setFilteredSubjects([])
+        }
+      }
+    } else {
+      if (isMountedRef.current) {
+        setFilteredSubjects([])
+      }
+    }
+  }
+
+  // Handle subject selection
+  const handleSubjectChange = (subjectId: string | null) => {
+    setFormData(prev => ({ ...prev, subject_id: subjectId }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.title.trim()) {
@@ -109,17 +143,38 @@ const ChapterManagement: React.FC = () => {
       return
     }
 
+    if (!formData.level_id) {
+      alert('Veuillez sélectionner un niveau')
+      return
+    }
+
+    if (!formData.subject_id) {
+      alert('Veuillez sélectionner une matière')
+      return
+    }
+
     try {
       setSubmitting(true)
       
+      // Prepare data for API (remove level_id as it's not part of the chapter table)
+      const { level_id, ...chapterData } = formData
+      
+      // Add default difficulty since database schema requires it
+      const finalChapterData = {
+        ...chapterData,
+        difficulty: 'Beginner' as const, // Default difficulty value
+        type: 'Theory' as const, // Default type value
+        estimated_time: '2 heures' // Default estimated time value
+      }
+      
       if (editingChapter) {
-        await updateChapter(editingChapter.id, formData)
+        await updateChapter(editingChapter.id, finalChapterData)
         // Only show alert if component is still mounted
         if (isMountedRef.current) {
           alert('Chapitre mis à jour avec succès!')
         }
       } else {
-        await createChapter(formData)
+        await createChapter(finalChapterData)
         // Only show alert if component is still mounted
         if (isMountedRef.current) {
           alert('Chapitre créé avec succès!')
@@ -145,18 +200,38 @@ const ChapterManagement: React.FC = () => {
     }
   }
 
-  const handleEdit = (chapter: Chapter) => {
+  const handleEdit = async (chapter: Chapter) => {
     setEditingChapter(chapter)
     setFormData({
       title: chapter.title,
       description: chapter.description,
-      difficulty: chapter.difficulty,
-      type: chapter.type,
-      estimated_time: chapter.estimated_time,
+      level_id: null, // Will be set after fetching subject details
       subject_id: chapter.subject_id,
       exercise_count: chapter.exercise_count
     })
     setShowForm(true)
+    
+    // Fetch subject details to get level information
+    if (chapter.subject_id) {
+      await fetchSubjectDetails(chapter.subject_id)
+    }
+  }
+
+  // Fetch subject details to populate level dropdown when editing
+  const fetchSubjectDetails = async (subjectId: string) => {
+    try {
+      const subject = subjects.find(s => s.id === subjectId)
+      if (subject && subject.level_id) {
+        setFormData(prev => ({ ...prev, level_id: subject.level_id }))
+        // Fetch subjects for this level
+        const subjectsForLevel = await getSubjectsByLevel(subject.level_id)
+        if (isMountedRef.current) {
+          setFilteredSubjects(subjectsForLevel)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching subject details:', error)
+    }
   }
 
   const handleDelete = async (chapter: Chapter) => {
@@ -184,14 +259,13 @@ const ChapterManagement: React.FC = () => {
     setFormData({
       title: '',
       description: '',
-      difficulty: null,
-      type: null,
-      estimated_time: '',
+      level_id: null,
       subject_id: null,
       exercise_count: null
     })
     setEditingChapter(null)
     setShowForm(false)
+    setFilteredSubjects([])
   }
 
   const getSubjectName = (subjectId: string | null) => {
@@ -200,24 +274,13 @@ const ChapterManagement: React.FC = () => {
     return subject ? subject.title : 'Matière inconnue'
   }
 
-  // Removed unused functions: getFilteredChapters and getChaptersBySubject
-
-  const getDifficultyColor = (difficulty: string | null) => {
-    switch (difficulty) {
-      case 'Beginner': return 'green'
-      case 'Intermediate': return 'orange'
-      case 'Advanced': return 'red'
-      default: return 'gray'
-    }
-  }
-
-  const getTypeIcon = (type: string | null) => {
-    switch (type) {
-      case 'Theory': return '📚'
-      case 'Practical': return '⚙️'
-      case 'Assessment': return '📋'
-      default: return '📖'
-    }
+  const getLevelName = (subjectId: string | null) => {
+    if (!subjectId) return 'Niveau inconnu'
+    const subject = subjects.find(s => s.id === subjectId)
+    if (!subject) return 'Niveau inconnu'
+    
+    const level = levels.find(l => l.id === subject.level_id)
+    return level ? level.title : 'Niveau inconnu'
   }
 
   if (loading) {
@@ -290,66 +353,41 @@ const ChapterManagement: React.FC = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="subject_id">Matière *</label>
-                <CustomSelect
-                  options={[
-                    { value: '', label: 'Sélectionner une matière' },
-                    ...subjects.map(subject => ({
-                      value: subject.id,
-                      label: subject.title
-                    }))
-                  ]}
-                  value={formData.subject_id || ''}
-                  onChange={(value) => setFormData(prev => ({ ...prev, subject_id: value || null }))}
-                  onBlur={() => {}}
-                  placeholder="Sélectionner une matière"
-                />
-              </div>
-
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="difficulty">Difficulté</label>
+                  <label htmlFor="level_id">Niveau *</label>
                   <CustomSelect
                     options={[
-                      { value: '', label: 'Sélectionner la difficulté' },
-                      { value: 'Beginner', label: 'Débutant' },
-                      { value: 'Intermediate', label: 'Intermédiaire' },
-                      { value: 'Advanced', label: 'Avancé' }
+                      { value: '', label: 'Sélectionner un niveau' },
+                      ...levels.map(level => ({
+                        value: level.id,
+                        label: level.title
+                      }))
                     ]}
-                    value={formData.difficulty || ''}
-                    onChange={(value) => setFormData(prev => ({ ...prev, difficulty: value as any || null }))}
+                    value={formData.level_id || ''}
+                    onChange={(value) => handleLevelChange(value || null)}
                     onBlur={() => {}}
-                    placeholder="Sélectionner la difficulté"
+                    placeholder="Sélectionner un niveau"
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="type">Type</label>
+                  <label htmlFor="subject_id">Matière *</label>
                   <CustomSelect
                     options={[
-                      { value: '', label: 'Sélectionner le type' },
-                      { value: 'Theory', label: 'Théorie' },
-                      { value: 'Practical', label: 'Pratique' },
-                      { value: 'Assessment', label: 'Évaluation' }
+                      { value: '', label: formData.level_id ? 'Sélectionner une matière' : 'Sélectionnez d\'abord un niveau' },
+                      ...filteredSubjects.map(subject => ({
+                        value: subject.id,
+                        label: subject.title
+                      }))
                     ]}
-                    value={formData.type || ''}
-                    onChange={(value) => setFormData(prev => ({ ...prev, type: value as any || null }))}
+                    value={formData.subject_id || ''}
+                    onChange={(value) => handleSubjectChange(value || null)}
                     onBlur={() => {}}
-                    placeholder="Sélectionner le type"
+                    placeholder={formData.level_id ? 'Sélectionner une matière' : 'Sélectionnez d\'abord un niveau'}
+                    disabled={!formData.level_id}
                   />
                 </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="estimated_time">Temps estimé</label>
-                <input
-                  type="text"
-                  id="estimated_time"
-                  value={formData.estimated_time || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, estimated_time: e.target.value }))}
-                  placeholder="Ex: 2 heures, 3h 30min"
-                />
               </div>
 
               <div className="form-group">
@@ -421,32 +459,18 @@ const ChapterManagement: React.FC = () => {
                 </p>
                 
                 <div className="card-meta">
-                  <span className="subject-badge">
-                    📚 {getSubjectName(chapter.subject_id)}
-                  </span>
+                  <div className="level-subject-info">
+                    <span className="level-badge">
+                      📚 {getLevelName(chapter.subject_id)}
+                    </span>
+                    <span className="subject-badge">
+                      📖 {getSubjectName(chapter.subject_id)}
+                    </span>
+                  </div>
                   
                   <div className="badges-row">
-                    {chapter.difficulty && (
-                      <span className={`difficulty-badge ${getDifficultyColor(chapter.difficulty)}`}>
-                        {chapter.difficulty === 'Beginner' ? 'Débutant' : 
-                         chapter.difficulty === 'Intermediate' ? 'Intermédiaire' : 'Avancé'}
-                      </span>
-                    )}
-                    {chapter.type && (
-                      <span className="type-badge">
-                        {getTypeIcon(chapter.type)} {
-                          chapter.type === 'Theory' ? 'Théorie' :
-                          chapter.type === 'Practical' ? 'Pratique' : 'Évaluation'
-                        }
-                      </span>
-                    )}
+                    {/* Type badges removed */}
                   </div>
-
-                  {chapter.estimated_time && (
-                    <div className="time-info">
-                      ⏱️ {chapter.estimated_time}
-                    </div>
-                  )}
 
                   <div className="exercise-count">
                     ✏️ {chapter.exercise_count || 0} exercice(s)

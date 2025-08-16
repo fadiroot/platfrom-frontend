@@ -132,13 +132,8 @@ export const getSecureExerciseFiles = async (exerciseId: string, exerciseIndex?:
   hasAccess: boolean
 }> => {
   try {
-    // First check if user has access to this exercise
-    let hasAccess = await canAccessExercise(exerciseId)
-    
-    // Temporary fix: First exercise (index 0) should always be available for testing
-    if (!hasAccess && exerciseIndex === 0) {
-      hasAccess = true
-    }
+    // Check if user has access to this exercise
+    const hasAccess = await canAccessExercise(exerciseId)
     
     if (!hasAccess) {
       return {

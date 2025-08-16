@@ -327,18 +327,37 @@
         }
 
         .card-meta {
-          .subject-badge {
-            display: inline-flex;
-            align-items: center;
-            background: #000;
-            color: white;
-            border: 2px solid #000;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            font-weight: 700;
+          .level-subject-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 1rem;
-            width: fit-content;
+
+            .level-badge {
+              display: inline-flex;
+              align-items: center;
+              background: #3b82f6;
+              color: white;
+              border: 2px solid #3b82f6;
+              padding: 0.25rem 0.75rem;
+              border-radius: 6px;
+              font-size: 0.875rem;
+              font-weight: 700;
+              width: fit-content;
+            }
+
+            .subject-badge {
+              display: inline-flex;
+              align-items: center;
+              background: #8b5cf6;
+              color: white;
+              border: 2px solid #8b5cf6;
+              padding: 0.25rem 0.75rem;
+              border-radius: 6px;
+              font-size: 0.875rem;
+              font-weight: 700;
+              width: fit-content;
+            }
           }
 
           .badges-row {
@@ -346,36 +365,6 @@
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-bottom: 1rem;
-
-            .difficulty-badge {
-              padding: 0.25rem 0.75rem;
-              border: 2px solid #000;
-              border-radius: 4px;
-              font-size: 0.8rem;
-              font-weight: 700;
-              color: white;
-
-              &.green { background: #10b981; }
-              &.orange { background: #f59e0b; }
-              &.red { background: #ef4444; }
-              &.gray { background: #6b7280; }
-            }
-
-            .type-badge {
-              background: white;
-              color: #000;
-              border: 2px solid #000;
-              padding: 0.25rem 0.75rem;
-              border-radius: 4px;
-              font-size: 0.8rem;
-              font-weight: 700;
-            }
-          }
-
-          .time-info {
-            font-size: 0.9rem;
-            color: #6b7280;
-            margin-bottom: 0.5rem;
           }
 
           .exercise-count {
