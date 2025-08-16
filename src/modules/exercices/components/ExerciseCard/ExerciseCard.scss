@@ -236,6 +236,19 @@
       border: 2px solid #000000;
       color: white;
 
+      &.difficulty-easy {
+        background: #10b981;
+      }
+
+      &.difficulty-medium {
+        background: #f59e0b;
+      }
+
+      &.difficulty-hard {
+        background: #ef4444;
+      }
+
+      // Keep backward compatibility with numeric classes
       &.difficulty-0 {
         background: #10b981;
       }

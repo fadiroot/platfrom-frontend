@@ -6,6 +6,7 @@ import { IoArrowBack, IoDocumentText, IoCheckmarkCircle } from 'react-icons/io5'
 import { getSecureExerciseFiles, getSecureFileUrl } from '@/lib/api/exercises'
 import { supabase } from '@/lib/supabase'
 import { ExerciseViewerProps, Exercise } from './types'
+import Loader from '../../../shared/components/Loader/Loader'
 
 import './ExerciseViewer.scss'
 
@@ -177,10 +178,13 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
   if (loadingFiles) {
     return (
       <div className="exercise-viewer-modern">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Loading exercise files...</p>
-        </div>
+        <Loader 
+          size="large" 
+          color="primary" 
+          text="Loading exercise files..." 
+          context="exercise"
+          fullScreen={true}
+        />
       </div>
     )
   }

@@ -3,9 +3,12 @@ export interface Exercise {
   code?: string;
   name: string;
   tag: number;
-  difficulty?: string;
+  difficulty: string | number;
   exerciseFileUrls?: string[];
   correctionFileUrls?: string[];
+  completed?: any;
+  subjectId?: string;
+  chapterId?: string;
 }
 
 export interface ExerciseViewerProps {

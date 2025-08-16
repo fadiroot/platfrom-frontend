@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
-import './PDFViewer.scss';
+import Loader from '../../../shared/components/Loader/Loader';
+import './SecurePDFViewer.scss';
 
 // Set up PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -150,8 +151,12 @@ const SecurePDFViewer: React.FC<SecurePDFViewerProps> = ({ url, onLoad, onError 
   if (loading) {
     return (
       <div className="pdf-viewer-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading PDF...</p>
+        <Loader 
+          size="large" 
+          color="primary" 
+          text="Loading PDF..." 
+          context="pdf"
+        />
       </div>
     );
   }

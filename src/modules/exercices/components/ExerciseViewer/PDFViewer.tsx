@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
+import Loader from '../../../shared/components/Loader/Loader';
+import './PDFViewer.scss';
 import { PDFViewerProps } from './types';
 
 // Set up PDF.js worker
@@ -229,8 +231,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ url, onLoad, onError }) => {
   if (loading) {
     return (
       <div className="pdf-viewer-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading PDF...</p>
+        <Loader 
+          size="large" 
+          color="primary" 
+          text="Loading PDF..." 
+          context="pdf"
+        />
       </div>
     );
   }

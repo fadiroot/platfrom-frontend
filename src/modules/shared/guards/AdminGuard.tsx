@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router-dom'
 import { RootState } from '../store'
 import { supabase } from '../../../lib/supabase'
+import PermissionDenied from '../features/PermissionDenied'
 
 interface AdminGuardProps {
   children: React.ReactNode
@@ -67,8 +68,8 @@ const AdminGuard: React.FC<AdminGuardProps> = ({ children }) => {
   }
 
   if (!isAdmin) {
-    console.log('🚫 Not admin, redirecting to dashboard')
-    return <Navigate to="/dashboard" replace />
+    console.log('🚫 Not admin, showing permission denied page')
+    return <PermissionDenied />
   }
 
   console.log('✅ Admin access granted')

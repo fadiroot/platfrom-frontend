@@ -13,9 +13,9 @@ type RouteConfig = {
 } & RouteProps
 
 const routes: RouteConfig[] = [
-  // Exercise Routes
+  // Exercise Routes - Single route that handles both list and viewer
   {
-    exact: true,
+    exact: null,
     guard: AuthGuard,
     layout: MainLayout,
     path: '/subjects/:subjectId/chapters/:chapterId/exercises',

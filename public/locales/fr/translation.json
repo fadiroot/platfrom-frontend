@@ -178,5 +178,24 @@
     "cancel": "Annuler",
     "contactAdmin": "Contacter l'administrateur",
     "contactInfo": "Veuillez contacter votre administrateur pour activer votre compte. Vous pouvez les joindre à admin@example.com ou appeler au +1234567890."
+  },
+  "permissionDenied": {
+    "title": "Accès Refusé",
+    "message": "Vous n'avez pas la permission d'accéder à cette page. Cette zone est réservée aux administrateurs uniquement.",
+    "goBack": "Retour",
+    "goToSubjects": "Aller aux Matières"
+  },
+  "notFound": {
+    "title": "Page Non Trouvée",
+    "message": "La page que vous recherchez a peut-être été supprimée, son nom a changé ou elle est temporairement indisponible.",
+    "suggestions": {
+      "title": "Ce que vous pouvez faire :",
+      "checkUrl": "Vérifiez l'URL pour d'éventuelles erreurs de frappe",
+      "goBack": "Retournez à la page précédente",
+      "explore": "Explorez nos matériels d'apprentissage"
+    },
+    "goBack": "Retour",
+    "goToSubjects": "Aller aux Matières",
+    "explore": "Explorer les Matières"
   }
 }

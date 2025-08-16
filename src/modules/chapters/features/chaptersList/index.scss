@@ -119,25 +119,11 @@
   }
 }
 
-.loading-spinner {
-  width: 32px;
-  height: 32px;
-  border: 2px solid var(--student-border-primary);
-  border-top: 2px solid var(--student-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
 .error-state {
   .error-icon {
     font-size: 2rem;
     margin-bottom: 1rem;
   }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 
 // Chapters List

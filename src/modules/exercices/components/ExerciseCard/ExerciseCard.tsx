@@ -25,16 +25,47 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const { t } = useTranslation('translation')
   const isCompleted = exercise.completed || false
 
-  const getDifficultyText = (tag: number) => {
-    switch (tag) {
-      case 0:
+  const getDifficultyText = (difficulty: string | number) => {
+    // Handle both string and number values
+    const difficultyStr = String(difficulty).toLowerCase()
+    
+    switch (difficultyStr) {
+      case 'easy':
+      case '0':
+      case 'beginner':
         return t('exercises.difficulty.easy')
-      case 1:
+      case 'medium':
+      case '1':
+      case 'intermediate':
         return t('exercises.difficulty.medium')
-      case 2:
+      case 'hard':
+      case '2':
+      case 'advanced':
         return t('exercises.difficulty.hard')
       default:
         return t('exercises.difficulty.easy')
+    }
+  }
+
+  const getDifficultyClass = (difficulty: string | number) => {
+    // Handle both string and number values
+    const difficultyStr = String(difficulty).toLowerCase()
+    
+    switch (difficultyStr) {
+      case 'easy':
+      case '0':
+      case 'beginner':
+        return 'difficulty-easy'
+      case 'medium':
+      case '1':
+      case 'intermediate':
+        return 'difficulty-medium'
+      case 'hard':
+      case '2':
+      case 'advanced':
+        return 'difficulty-hard'
+      default:
+        return 'difficulty-easy'
     }
   }
 
@@ -60,7 +91,9 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <div className="title-section">
             <h3 className="exercise-title">{exercise.name}</h3>
             <div className="badges">
-              <span className={`difficulty-badge difficulty-${exercise.tag}`}>{getDifficultyText(exercise.tag)}</span>
+              <span className={`difficulty-badge ${getDifficultyClass(exercise.difficulty)}`}>
+                {getDifficultyText(exercise.difficulty)}
+              </span>
               {isPremium && !hasAccess && (
                 <span className="premium-badge">
                   <Lock className="premium-icon" />

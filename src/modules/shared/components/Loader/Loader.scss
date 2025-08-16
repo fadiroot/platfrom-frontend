@@ -5,6 +5,7 @@
   justify-content: center;
   padding: 2rem;
   text-align: center;
+  min-height: 200px;
   
   &.fullscreen {
     position: fixed;
@@ -12,9 +13,10 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(4px);
+    background: var(--student-bg-primary);
+    backdrop-filter: blur(8px);
     z-index: 9999;
+    min-height: 100vh;
   }
 }
 
@@ -23,88 +25,222 @@
   display: inline-block;
   
   &.small {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
   
   &.medium {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
   }
   
   &.large {
-    width: 60px;
-    height: 60px;
+    width: 64px;
+    height: 64px;
   }
   
-  .spinner-ring {
+  // Modern pulse animation
+  &::before {
+    content: '';
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     border-radius: 50%;
-    border: 3px solid transparent;
-    animation: spin 1.2s linear infinite;
-    
-    &:nth-child(1) {
-      width: 100%;
-      height: 100%;
-      border-top-color: var(--student-primary, #007bff);
-      animation-delay: 0s;
-    }
-    
-    &:nth-child(2) {
-      width: 80%;
-      height: 80%;
-      top: 10%;
-      left: 10%;
-      border-right-color: var(--student-primary, #007bff);
-      animation-delay: 0.2s;
-    }
-    
-    &:nth-child(3) {
-      width: 60%;
-      height: 60%;
-      top: 20%;
-      left: 20%;
-      border-bottom-color: var(--student-primary, #007bff);
-      animation-delay: 0.4s;
-    }
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--student-primary) 90deg,
+      transparent 180deg,
+      transparent 360deg
+    );
+    animation: spin 1.5s linear infinite;
   }
   
-  &.primary .spinner-ring {
-    border-top-color: var(--student-primary, #007bff);
-    border-right-color: var(--student-primary, #007bff);
-    border-bottom-color: var(--student-primary, #007bff);
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 70%;
+    border-radius: 50%;
+    background: var(--student-bg-secondary);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
-  &.secondary .spinner-ring {
-    border-top-color: var(--student-text-secondary, #6c757d);
-    border-right-color: var(--student-text-secondary, #6c757d);
-    border-bottom-color: var(--student-text-secondary, #6c757d);
+  // Primary color variant
+  &.primary::before {
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--student-primary) 90deg,
+      transparent 180deg,
+      transparent 360deg
+    );
   }
   
-  &.white .spinner-ring {
-    border-top-color: #ffffff;
-    border-right-color: #ffffff;
-    border-bottom-color: #ffffff;
+  // Secondary color variant
+  &.secondary::before {
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--student-text-secondary) 90deg,
+      transparent 180deg,
+      transparent 360deg
+    );
+  }
+  
+  // White color variant
+  &.white::before {
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      #ffffff 90deg,
+      transparent 180deg,
+      transparent 360deg
+    );
+  }
+  
+  &.white::after {
+    background: rgba(0, 0, 0, 0.8);
+  }
+  
+  // Success color variant
+  &.success::before {
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--student-success) 90deg,
+      transparent 180deg,
+      transparent 360deg
+    );
+  }
+  
+  // Warning color variant
+  &.warning::before {
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--student-warning) 90deg,
+      transparent 180deg,
+      transparent 360deg
+    );
+  }
+  
+  // Danger color variant
+  &.danger::before {
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--student-danger) 90deg,
+      transparent 180deg,
+      transparent 360deg
+    );
   }
 }
 
 .loader-text {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   font-size: 1rem;
-  color: var(--student-text-secondary, #6c757d);
+  color: var(--student-text-secondary);
   font-weight: 500;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.025em;
+  
+  // Add subtle animation
+  animation: pulse 2s ease-in-out infinite;
 }
 
+// Modern spin animation
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% { 
+    transform: rotate(360deg); 
+  }
+}
+
+// Subtle pulse animation for text
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.7; 
+  }
 }
 
 // Dark theme support
-[data-theme="dark"] .loader-container.fullscreen {
-  background: rgba(0, 0, 0, 0.95);
+#dark .loader-container.fullscreen {
+  background: var(--student-bg-primary);
 }
 
-[data-theme="dark"] .loader-text {
-  color: var(--student-text-secondary, #adb5bd);
+#dark .loader-spinner::after {
+  background: var(--student-bg-secondary);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#dark .loader-text {
+  color: var(--student-text-secondary);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .loader-container {
+    padding: 1.5rem;
+    
+    &.fullscreen {
+      padding: 1rem;
+    }
+  }
+  
+  .loader-spinner {
+    &.large {
+      width: 56px;
+      height: 56px;
+    }
+    
+    &.medium {
+      width: 40px;
+      height: 40px;
+    }
+    
+    &.small {
+      width: 28px;
+      height: 28px;
+    }
+  }
+  
+  .loader-text {
+    font-size: 0.9rem;
+    margin-top: 1.25rem;
+  }
+}
+
+// Special loading states for specific contexts
+.loader-container {
+  &.pdf-loading {
+    .loader-text {
+      color: var(--student-primary);
+      font-weight: 600;
+    }
+  }
+  
+  &.exercise-loading {
+    .loader-text {
+      color: var(--student-accent);
+      font-weight: 600;
+    }
+  }
+  
+  &.file-loading {
+    .loader-text {
+      color: var(--student-info);
+      font-weight: 600;
+    }
+  }
 }

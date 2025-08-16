@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import ExerciseCard from '../../components/ExerciseCard/ExerciseCard';
@@ -16,6 +16,7 @@ const ExercisesList: React.FC = () => {
   const { t } = useTranslation('translation');
   const { chapterId, subjectId } = useParams<{ chapterId: string; subjectId: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -25,6 +26,9 @@ const ExercisesList: React.FC = () => {
   const [accessibleExercises, setAccessibleExercises] = useState<string[]>([]);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumExerciseId, setPremiumExerciseId] = useState<string | null>(null);
+
+  // Get exercise ID from URL search params
+  const exerciseIdFromUrl = searchParams.get('exercise');
 
   useEffect(() => {
     if (chapterId) {
@@ -66,6 +70,36 @@ const ExercisesList: React.FC = () => {
     }
   }, [chapterId]);
 
+  // Restore exercise viewer state from URL on component mount
+  useEffect(() => {
+    if (exerciseIdFromUrl && exercises.length > 0) {
+      const exercise = exercises.find(ex => ex.id === exerciseIdFromUrl);
+      
+      if (exercise) {
+        // Check if user has access to this exercise
+        const exerciseIndex = exercises.findIndex(ex => ex.id === exercise.id);
+        const hasAccess = accessibleExercises.includes(exercise.id) || exerciseIndex === 0;
+        
+        if (hasAccess) {
+          setSelectedExercise(exercise);
+        } else {
+          // If no access, clear the exercise param from URL
+          const newSearchParams = new URLSearchParams(searchParams);
+          newSearchParams.delete('exercise');
+          setSearchParams(newSearchParams);
+        }
+      } else {
+        // Exercise not found, clear the exercise param from URL
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.delete('exercise');
+        setSearchParams(newSearchParams);
+      }
+    } else if (!exerciseIdFromUrl && selectedExercise) {
+      // If URL doesn't have exercise param but we have selected exercise, clear it
+      setSelectedExercise(null);
+    }
+  }, [exerciseIdFromUrl, exercises, accessibleExercises, searchParams, setSearchParams, selectedExercise]);
+
   const handleExerciseClick = async (exercise: Exercise) => {
     // Check if user has access to this exercise (including temporary fix for first exercise)
     const exerciseIndex = exercises.findIndex(ex => ex.id === exercise.id);
@@ -76,6 +110,11 @@ const ExercisesList: React.FC = () => {
       setShowPremiumModal(true);
       return;
     }
+    
+    // Update URL with exercise ID using search parameters
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('exercise', exercise.id);
+    setSearchParams(newSearchParams);
     
     setSelectedExercise(exercise);
   };
@@ -92,6 +131,10 @@ const ExercisesList: React.FC = () => {
 
   const handleCloseViewer = () => {
     setSelectedExercise(null);
+    // Clear exercise ID from URL search parameters
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete('exercise');
+    setSearchParams(newSearchParams);
   };
 
   const handleBackToChapters = () => {
@@ -110,7 +153,13 @@ const ExercisesList: React.FC = () => {
   if (loading) {
     return (
       <div className="exercises-list-container">
-        <Loader fullScreen />
+        <Loader 
+          size="large" 
+          color="primary" 
+          text="Loading exercises..." 
+          context="exercise"
+          fullScreen={true}
+        />
       </div>
     );
   }
@@ -158,7 +207,7 @@ const ExercisesList: React.FC = () => {
             </button>
             
             <div className="header-content">
-              <h1>{chapterTitle} - {t('exercises.title')}</h1>
+              <h1>{chapterTitle}</h1>
               <p>{t('exercises.subtitle')}</p>
             </div>
           </div>

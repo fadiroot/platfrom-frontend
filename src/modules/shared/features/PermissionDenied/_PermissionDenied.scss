@@ -1,0 +1,142 @@
+@use '../../assets/styles/base';
+@use '../../assets/styles/abstracts' as *;
+
+.permission-denied {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--main-bg);
+  color: var(--text-primary);
+  padding: 20px;
+  
+  &__container {
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    background: var(--content-bg);
+    border-radius: 12px;
+    padding: 40px 30px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border-color);
+  }
+  
+  &__icon {
+    margin-bottom: 24px;
+    color: $danger;
+    
+    svg {
+      filter: drop-shadow(0 2px 4px rgba(244, 67, 54, 0.2));
+    }
+  }
+  
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  &__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+  }
+  
+  &__message {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  &__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  
+  &__btn {
+    min-width: 140px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Dark theme adjustments
+#dark {
+  .permission-denied {
+    &__container {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    }
+    
+    &__icon {
+      svg {
+        filter: drop-shadow(0 2px 4px rgba(244, 67, 54, 0.4));
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .permission-denied {
+    padding: 16px;
+    
+    &__container {
+      padding: 32px 24px;
+    }
+    
+    &__title {
+      font-size: 24px;
+    }
+    
+    &__message {
+      font-size: 15px;
+    }
+    
+    &__actions {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    &__btn {
+      width: 100%;
+      max-width: 200px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .permission-denied {
+    &__container {
+      padding: 24px 20px;
+    }
+    
+    &__title {
+      font-size: 22px;
+    }
+    
+    &__icon {
+      svg {
+        width: 64px;
+        height: 64px;
+      }
+    }
+  }
+}

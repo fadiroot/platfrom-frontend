@@ -168,5 +168,24 @@
     "cancel": "Cancel",
     "contactAdmin": "Contact Administrator",
     "contactInfo": "Please contact your administrator to activate your account. You can reach them at admin@example.com or call +1234567890."
+  },
+  "permissionDenied": {
+    "title": "Access Denied",
+    "message": "You do not have permission to access this page. This area is restricted to administrators only.",
+    "goBack": "Go Back",
+    "goToSubjects": "Go to Subjects"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+    "suggestions": {
+      "title": "What you can do:",
+      "checkUrl": "Check the URL for any typing errors",
+      "goBack": "Go back to the previous page",
+      "explore": "Explore our learning materials"
+    },
+    "goBack": "Go Back",
+    "goToSubjects": "Go to Subjects",
+    "explore": "Explore Subjects"
   }
 }
