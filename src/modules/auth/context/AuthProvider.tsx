@@ -39,7 +39,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // If we're on a magic link page, don't initialize auth automatically
     if (isMagicLinkPage()) {
-      console.log('🔗 Magic link detected, skipping automatic auth initialization')
       // Set initialized to true but don't authenticate
       dispatch({
         type: 'auth/initialise',

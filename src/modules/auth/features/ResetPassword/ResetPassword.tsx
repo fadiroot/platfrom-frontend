@@ -40,8 +40,10 @@ const ResetPasswordComponent = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isRecoveryMode, setIsRecoveryMode] = useState(false)
   const [isDirectLoginMode, setIsDirectLoginMode] = useState(false)
+  const [isAuthenticatedUserMode, setIsAuthenticatedUserMode] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
   const [userEmail, setUserEmail] = useState<string | null>(null)
   
   const { resetPasswordStatus, resetPasswordMessage } = useAppSelector((state) => state.auth)
@@ -52,45 +54,42 @@ const ResetPasswordComponent = () => {
   const tokenHash = searchParams.get('token_hash') || new URLSearchParams(window.location.hash.substring(1)).get('token_hash')
   const type = searchParams.get('type') || new URLSearchParams(window.location.hash.substring(1)).get('type')
   
+  // Check for error parameters in URL hash
+  const hashParams = new URLSearchParams(window.location.hash.substring(1))
+  const errorCode = hashParams.get('error_code')
+  const errorDescription = hashParams.get('error_description')
+  
   useEffect(() => {
-    console.log('ResetPassword component mounted')
-    console.log('URL search params:', searchParams.toString())
-    console.log('URL hash:', window.location.hash)
-    console.log('Access token:', accessToken)
-    console.log('Refresh token:', refreshToken)
-    console.log('Token hash:', tokenHash)
-    console.log('Type:', type)
-    
     // Clear any previous reset password state when component mounts
     dispatch(clearResetPasswordState())
+    setError(null)
+    setSuccess(null)
+    
+    // Check for error parameters first
+    if (errorCode) {
+      let errorMessage = 'Invalid reset link. Please request a new password reset.'
+      
+      if (errorCode === 'otp_expired') {
+        errorMessage = 'The password reset link has expired. Please request a new password reset.'
+      } else if (errorCode === 'access_denied') {
+        errorMessage = 'Access denied. The reset link is invalid or has expired.'
+      } else if (errorDescription) {
+        errorMessage = decodeURIComponent(errorDescription)
+      }
+      
+      setError(errorMessage)
+      setSuccess(null)
+      setLoading(false)
+      return
+    }
     
     const checkRecoveryMode = async () => {
       try {
         // Add a small delay to ensure URL parameters are processed
         await new Promise(resolve => setTimeout(resolve, 100))
         
-        // First, try to get the current session
-        const session = await getCurrentSession()
-        console.log('Current session:', session)
-        
-        // If user is already authenticated (not in recovery mode), redirect them
-        if (session?.user?.aud === 'authenticated') {
-          console.log('✅ User is already authenticated, redirecting to subjects')
-          navigate('/subjects')
-          return
-        }
-        
-        if (session?.user?.aud === 'recovery') {
-          console.log('✅ User is in recovery mode, allowing password reset')
-          setIsRecoveryMode(true)
-          setUserEmail(session.user.email)
-          setLoading(false)
-          return
-        }
-        
-        // If we have token_hash and type=recovery, this is a recovery link
+        // First, check if we have reset password parameters - these take priority
         if (tokenHash && type === 'recovery') {
-          console.log('🔗 Processing recovery token hash')
           try {
             const { data, error } = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
@@ -98,22 +97,21 @@ const ResetPasswordComponent = () => {
             })
             
             if (error) {
-              console.error('❌ Recovery token verification failed:', error)
               setError('Invalid or expired recovery link. Please request a new password reset.')
+              setSuccess(null)
               setLoading(false)
               return
             }
             
             if (data.user) {
-              console.log('✅ Recovery token verified, user in recovery mode')
               setIsRecoveryMode(true)
               setUserEmail(data.user.email)
               setLoading(false)
               return
             }
           } catch (verifyError) {
-            console.error('❌ Error verifying recovery token:', verifyError)
             setError('Invalid recovery link. Please request a new password reset.')
+            setSuccess(null)
             setLoading(false)
             return
           }
@@ -121,7 +119,6 @@ const ResetPasswordComponent = () => {
         
         // If we have access_token and refresh_token, try to set the session
         if (accessToken && refreshToken) {
-          console.log('🔗 Setting session with access and refresh tokens')
           try {
             const { data, error } = await supabase.auth.setSession({
               access_token: accessToken,
@@ -129,74 +126,104 @@ const ResetPasswordComponent = () => {
             })
             
             if (error) {
-              console.error('❌ Failed to set session:', error)
               setError('Invalid reset link. Please request a new password reset.')
+              setSuccess(null)
               setLoading(false)
               return
             }
             
             if (data.session?.user?.aud === 'recovery') {
-              console.log('✅ Session set successfully, user in recovery mode')
               setIsRecoveryMode(true)
               setUserEmail(data.session.user.email)
               setLoading(false)
               return
             } else if (data.session?.user?.aud === 'authenticated') {
-              console.log('✅ User is authenticated, redirecting to subjects')
               navigate('/subjects')
               return
             } else {
-              console.log('❌ User not in recovery mode after setting session')
               setError('Invalid reset link. Please request a new password reset.')
+              setSuccess(null)
               setLoading(false)
               return
             }
           } catch (sessionError) {
-            console.error('❌ Error setting session:', sessionError)
             setError('Invalid reset link. Please request a new password reset.')
+            setSuccess(null)
+            setLoading(false)
+            return
+          }
+        }
+        
+        // Only check existing session if we don't have reset password parameters
+        if (!tokenHash && !accessToken && !refreshToken) {
+          // First, try to get the current session
+          const session = await getCurrentSession()
+          
+          // If user is already authenticated (not in recovery mode), allow them to change password
+          if (session?.user?.aud === 'authenticated') {
+            setIsAuthenticatedUserMode(true)
+            setUserEmail(session.user.email)
+            setLoading(false)
+            return
+          }
+          
+          if (session?.user?.aud === 'recovery') {
+            setIsRecoveryMode(true)
+            setUserEmail(session.user.email)
             setLoading(false)
             return
           }
         }
         
         // If we reach here, no valid recovery parameters found
-        console.log('❌ No valid recovery parameters found')
         setError('Invalid reset link. Please request a new password reset.')
+        setSuccess(null)
         setLoading(false)
         
       } catch (err) {
-        console.error('❌ Error in recovery mode check:', err)
         setError('An error occurred while processing the reset link.')
+        setSuccess(null)
         setLoading(false)
       }
     }
     
     checkRecoveryMode()
-  }, [accessToken, refreshToken, tokenHash, type, dispatch, navigate])
+  }, [accessToken, refreshToken, tokenHash, type, errorCode, errorDescription, dispatch, navigate])
   
   useEffect(() => {
     if (resetPasswordStatus === 'succeeded') {
       // Show success message and offer direct login option
-      setIsDirectLoginMode(true)
+      if (isRecoveryMode) {
+        setIsDirectLoginMode(true)
+      } else if (isAuthenticatedUserMode) {
+        // For authenticated users, show success and redirect to dashboard
+        setError(null) // Clear any existing error
+        setSuccess('Password updated successfully! Redirecting to dashboard...')
+        setTimeout(() => {
+          navigate('/subjects')
+        }, 2000)
+      }
     }
-  }, [resetPasswordStatus])
+  }, [resetPasswordStatus, isRecoveryMode, isAuthenticatedUserMode, navigate])
 
   const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: (values) => {
-      console.log('Form submitted with values:', { password: '***', confirmPassword: '***' })
       
       if (isRecoveryMode) {
-        console.log('Dispatching resetUserPassword...')
         dispatch(resetUserPassword({
           password: values.password,
           accessToken,
           refreshToken
         }))
+      } else if (isAuthenticatedUserMode) {
+        dispatch(resetUserPassword({
+          password: values.password
+        }))
       } else {
-        console.error('No recovery mode available for password reset')
         setError('Unable to reset password. Please request a new reset link.')
+        setSuccess(null)
       }
     },
   })
@@ -214,6 +241,7 @@ const ResetPasswordComponent = () => {
   const handleDirectLogin = async () => {
     if (!userEmail) {
       setError('No email available for direct login')
+      setSuccess(null)
       return
     }
 
@@ -223,15 +251,12 @@ const ResetPasswordComponent = () => {
       const session = await getCurrentSession()
       
       if (session?.user?.aud === 'authenticated') {
-        console.log('✅ Direct login successful, redirecting to subjects')
         navigate('/subjects')
       } else {
         // If no valid session, redirect to login
-        console.log('❌ No valid session for direct login, redirecting to login')
         navigate(PATH.LOGIN)
       }
     } catch (error) {
-      console.error('❌ Error during direct login:', error)
       navigate(PATH.LOGIN)
     }
   }
@@ -256,6 +281,9 @@ const ResetPasswordComponent = () => {
   }
 
   if (error) {
+    // Check if this is the "already authenticated" case
+    const isAlreadyAuthenticated = error.includes('already logged in')
+    
     return (
       <div className="reset-password-module">
         <div className="language-selector-container">
@@ -276,15 +304,106 @@ const ResetPasswordComponent = () => {
           </button>
           
           <div className="error-container">
-            <h1 className="title">{t('auth.resetPassword.errorTitle', 'Invalid Reset Link')}</h1>
+            <h1 className="title">
+              {isAlreadyAuthenticated 
+                ? t('auth.resetPassword.alreadyLoggedIn', 'Already Logged In') 
+                : t('auth.resetPassword.errorTitle', 'Invalid Reset Link')
+              }
+            </h1>
             <p className="error-message">{error}</p>
-            <button 
-              type="button" 
-              className="submit-button"
-              onClick={handleRequestNewReset}
-            >
-              {t('auth.resetPassword.requestNewReset', 'Request New Reset Link')}
-            </button>
+            
+            {isAlreadyAuthenticated ? (
+              <div className="action-buttons">
+                <button 
+                  type="button" 
+                  className="submit-button"
+                  onClick={() => {
+                    setError(null)
+                    setLoading(true)
+                    // Allow them to proceed with password reset as authenticated user
+                    setIsAuthenticatedUserMode(true)
+                    setUserEmail('fadiromdhan2@gmail.com') // You might want to get this from session
+                    setLoading(false)
+                  }}
+                >
+                  {t('auth.resetPassword.setNewPassword', 'Set New Password')}
+                </button>
+                
+                <button 
+                  type="button" 
+                  className="secondary-button"
+                  onClick={() => navigate('/subjects')}
+                >
+                  {t('auth.resetPassword.goToDashboard', 'Go to Dashboard')}
+                </button>
+                
+                <button 
+                  type="button" 
+                  className="secondary-button"
+                  onClick={() => navigate('/login')}
+                >
+                  {t('auth.resetPassword.goToLogin', 'Go to Login')}
+                </button>
+              </div>
+            ) : (
+              <button 
+                type="button" 
+                className="submit-button"
+                onClick={handleRequestNewReset}
+              >
+                {t('auth.resetPassword.requestNewReset', 'Request New Reset Link')}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (success) {
+    return (
+      <div className="reset-password-module">
+        <div className="language-selector-container">
+          <LanguageSelector />
+        </div>
+        <div className="reset-password-card-container">
+          <div className="logo-container">
+            <img src={logoImg} alt="Platform Logo" className="logo-image" />
+          </div>
+          
+          <button 
+            type="button" 
+            className="back-link"
+            onClick={handleBackToLogin}
+          >
+            <ArrowLeft size={16} />
+            {t('auth.resetPassword.backToLogin', 'Back to Login')}
+          </button>
+          
+          <div className="success-container">
+            <h1 className="title">{t('auth.resetPassword.successTitle', 'Password Updated!')}</h1>
+            <p className="success-message">
+              {success}
+            </p>
+            
+            <div className="action-buttons">
+              <button 
+                type="button" 
+                className="submit-button direct-login-button"
+                onClick={handleDirectLogin}
+              >
+                <LogIn size={18} />
+                {t('auth.resetPassword.directLogin', 'Login Now')}
+              </button>
+              
+              <button 
+                type="button" 
+                className="secondary-button"
+                onClick={handleBackToLogin}
+              >
+                {t('auth.resetPassword.goToLogin', 'Go to Login Page')}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -360,9 +479,17 @@ const ResetPasswordComponent = () => {
           {t('auth.resetPassword.backToLogin', 'Back to Login')}
         </button>
         
-        <h1 className="title">{t('auth.resetPassword.title', 'Reset Password')}</h1>
+        <h1 className="title">
+          {isAuthenticatedUserMode 
+            ? t('auth.resetPassword.changePassword', 'Change Password') 
+            : t('auth.resetPassword.title', 'Reset Password')
+          }
+        </h1>
         <p className="subtitle">
-          {t('auth.resetPassword.subtitle', 'Enter your new password below.')}
+          {isAuthenticatedUserMode 
+            ? t('auth.resetPassword.changePasswordSubtitle', 'Enter your new password below.') 
+            : t('auth.resetPassword.subtitle', 'Enter your new password below.')
+          }
         </p>
 
         {userEmail && (
@@ -444,10 +571,15 @@ const ResetPasswordComponent = () => {
             {resetPasswordStatus === 'loading' ? (
               <>
                 <Loader2 size={18} className="spinner" />
-                {t('auth.resetPassword.updating', 'Updating...')}
+                {isAuthenticatedUserMode 
+                  ? t('auth.resetPassword.updating', 'Updating...') 
+                  : t('auth.resetPassword.updating', 'Updating...')
+                }
               </>
             ) : (
-              t('auth.resetPassword.submit', 'Update Password')
+              isAuthenticatedUserMode 
+                ? t('auth.resetPassword.changePassword', 'Change Password') 
+                : t('auth.resetPassword.submit', 'Update Password')
             )}
           </button>
         </form>

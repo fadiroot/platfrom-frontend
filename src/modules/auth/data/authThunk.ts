@@ -50,11 +50,9 @@ export const login = createAsyncThunk(
 
       // Check if user needs student profile created (for users who registered but needed email verification)
       if (!userWithLevel.levelId && user.user_metadata?.levelId) {
-        console.log('🔄 Creating missing student profile for verified user')
         const profileResult = await ensureStudentProfile(user.id, user.user_metadata.levelId)
         
         if (!profileResult.error) {
-          console.log('✅ Student profile created successfully on login')
           // Fetch updated user with level after profile creation
           const updatedUserWithLevel = await getUserWithLevel(user)
           return {
@@ -167,7 +165,6 @@ export const initializeAuth = createAsyncThunk(
     try {
       // Don't initialize auth if we're on a magic link page
       if (isMagicLinkPage()) {
-        console.log('🔗 Magic link page detected, skipping auth initialization')
         return {
           isAuthenticated: false,
           user: null
@@ -186,7 +183,6 @@ export const initializeAuth = createAsyncThunk(
       // Check if user is in recovery mode (password reset)
       const session = await getCurrentSession()
       if (session?.user?.aud === 'recovery') {
-        console.log('User is in recovery mode during auth initialization, not authenticating')
         return {
           isAuthenticated: false,
           user: null
@@ -219,11 +215,8 @@ export const initializeAuth = createAsyncThunk(
 // Auth state change listener (call this in your app initialization)
 export const setupAuthListener = (dispatch: any) => {
   return onAuthStateChange(async (event, session) => {
-    console.log('Auth state change:', event, session?.user?.aud)
-    
     // Don't handle auth state changes on magic link pages
     if (isMagicLinkPage()) {
-      console.log('🔗 Magic link page detected, skipping auth state change handling')
       return
     }
     
@@ -236,7 +229,6 @@ export const setupAuthListener = (dispatch: any) => {
     } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
       // Check if user is in recovery mode (password reset)
       if (session?.user?.aud === 'recovery') {
-        console.log('User is in recovery mode, not initializing auth')
         // Don't initialize auth for recovery mode - let the reset password component handle it
         return
       }
@@ -283,7 +275,15 @@ export const resetUserPassword = createAsyncThunk(
         
         // Don't sign out the user - keep the session for direct login
         // The session will automatically become 'authenticated' after password update
-        console.log('✅ Password updated successfully, maintaining session for direct login')
+        
+        return { success: true }
+      } else if (session?.user?.aud === 'authenticated') {
+        // User is authenticated and wants to change their password
+        const { error } = await updatePassword(payload.password)
+        
+        if (error) {
+          throw new Error(error.message)
+        }
         
         return { success: true }
       } else if (payload.accessToken) {
@@ -296,7 +296,7 @@ export const resetUserPassword = createAsyncThunk(
         
         return { success: true }
       } else {
-        throw new Error('No valid recovery session or access token found')
+        throw new Error('No valid recovery session, authenticated session, or access token found')
       }
     } catch (err: any) {
       return rejectWithValue(err.message || 'Failed to reset password')

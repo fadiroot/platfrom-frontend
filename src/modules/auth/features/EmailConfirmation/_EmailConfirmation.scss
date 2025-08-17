@@ -142,6 +142,15 @@
           
           &.direct-login-button {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            
+            svg {
+              stroke: white;
+              stroke-width: 2px;
+            }
             
             &:hover {
               background: linear-gradient(135deg, #059669 0%, #047857 100%);

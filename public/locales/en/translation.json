@@ -124,10 +124,13 @@
     "emailConfirmation": {
       "confirming": "Confirming your email...",
       "backToLogin": "Back to Login",
-      "successTitle": "Email Confirmed!",
+      "successTitle": "Account Confirmed!",
       "errorTitle": "Confirmation Failed",
-      "successMessage": "Your email has been successfully confirmed. You will be redirected shortly...",
-      "errorMessage": "There was an error confirming your email. Please try again or contact support."
+      "successMessage": "Your account has been confirmed successfully! You can now log in to your account.",
+      "errorMessage": "There was an error confirming your email. Please try again or contact support.",
+      "directLogin": "Login Now",
+      "goToLogin": "Go to Login Page",
+      "resendConfirmation": "Resend Confirmation"
     },
     "emailVerificationModal": {
       "title": "Email Verification Required",

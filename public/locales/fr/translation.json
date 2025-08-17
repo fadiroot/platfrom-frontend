@@ -106,10 +106,13 @@
     "emailConfirmation": {
       "confirming": "Confirmation de votre email...",
       "backToLogin": "Retour à la Connexion",
-      "successTitle": "Email Confirmé !",
+      "successTitle": "Compte Confirmé !",
       "errorTitle": "Échec de la Confirmation",
-      "successMessage": "Votre email a été confirmé avec succès. Vous allez être redirigé dans quelques instants...",
-      "errorMessage": "Une erreur s'est produite lors de la confirmation de votre email. Veuillez réessayer ou contacter le support."
+      "successMessage": "Votre compte a été confirmé avec succès ! Vous pouvez maintenant vous connecter à votre compte.",
+      "errorMessage": "Une erreur s'est produite lors de la confirmation de votre email. Veuillez réessayer ou contacter le support.",
+      "directLogin": "Se Connecter Maintenant",
+      "goToLogin": "Aller à la Page de Connexion",
+      "resendConfirmation": "Renvoyer la Confirmation"
     },
     "emailVerificationModal": {
       "title": "Vérification d'Email Requise",

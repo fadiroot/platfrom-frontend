@@ -33,28 +33,21 @@ const EmailConfirmationComponent = () => {
   const next = searchParams.get('next') || new URLSearchParams(window.location.hash.substring(1)).get('next') || '/subjects'
   
   useEffect(() => {
-    console.log('EmailConfirmation component mounted')
-    console.log('URL search params:', searchParams.toString())
-    console.log('URL hash:', window.location.hash)
-    console.log('Token hash:', tokenHash)
-    console.log('Type:', type)
-    console.log('Access token:', accessToken)
-    console.log('Refresh token:', refreshToken)
-    console.log('Next:', next)
-    
     const confirmEmail = async () => {
       try {
         // First, check if user is already authenticated
         const { data: { session } } = await supabase.auth.getSession()
         if (session?.user?.aud === 'authenticated') {
-          console.log('✅ User is already authenticated, redirecting to subjects')
-          navigate('/subjects')
+          setUserEmail(session.user.email)
+          setStatus('success')
+          setMessage(t('auth.emailConfirmation.successMessage', 'Your account has been confirmed successfully! You can now log in to your account.'))
+          setIsDirectLoginMode(true)
+          setLoading(false)
           return
         }
         
         // If we have access_token and refresh_token, this might be a signup confirmation
         if (accessToken && refreshToken) {
-          console.log('🔗 Setting session with access and refresh tokens')
           try {
             const { data, error } = await supabase.auth.setSession({
               access_token: accessToken,
@@ -62,7 +55,6 @@ const EmailConfirmationComponent = () => {
             })
             
             if (error) {
-              console.error('❌ Failed to set session:', error)
               setStatus('error')
               setMessage('Invalid confirmation link. Please try again.')
               setLoading(false)
@@ -70,16 +62,14 @@ const EmailConfirmationComponent = () => {
             }
             
             if (data.session?.user) {
-              console.log('✅ Session set successfully, email confirmed')
               setUserEmail(data.session.user.email)
               setStatus('success')
-              setMessage(t('auth.emailConfirmation.successMessage', 'Your email has been confirmed successfully! You can now log in to your account.'))
+              setMessage(t('auth.emailConfirmation.successMessage', 'Your account has been confirmed successfully! You can now log in to your account.'))
               setIsDirectLoginMode(true)
               setLoading(false)
               return
             }
           } catch (sessionError) {
-            console.error('❌ Error setting session:', sessionError)
             setStatus('error')
             setMessage('Invalid confirmation link. Please try again.')
             setLoading(false)
@@ -89,7 +79,6 @@ const EmailConfirmationComponent = () => {
         
         // If we have token_hash and type=email, this is an email confirmation
         if (tokenHash && type === 'email') {
-          console.log('🔗 Processing email confirmation token hash')
           try {
             const { data, error } = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
@@ -97,7 +86,6 @@ const EmailConfirmationComponent = () => {
             })
             
             if (error) {
-              console.error('❌ Email confirmation error:', error)
               setStatus('error')
               setMessage(error.message || t('auth.emailConfirmation.errorMessage', 'Email confirmation failed. Please try again.'))
               setLoading(false)
@@ -105,16 +93,14 @@ const EmailConfirmationComponent = () => {
             }
             
             if (data.user) {
-              console.log('✅ Email confirmed successfully')
               setUserEmail(data.user.email)
               setStatus('success')
-              setMessage(t('auth.emailConfirmation.successMessage', 'Your email has been confirmed successfully! You can now log in to your account.'))
+              setMessage(t('auth.emailConfirmation.successMessage', 'Your account has been confirmed successfully! You can now log in to your account.'))
               setIsDirectLoginMode(true)
               setLoading(false)
               return
             }
           } catch (verifyError) {
-            console.error('❌ Error verifying email confirmation:', verifyError)
             setStatus('error')
             setMessage(t('auth.emailConfirmation.errorMessage', 'Email confirmation failed. Please try again.'))
             setLoading(false)
@@ -123,13 +109,11 @@ const EmailConfirmationComponent = () => {
         }
         
         // If we reach here, no valid confirmation parameters found
-        console.log('❌ No valid confirmation parameters found')
         setStatus('error')
         setMessage('Invalid confirmation link. Please check your email for the correct link.')
         setLoading(false)
         
       } catch (err) {
-        console.error('❌ Error in email confirmation:', err)
         setStatus('error')
         setMessage(t('auth.emailConfirmation.errorMessage', 'Email confirmation failed. Please try again.'))
         setLoading(false)
@@ -154,15 +138,12 @@ const EmailConfirmationComponent = () => {
       const { data: { session } } = await supabase.auth.getSession()
       
       if (session?.user?.aud === 'authenticated') {
-        console.log('✅ Direct login successful, redirecting to subjects')
         navigate('/subjects')
       } else {
         // If no valid session, redirect to login
-        console.log('❌ No valid session for direct login, redirecting to login')
         navigate(PATH.LOGIN)
       }
     } catch (error) {
-      console.error('❌ Error during direct login:', error)
       navigate(PATH.LOGIN)
     }
   }
@@ -209,7 +190,7 @@ const EmailConfirmationComponent = () => {
           {status === 'success' ? (
             <>
               <CheckCircle size={48} className="success-icon" />
-              <h1 className="title">{t('auth.emailConfirmation.successTitle', 'Email Confirmed!')}</h1>
+              <h1 className="title">{t('auth.emailConfirmation.successTitle', 'Account Confirmed!')}</h1>
               <p className="message">{message}</p>
               
               {userEmail && (
@@ -220,23 +201,14 @@ const EmailConfirmationComponent = () => {
               
               <div className="action-buttons">
                 {isDirectLoginMode ? (
-                  <>
-                    <button 
-                      type="button" 
-                      className="submit-button direct-login-button"
-                      onClick={handleDirectLogin}
-                    >
-                      <LogIn size={18} />
-                      {t('auth.emailConfirmation.directLogin', 'Login Now')}
-                    </button>
-                    <button 
-                      type="button" 
-                      className="secondary-button"
-                      onClick={handleBackToLogin}
-                    >
-                      {t('auth.emailConfirmation.goToLogin', 'Go to Login Page')}
-                    </button>
-                  </>
+                  <button 
+                    type="button" 
+                    className="submit-button direct-login-button"
+                    onClick={handleDirectLogin}
+                  >
+                    <LogIn size={18} />
+                    {t('auth.emailConfirmation.directLogin', 'Login Now')}
+                  </button>
                 ) : (
                   <button 
                     type="button" 

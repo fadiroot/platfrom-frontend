@@ -6,7 +6,7 @@ import newLogo from '/logo/astuceLogo.png'
 
 const App = () => {
   // get translation.json file from public/locales
-  const { i18n } = useTranslation('translation')
+  const { i18n  } = useTranslation('translation')
 
   // Always keep LTR direction, but apply Arabic fonts when Arabic is selected
   document.body.dir = 'ltr'
