@@ -24,7 +24,7 @@ const App = () => {
   return (
     <div id={theme}>
       <Helmet>
-        <title>Welcome - GoMyDesk</title>
+        <title>Welcome - Astuce</title>
         <link rel="icon" type="image/png" href={newLogo} />
       </Helmet>
 
