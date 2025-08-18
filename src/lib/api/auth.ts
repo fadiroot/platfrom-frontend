@@ -100,7 +100,7 @@ export const signUp = async (registerData: RegisterData): Promise<AuthResponse> 
 
 
     // Create student profile with retry logic
-    const profileResult = await ensureStudentProfile(data.user.id, levelId, formattedPhone)
+    const profileResult = await ensureStudentProfile(data.user.id, levelId)
     
     if (profileResult.error) {
       console.error('❌ Failed to create student profile after all attempts:', profileResult.error)
@@ -290,7 +290,7 @@ export const getUserWithLevel = async (user: User): Promise<UserProfile & { leve
 }
 
 // Create student profile (separate function for delayed creation)
-export const createStudentProfile = async (userId: string, levelId: string, phoneNumber?: string | null): Promise<{ error: any; data?: any }> => {
+export const createStudentProfile = async (userId: string, levelId: string): Promise<{ error: any; data?: any }> => {
   try {
     console.log('🔄 Creating student profile for user:', userId, 'level:', levelId)
     
@@ -299,7 +299,7 @@ export const createStudentProfile = async (userId: string, levelId: string, phon
       .insert({
         user_id: userId,
         level_id: levelId, // Keep as UUID string, don't convert to integer
-        phone_number: phoneNumber, // Store phone number in student_profile
+
         is_active: false // Explicitly set to false - student accounts are deactivated by default
       })
       .select()
@@ -319,7 +319,7 @@ export const createStudentProfile = async (userId: string, levelId: string, phon
 }
 
 // Ensure student profile exists (with retry logic)
-export const ensureStudentProfile = async (userId: string, levelId: string, phoneNumber?: string | null): Promise<{ error: any; data?: any }> => {
+export const ensureStudentProfile = async (userId: string, levelId: string): Promise<{ error: any; data?: any }> => {
   try {
     console.log('🔍 Checking if student profile exists for user:', userId)
     
@@ -345,7 +345,7 @@ export const ensureStudentProfile = async (userId: string, levelId: string, phon
       attempts++
       console.log(`🔄 Attempt ${attempts}/${maxAttempts} to create student profile`)
       
-      const result = await createStudentProfile(userId, levelId, phoneNumber)
+      const result = await createStudentProfile(userId, levelId)
       
       if (!result.error) {
         return result
@@ -431,7 +431,7 @@ export const manuallyCreateStudentProfile = async (levelId: string): Promise<{ e
     }
     
     console.log('🔧 Manually creating student profile for current user')
-    return await ensureStudentProfile(user.id, levelId, user.user_metadata?.phone)
+    return await ensureStudentProfile(user.id, levelId)
   } catch (error) {
     console.error('❌ Manual profile creation failed:', error)
     return { error }

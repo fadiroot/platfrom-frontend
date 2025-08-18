@@ -50,7 +50,7 @@ export const login = createAsyncThunk(
 
       // Check if user needs student profile created (for users who registered but needed email verification)
       if (!userWithLevel.levelId && user.user_metadata?.levelId) {
-        const profileResult = await ensureStudentProfile(user.id, user.user_metadata.levelId, user.user_metadata?.phone)
+        const profileResult = await ensureStudentProfile(user.id, user.user_metadata.levelId)
         
         if (!profileResult.error) {
           // Fetch updated user with level after profile creation
