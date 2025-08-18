@@ -79,7 +79,7 @@ const RegisterComponent = () => {
       // Map form values to API DTO
       const payload = {
         email: values.email,
-        phoneNumber: values.phoneNumber,
+        phone: values.phoneNumber,
         username: values.username,
         password: values.password,
         confirmPassword: values.confirmPassword,

@@ -64,6 +64,9 @@ export const signUp = async (registerData: RegisterData): Promise<AuthResponse> 
   }
 
   try {
+    // Ensure phone number is properly formatted
+    const formattedPhone = phone ? phone.trim() : null
+    
     // Create user with Supabase Auth first
     const { data, error } = await supabase.auth.signUp({
       email: authData.email,
@@ -73,7 +76,7 @@ export const signUp = async (registerData: RegisterData): Promise<AuthResponse> 
           first_name: firstName,
           last_name: lastName,
           username: username,
-          phone: phone,
+          phone: formattedPhone, // Use formatted phone number
           age: age,
           birth_date: birthDate,
           levelId: levelId // Store levelId in metadata for later profile creation
@@ -94,8 +97,10 @@ export const signUp = async (registerData: RegisterData): Promise<AuthResponse> 
       }
     }
 
+
+
     // Create student profile with retry logic
-    const profileResult = await ensureStudentProfile(data.user.id, levelId)
+    const profileResult = await ensureStudentProfile(data.user.id, levelId, formattedPhone)
     
     if (profileResult.error) {
       console.error('❌ Failed to create student profile after all attempts:', profileResult.error)
@@ -214,6 +219,8 @@ export const updatePassword = async (newPassword: string): Promise<{ error: Auth
 export const getUserProfile = async (user: User): Promise<UserProfile> => {
   const metadata = user.user_metadata || {}
   
+
+  
   return {
     id: user.id,
     email: user.email || '',
@@ -283,7 +290,7 @@ export const getUserWithLevel = async (user: User): Promise<UserProfile & { leve
 }
 
 // Create student profile (separate function for delayed creation)
-export const createStudentProfile = async (userId: string, levelId: string): Promise<{ error: any; data?: any }> => {
+export const createStudentProfile = async (userId: string, levelId: string, phoneNumber?: string | null): Promise<{ error: any; data?: any }> => {
   try {
     console.log('🔄 Creating student profile for user:', userId, 'level:', levelId)
     
@@ -292,6 +299,7 @@ export const createStudentProfile = async (userId: string, levelId: string): Pro
       .insert({
         user_id: userId,
         level_id: levelId, // Keep as UUID string, don't convert to integer
+        phone_number: phoneNumber, // Store phone number in student_profile
         is_active: false // Explicitly set to false - student accounts are deactivated by default
       })
       .select()
@@ -311,7 +319,7 @@ export const createStudentProfile = async (userId: string, levelId: string): Pro
 }
 
 // Ensure student profile exists (with retry logic)
-export const ensureStudentProfile = async (userId: string, levelId: string): Promise<{ error: any; data?: any }> => {
+export const ensureStudentProfile = async (userId: string, levelId: string, phoneNumber?: string | null): Promise<{ error: any; data?: any }> => {
   try {
     console.log('🔍 Checking if student profile exists for user:', userId)
     
@@ -337,7 +345,7 @@ export const ensureStudentProfile = async (userId: string, levelId: string): Pro
       attempts++
       console.log(`🔄 Attempt ${attempts}/${maxAttempts} to create student profile`)
       
-      const result = await createStudentProfile(userId, levelId)
+      const result = await createStudentProfile(userId, levelId, phoneNumber)
       
       if (!result.error) {
         return result
@@ -423,12 +431,14 @@ export const manuallyCreateStudentProfile = async (levelId: string): Promise<{ e
     }
     
     console.log('🔧 Manually creating student profile for current user')
-    return await ensureStudentProfile(user.id, levelId)
+    return await ensureStudentProfile(user.id, levelId, user.user_metadata?.phone)
   } catch (error) {
     console.error('❌ Manual profile creation failed:', error)
     return { error }
   }
 }
+
+
 
 // ===== Auth State Listeners =====
 
