@@ -12,7 +12,7 @@ import arFlagIcon from '../../assets/icons/Navbar/ar-flag.png'
 import { ReactComponent as ProfileIcon } from '../../assets/icons/sidebar/profile.svg'
 import { ReactComponent as SettingsIcon } from '../../assets/icons/navbar/settings.svg'
 import { ReactComponent as LogoutIcon } from '../../assets/icons/navbar/logout.svg'
-import { useAppDispatch, useSelector } from '../../store'
+import { useAppDispatch, useAppSelector } from '../../store'
 import { logout } from '../../../auth/data/authThunk'
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
@@ -31,7 +31,7 @@ const Navbar: React.FC<INavbarProps> = ({
 }) => {
   const { pathname } = useLocation()
   const dispatch = useAppDispatch()
-  const { user } = useSelector((state: RootState) => state.auth)
+  const { user } = useAppSelector((state: RootState) => state.auth)
   const { t, i18n } = useTranslation('translation')
   const [lang, setLang] = useState(i18n?.language?.toString())
 
