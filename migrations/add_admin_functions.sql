@@ -1,7 +1,9 @@
--- Comprehensive Fix for Admin Functions and Payment Amount Ambiguity
--- This script fixes both the is_admin function and the activate_student_account function
+-- Migration: Add Admin Functions
+-- This migration adds the required admin functions for student account management
 
--- Step 1: Fix is_admin function to check user_roles table
+BEGIN;
+
+-- Function: Check if current user is admin (updated version with better error handling)
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -34,9 +36,7 @@ EXCEPTION
 END;
 $$;
 
--- Step 2: Drop and recreate activate_student_account function with explicit parameter references
-DROP FUNCTION IF EXISTS public.activate_student_account(UUID, UUID, INTEGER, NUMERIC, TEXT, TEXT);
-
+-- Function: Activate student account
 CREATE OR REPLACE FUNCTION public.activate_student_account(
   student_profile_id UUID,  -- This is the user_id UUID
   admin_user_id UUID,
@@ -94,9 +94,7 @@ EXCEPTION
 END;
 $$;
 
--- Step 3: Drop and recreate deactivate_student_account function
-DROP FUNCTION IF EXISTS public.deactivate_student_account(UUID, UUID, TEXT);
-
+-- Function: Deactivate student account
 CREATE OR REPLACE FUNCTION public.deactivate_student_account(
   student_profile_id UUID,  -- This is the user_id UUID
   admin_user_id UUID,
@@ -143,60 +141,65 @@ EXCEPTION
 END;
 $$;
 
--- Step 4: Grant permissions
+-- Function: Get student profiles (for admin dashboard)
+CREATE OR REPLACE FUNCTION public.get_student_profiles()
+RETURNS TABLE (
+  id UUID,
+  user_id UUID,
+  level_id UUID,
+  is_active BOOLEAN,
+  subscription_start_date TIMESTAMP,
+  subscription_end_date TIMESTAMP,
+  payment_status VARCHAR,
+  payment_amount NUMERIC,
+  payment_method TEXT,
+  payment_notes TEXT,
+  activated_by UUID,
+  activated_at TIMESTAMP,
+  deactivated_by UUID,
+  deactivated_at TIMESTAMP,
+  deactivation_reason TEXT,
+  created_at TIMESTAMP,
+  updated_at TIMESTAMP
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  -- Check if current user is admin
+  IF NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Access denied: Admin privileges required';
+  END IF;
+  
+  -- Return all student profiles for admin users
+  RETURN QUERY
+  SELECT 
+    sp.id,
+    sp.user_id,
+    sp.level_id,
+    sp.is_active,
+    sp.subscription_start_date,
+    sp.subscription_end_date,
+    sp.payment_status,
+    sp.payment_amount,
+    sp.payment_method,
+    sp.payment_notes,
+    sp.activated_by,
+    sp.activated_at,
+    sp.deactivated_by,
+    sp.deactivated_at,
+    sp.deactivation_reason,
+    sp.created_at,
+    sp.updated_at
+  FROM public.student_profile sp
+  ORDER BY sp.created_at DESC;
+END;
+$$;
+
+-- Grant necessary permissions
 GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.activate_student_account(UUID, UUID, INTEGER, NUMERIC, TEXT, TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.deactivate_student_account(UUID, UUID, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_student_profiles() TO authenticated;
 
--- Step 5: Add current user as admin if not already
-INSERT INTO user_roles (id, user_id, role, is_active, created_at, updated_at)
-VALUES (
-  gen_random_uuid(),
-  auth.uid(),
-  'admin',
-  true,
-  NOW(),
-  NOW()
-)
-ON CONFLICT (user_id, role) 
-DO UPDATE SET 
-  is_active = true,
-  updated_at = NOW()
-WHERE user_roles.user_id = auth.uid() AND user_roles.role = 'admin';
-
--- Step 6: Test the fixes
-SELECT '=== COMPREHENSIVE ADMIN FIX COMPLETE ===' as info;
-
-SELECT 'Current user ID:' as field, auth.uid() as value
-UNION ALL
-SELECT 'User in user_roles table:' as field, 
-       CASE WHEN EXISTS(SELECT 1 FROM user_roles WHERE user_id = auth.uid()) 
-            THEN 'YES' ELSE 'NO' END as value
-UNION ALL
-SELECT 'Admin role active:' as field,
-       CASE WHEN EXISTS(SELECT 1 FROM user_roles 
-                       WHERE user_id = auth.uid() 
-                         AND role = 'admin' 
-                         AND is_active = true) 
-            THEN 'YES' ELSE 'NO' END as value
-UNION ALL
-SELECT 'is_admin() returns:' as field,
-       CASE WHEN is_admin() THEN 'TRUE' ELSE 'FALSE' END as value
-UNION ALL
-SELECT 'activate_student_account function:' as field,
-       'FIXED - No more ambiguous column reference' as value
-UNION ALL
-SELECT 'deactivate_student_account function:' as field,
-       'FIXED - Ready to use' as value;
-
--- Step 7: Show detailed user roles
-SELECT '=== USER ROLES DETAIL ===' as info;
-
-SELECT 
-  role,
-  is_active,
-  created_at,
-  updated_at
-FROM user_roles 
-WHERE user_id = auth.uid()
-ORDER BY created_at DESC;
+COMMIT;
