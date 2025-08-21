@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -21,50 +21,72 @@ const EmailConfirmationComponent = () => {
   const [message, setMessage] = useState('')
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [isDirectLoginMode, setIsDirectLoginMode] = useState(false)
-  
+
   // Add Arabic font class when Arabic language is selected
   const isArabic = i18n?.language === 'ar'
-  
+
   // Get URL parameters - check both search params and hash params
-  const tokenHash = searchParams.get('token_hash') || new URLSearchParams(window.location.hash.substring(1)).get('token_hash')
-  const type = searchParams.get('type') || new URLSearchParams(window.location.hash.substring(1)).get('type')
-  const accessToken = searchParams.get('access_token') || new URLSearchParams(window.location.hash.substring(1)).get('access_token')
-  const refreshToken = searchParams.get('refresh_token') || new URLSearchParams(window.location.hash.substring(1)).get('refresh_token')
-  const next = searchParams.get('next') || new URLSearchParams(window.location.hash.substring(1)).get('next') || '/subjects'
-  
+  const tokenHash =
+    searchParams.get('token_hash') ||
+    new URLSearchParams(window.location.hash.substring(1)).get('token_hash')
+  const type =
+    searchParams.get('type') || new URLSearchParams(window.location.hash.substring(1)).get('type')
+  const accessToken =
+    searchParams.get('access_token') ||
+    new URLSearchParams(window.location.hash.substring(1)).get('access_token')
+  const refreshToken =
+    searchParams.get('refresh_token') ||
+    new URLSearchParams(window.location.hash.substring(1)).get('refresh_token')
+  const next =
+    searchParams.get('next') ||
+    new URLSearchParams(window.location.hash.substring(1)).get('next') ||
+    '/subjects'
+
   useEffect(() => {
     const confirmEmail = async () => {
       try {
         // First, check if user is already authenticated
-        const { data: { session } } = await supabase.auth.getSession()
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
         if (session?.user?.aud === 'authenticated') {
           setUserEmail(session.user.email)
           setStatus('success')
-          setMessage(t('auth.emailConfirmation.successMessage', 'Your account has been confirmed successfully! You can now log in to your account.'))
+          setMessage(
+            t(
+              'auth.emailConfirmation.successMessage',
+              'Your account has been confirmed successfully! You can now log in to your account.'
+            )
+          )
           setIsDirectLoginMode(true)
           setLoading(false)
           return
         }
-        
+
         // If we have access_token and refresh_token, this might be a signup confirmation
         if (accessToken && refreshToken) {
           try {
             const { data, error } = await supabase.auth.setSession({
               access_token: accessToken,
-              refresh_token: refreshToken
+              refresh_token: refreshToken,
             })
-            
+
             if (error) {
               setStatus('error')
               setMessage('Invalid confirmation link. Please try again.')
               setLoading(false)
               return
             }
-            
+
             if (data.session?.user) {
               setUserEmail(data.session.user.email)
               setStatus('success')
-              setMessage(t('auth.emailConfirmation.successMessage', 'Your account has been confirmed successfully! You can now log in to your account.'))
+              setMessage(
+                t(
+                  'auth.emailConfirmation.successMessage',
+                  'Your account has been confirmed successfully! You can now log in to your account.'
+                )
+              )
               setIsDirectLoginMode(true)
               setLoading(false)
               return
@@ -76,50 +98,67 @@ const EmailConfirmationComponent = () => {
             return
           }
         }
-        
+
         // If we have token_hash and type=email, this is an email confirmation
         if (tokenHash && type === 'email') {
           try {
             const { data, error } = await supabase.auth.verifyOtp({
               token_hash: tokenHash,
-              type: 'email'
+              type: 'email',
             })
-            
+
             if (error) {
               setStatus('error')
-              setMessage(error.message || t('auth.emailConfirmation.errorMessage', 'Email confirmation failed. Please try again.'))
+              setMessage(
+                error.message ||
+                  t(
+                    'auth.emailConfirmation.errorMessage',
+                    'Email confirmation failed. Please try again.'
+                  )
+              )
               setLoading(false)
               return
             }
-            
+
             if (data.user) {
               setUserEmail(data.user.email)
               setStatus('success')
-              setMessage(t('auth.emailConfirmation.successMessage', 'Your account has been confirmed successfully! You can now log in to your account.'))
+              setMessage(
+                t(
+                  'auth.emailConfirmation.successMessage',
+                  'Your account has been confirmed successfully! You can now log in to your account.'
+                )
+              )
               setIsDirectLoginMode(true)
               setLoading(false)
               return
             }
           } catch (verifyError) {
             setStatus('error')
-            setMessage(t('auth.emailConfirmation.errorMessage', 'Email confirmation failed. Please try again.'))
+            setMessage(
+              t(
+                'auth.emailConfirmation.errorMessage',
+                'Email confirmation failed. Please try again.'
+              )
+            )
             setLoading(false)
             return
           }
         }
-        
+
         // If we reach here, no valid confirmation parameters found
         setStatus('error')
         setMessage('Invalid confirmation link. Please check your email for the correct link.')
         setLoading(false)
-        
       } catch (err) {
         setStatus('error')
-        setMessage(t('auth.emailConfirmation.errorMessage', 'Email confirmation failed. Please try again.'))
+        setMessage(
+          t('auth.emailConfirmation.errorMessage', 'Email confirmation failed. Please try again.')
+        )
         setLoading(false)
       }
     }
-    
+
     confirmEmail()
   }, [tokenHash, type, accessToken, refreshToken, next, navigate, searchParams, t])
 
@@ -135,10 +174,23 @@ const EmailConfirmationComponent = () => {
     try {
       // For direct login, we'll use the current session that was established
       // during the email confirmation process
-      const { data: { session } } = await supabase.auth.getSession()
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
       if (session?.user?.aud === 'authenticated') {
-        navigate('/subjects')
+        // Check if user is admin and route accordingly
+        const isAdmin =
+          session.user.user_metadata?.role === 'admin' ||
+          session.user.user_metadata?.role === 'super_admin' ||
+          session.user.app_metadata?.role === 'admin' ||
+          session.user.app_metadata?.role === 'super_admin'
+
+        if (isAdmin) {
+          navigate('/admin')
+        } else {
+          navigate('/subjects')
+        }
       } else {
         // If no valid session, redirect to login
         navigate(PATH.LOGIN)
@@ -176,33 +228,33 @@ const EmailConfirmationComponent = () => {
         <div className="logo-container">
           <img src={logoImg} alt="Platform Logo" className="logo-image" />
         </div>
-        
-        <button 
-          type="button" 
-          className="back-link"
-          onClick={handleBackToLogin}
-        >
+
+        <button type="button" className="back-link" onClick={handleBackToLogin}>
           <ArrowLeft size={16} />
           {t('auth.emailConfirmation.backToLogin', 'Back to Login')}
         </button>
-        
+
         <div className="status-container">
           {status === 'success' ? (
             <>
               <CheckCircle size={48} className="success-icon" />
-              <h1 className="title">{t('auth.emailConfirmation.successTitle', 'Account Confirmed!')}</h1>
+              <h1 className="title">
+                {t('auth.emailConfirmation.successTitle', 'Account Confirmed!')}
+              </h1>
               <p className="message">{message}</p>
-              
+
               {userEmail && (
                 <div className="user-info">
-                  <p>Email: <strong>{userEmail}</strong></p>
+                  <p>
+                    Email: <strong>{userEmail}</strong>
+                  </p>
                 </div>
               )}
-              
+
               <div className="action-buttons">
                 {isDirectLoginMode ? (
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="submit-button direct-login-button"
                     onClick={handleDirectLogin}
                   >
@@ -210,11 +262,7 @@ const EmailConfirmationComponent = () => {
                     {t('auth.emailConfirmation.directLogin', 'Login Now')}
                   </button>
                 ) : (
-                  <button 
-                    type="button" 
-                    className="submit-button"
-                    onClick={handleBackToLogin}
-                  >
+                  <button type="button" className="submit-button" onClick={handleBackToLogin}>
                     {t('auth.emailConfirmation.goToLogin', 'Go to Login')}
                   </button>
                 )}
@@ -223,21 +271,15 @@ const EmailConfirmationComponent = () => {
           ) : (
             <>
               <XCircle size={48} className="error-icon" />
-              <h1 className="title">{t('auth.emailConfirmation.errorTitle', 'Confirmation Failed')}</h1>
+              <h1 className="title">
+                {t('auth.emailConfirmation.errorTitle', 'Confirmation Failed')}
+              </h1>
               <p className="message">{message}</p>
               <div className="action-buttons">
-                <button 
-                  type="button" 
-                  className="submit-button"
-                  onClick={handleResendConfirmation}
-                >
+                <button type="button" className="submit-button" onClick={handleResendConfirmation}>
                   {t('auth.emailConfirmation.resendConfirmation', 'Resend Confirmation')}
                 </button>
-                <button 
-                  type="button" 
-                  className="secondary-button"
-                  onClick={handleBackToLogin}
-                >
+                <button type="button" className="secondary-button" onClick={handleBackToLogin}>
                   {t('auth.emailConfirmation.backToLogin', 'Back to Login')}
                 </button>
               </div>

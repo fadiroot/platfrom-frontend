@@ -3,6 +3,7 @@ import GuestLayout from '../../shared/layout/GuestLayout/GuestLayout'
 import GuestGuard from '../../shared/guards/GuestGuard'
 import { Navigate, RouteProps } from 'react-router-dom'
 import { Fragment, lazy } from 'react'
+import SmartRedirect from '../../shared/components/SmartRedirect/SmartRedirect'
 import { PATH } from './paths'
 
 type RouteConfig = {
@@ -14,12 +15,11 @@ type RouteConfig = {
 } & RouteProps
 
 const routes: RouteConfig[] = [
-  // GuestGuard Routes
+  // Smart redirect route for root - no guard needed as SmartRedirect handles auth logic
   {
     exact: true,
     path: PATH.ROOT,
-    guard: GuestGuard,
-    component: () => <Navigate to="/login" />,
+    component: SmartRedirect,
   },
   {
     exact: true,

@@ -21,10 +21,12 @@ export const getChapters = async (): Promise<Chapter[]> => {
 export const getChaptersBySubject = async (subjectId: string): Promise<Chapter[]> => {
   const { data, error } = await supabase
     .from('chapters')
-    .select(`
+    .select(
+      `
       *,
-      exercises:exercises(count)
-    `)
+      exercises:user_accessible_exercises(count)
+    `
+    )
     .eq('subject_id', subjectId)
     .order('created_at', { ascending: true })
 
@@ -33,10 +35,11 @@ export const getChaptersBySubject = async (subjectId: string): Promise<Chapter[]
   }
 
   // Transform the data to include exercise_count
-  const transformedData = data?.map(chapter => ({
-    ...chapter,
-    exercise_count: chapter.exercises?.[0]?.count || 0
-  })) || []
+  const transformedData =
+    data?.map((chapter) => ({
+      ...chapter,
+      exercise_count: chapter.exercises?.[0]?.count || 0,
+    })) || []
 
   return transformedData
 }
@@ -45,13 +48,15 @@ export const getChaptersBySubject = async (subjectId: string): Promise<Chapter[]
 export const getChaptersByLevel = async (levelId: string): Promise<Chapter[]> => {
   const { data, error } = await supabase
     .from('chapters')
-    .select(`
+    .select(
+      `
       *,
       subject:subjects!inner(
         level_id
       ),
-      exercises:exercises(count)
-    `)
+      exercises:user_accessible_exercises(count)
+    `
+    )
     .eq('subject.level_id', levelId)
     .order('created_at', { ascending: true })
 
@@ -60,21 +65,18 @@ export const getChaptersByLevel = async (levelId: string): Promise<Chapter[]> =>
   }
 
   // Transform the data to include exercise_count
-  const transformedData = data?.map(chapter => ({
-    ...chapter,
-    exercise_count: chapter.exercises?.[0]?.count || 0
-  })) || []
+  const transformedData =
+    data?.map((chapter) => ({
+      ...chapter,
+      exercise_count: chapter.exercises?.[0]?.count || 0,
+    })) || []
 
   return transformedData
 }
 
 // Get chapter by ID
 export const getChapterById = async (id: string): Promise<Chapter | null> => {
-  const { data, error } = await supabase
-    .from('chapters')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const { data, error } = await supabase.from('chapters').select('*').eq('id', id).single()
 
   if (error) {
     throw new Error(`Failed to fetch chapter: ${error.message}`)
@@ -84,18 +86,22 @@ export const getChapterById = async (id: string): Promise<Chapter | null> => {
 }
 
 // Get chapters with subject and level information
-export const getChaptersWithDetails = async (): Promise<(Chapter & { 
-  subject: Tables<'subjects'> & { level: Tables<'levels'> | null } | null 
-})[]> => {
+export const getChaptersWithDetails = async (): Promise<
+  (Chapter & {
+    subject: (Tables<'subjects'> & { level: Tables<'levels'> | null }) | null
+  })[]
+> => {
   const { data, error } = await supabase
     .from('chapters')
-    .select(`
+    .select(
+      `
       *,
       subject:subjects(
         *,
         level:levels(*)
       )
-    `)
+    `
+    )
     .order('created_at', { ascending: true })
 
   if (error) {
@@ -106,7 +112,10 @@ export const getChaptersWithDetails = async (): Promise<(Chapter & {
 }
 
 // Get chapter with progress for a specific user
-export const getChapterWithProgress = async (chapterId: string, userId: string): Promise<Chapter & { progress?: number }> => {
+export const getChapterWithProgress = async (
+  chapterId: string,
+  userId: string
+): Promise<Chapter & { progress?: number }> => {
   // First get the chapter
   const { data: chapter, error: chapterError } = await supabase
     .from('chapters')
@@ -131,20 +140,19 @@ export const getChapterWithProgress = async (chapterId: string, userId: string):
   }
 
   // Calculate average progress percentage for the chapter
-  const averageProgress = progressData.length > 0 
-    ? progressData.reduce((sum, p) => sum + (p.progress_percentage || 0), 0) / progressData.length
-    : 0
+  const averageProgress =
+    progressData.length > 0
+      ? progressData.reduce((sum, p) => sum + (p.progress_percentage || 0), 0) / progressData.length
+      : 0
 
   return { ...chapter, progress: averageProgress }
 }
 
 // Create new chapter (for admin)
-export const createChapter = async (chapterData: Omit<Chapter, 'id' | 'created_at' | 'updated_at'>): Promise<Chapter> => {
-  const { data, error } = await supabase
-    .from('chapters')
-    .insert(chapterData)
-    .select()
-    .single()
+export const createChapter = async (
+  chapterData: Omit<Chapter, 'id' | 'created_at' | 'updated_at'>
+): Promise<Chapter> => {
+  const { data, error } = await supabase.from('chapters').insert(chapterData).select().single()
 
   if (error) {
     throw new Error(`Failed to create chapter: ${error.message}`)
@@ -154,7 +162,10 @@ export const createChapter = async (chapterData: Omit<Chapter, 'id' | 'created_a
 }
 
 // Update chapter (for admin)
-export const updateChapter = async (id: string, chapterData: Partial<Omit<Chapter, 'id' | 'created_at' | 'updated_at'>>): Promise<Chapter> => {
+export const updateChapter = async (
+  id: string,
+  chapterData: Partial<Omit<Chapter, 'id' | 'created_at' | 'updated_at'>>
+): Promise<Chapter> => {
   const { data, error } = await supabase
     .from('chapters')
     .update(chapterData)
@@ -171,10 +182,7 @@ export const updateChapter = async (id: string, chapterData: Partial<Omit<Chapte
 
 // Delete chapter (for admin)
 export const deleteChapter = async (id: string): Promise<void> => {
-  const { error } = await supabase
-    .from('chapters')
-    .delete()
-    .eq('id', id)
+  const { error } = await supabase.from('chapters').delete().eq('id', id)
 
   if (error) {
     throw new Error(`Failed to delete chapter: ${error.message}`)

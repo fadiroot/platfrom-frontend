@@ -1,19 +1,19 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useFormik } from "formik"
-import * as Yup from "yup"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { useAppDispatch } from "../../../../modules/shared/store"
-import { login } from "../../data/authThunk"
-import { PATH } from "../../routes/paths"
-import ErrorModal from "../../components/ErrorModal"
-import LanguageSelector from "../../../shared/components/LanguageSelector/LanguageSelector"
-import "./_Login.scss"
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useAppDispatch } from '../../../../modules/shared/store'
+import { login } from '../../data/authThunk'
+import { PATH } from '../../routes/paths'
+import ErrorModal from '../../components/ErrorModal'
+import LanguageSelector from '../../../shared/components/LanguageSelector/LanguageSelector'
+import './_Login.scss'
 import logoImg from '/logo/astuceLogo.png'
 
 // Custom Input Component to match your original styling
@@ -27,15 +27,23 @@ interface InputProps {
   autoComplete?: string
 }
 
-const Input = ({ name, formik, placeholder, label, type = "text", required, autoComplete }: InputProps) => {
+const Input = ({
+  name,
+  formik,
+  placeholder,
+  label,
+  type = 'text',
+  required,
+  autoComplete,
+}: InputProps) => {
   const [showPassword, setShowPassword] = useState(false)
-  const isPassword = type === "password"
-  const inputType = isPassword ? (showPassword ? "text" : "password") : type
+  const isPassword = type === 'password'
+  const inputType = isPassword ? (showPassword ? 'text' : 'password') : type
 
   return (
     <div className="Input-component-wrapper">
       <label htmlFor={name} className="label">
-        {label} {required && "*"}
+        {label} {required && '*'}
       </label>
       <div className="input-container">
         <input
@@ -50,7 +58,11 @@ const Input = ({ name, formik, placeholder, label, type = "text", required, auto
           className="input"
         />
         {isPassword && (
-          <button type="button" onClick={() => setShowPassword(!showPassword)} className="password-toggle">
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="password-toggle"
+          >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         )}
@@ -61,13 +73,13 @@ const Input = ({ name, formik, placeholder, label, type = "text", required, auto
 
 // Custom Button Component to match your original styling
 interface ButtonProps {
-  type?: "button" | "submit"
+  type?: 'button' | 'submit'
   label?: string
   loading?: boolean
   children?: React.ReactNode
 }
 
-const Button = ({ type = "button", label, loading, children }: ButtonProps) => {
+const Button = ({ type = 'button', label, loading, children }: ButtonProps) => {
   return (
     <button type={type} className="Button-component" disabled={loading}>
       {loading ? (
@@ -83,8 +95,8 @@ const Button = ({ type = "button", label, loading, children }: ButtonProps) => {
 }
 
 const initialValues = {
-  email: "",
-  password: "",
+  email: '',
+  password: '',
 }
 
 const LoginComponent = () => {
@@ -94,27 +106,38 @@ const LoginComponent = () => {
   const [showError, setShowError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const { t, i18n } = useTranslation()
-  
+
   // Add Arabic font class when Arabic language is selected
   const isArabic = i18n?.language === 'ar'
 
   const formik = useFormik({
     initialValues,
     validationSchema: Yup.object().shape({
-      email: Yup.string().email("Invalid email address").required("Email is required"),
-      password: Yup.string().required("Password is required").min(6, "Password must be at least 6 characters"),
+      email: Yup.string().email('Invalid email address').required('Email is required'),
+      password: Yup.string()
+        .required('Password is required')
+        .min(6, 'Password must be at least 6 characters'),
     }),
     onSubmit: (values) => {
       setSubmitting(true)
       dispatch(login(values))
         .unwrap()
-        .then(() => {
-          // Navigate to subjects page - the SubjectList component will automatically
-          // filter subjects based on the user's level from Redux store
-          navigate('/subjects')
+        .then((result) => {
+          // Check if user is admin and route accordingly
+          if (
+            result.user?.isAdmin ||
+            result.user?.role === 'admin' ||
+            result.user?.role === 'super_admin'
+          ) {
+            // Redirect admin users to admin panel
+            navigate('/admin')
+          } else {
+            // Navigate regular users to subjects page
+            navigate('/subjects')
+          }
         })
         .catch((err) => {
-          setErrorMessage(err?.message || "Login failed")
+          setErrorMessage(err?.message || 'Login failed')
           setShowError(true)
         })
         .finally(() => {
@@ -128,12 +151,12 @@ const LoginComponent = () => {
       <div className="language-selector-container">
         <LanguageSelector />
       </div>
-      
+
       <div className="login-card-container">
         <div className="logo-container">
           <img src={logoImg} alt="Platform Logo" className="logo-image" />
         </div>
-        
+
         <h1 className="title">{t('auth.login.title')}</h1>
         <p className="subtitle">{t('auth.login.subtitle')}</p>
 
@@ -176,13 +199,13 @@ const LoginComponent = () => {
           {t('auth.login.noAccount')} {t('auth.login.createAccount')}
         </Link>
       </div>
-      
-      <ErrorModal 
-         isOpen={showError} 
-         onClose={() => setShowError(false)} 
-         title={t('auth.login.title')}
-         message={errorMessage} 
-       />
+
+      <ErrorModal
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        title={t('auth.login.title')}
+        message={errorMessage}
+      />
     </div>
   )
 }

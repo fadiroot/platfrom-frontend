@@ -8,8 +8,8 @@ const supabaseAdmin = createClient(
   {
     auth: {
       autoRefreshToken: false,
-      persistSession: false
-    }
+      persistSession: false,
+    },
   }
 )
 
@@ -92,34 +92,31 @@ export const setUserAsAdmin = async (userEmail: string): Promise<boolean> => {
   try {
     // First get the user by email
     const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers()
-    
+
     if (listError) {
       console.error('Error listing users:', listError)
       return false
     }
-    
+
     const user = users.users.find((u: any) => u.email === userEmail)
     if (!user) {
       console.error('User not found:', userEmail)
       return false
     }
-    
+
     // Update user metadata to set admin role
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(
-      user.id,
-      {
-        user_metadata: { 
-          ...user.user_metadata,
-          role: 'admin' 
-        }
-      }
-    )
-    
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      user_metadata: {
+        ...user.user_metadata,
+        role: 'admin',
+      },
+    })
+
     if (error) {
       console.error('Error setting admin role:', error)
       return false
     }
-    
+
     return true
   } catch (error) {
     console.error('Error setting admin role:', error)
@@ -130,57 +127,58 @@ export const setUserAsAdmin = async (userEmail: string): Promise<boolean> => {
 // Check if current user is admin
 export const isCurrentUserAdmin = async (): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
     if (!user) {
       return false
     }
-    
-    // Use the is_admin function from the database
-    const { data: isAdmin, error } = await supabase.rpc('is_admin')
-    
+
+    // Use the new check_user_is_admin function with user ID
+    const { data: isAdmin, error } = await supabase.rpc('check_user_is_admin', {
+      target_user_id: user.id,
+    })
+
     if (error) {
       console.error('Error checking admin status:', error)
-      return false
+      // Fallback to checking user metadata
+      return user.user_metadata?.role === 'admin' || user.app_metadata?.role === 'admin'
     }
-    
+
     return isAdmin || false
   } catch (error) {
     console.error('Error checking admin status:', error)
-    return false
+    // Fallback to checking user metadata
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    return user?.user_metadata?.role === 'admin' || user?.app_metadata?.role === 'admin'
   }
 }
 
 // Get all admin users
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
   try {
-    // Check if current user is admin first
-    const isAdmin = await isCurrentUserAdmin()
-    if (!isAdmin) {
-      throw new Error('Access denied: Admin privileges required')
-    }
-    
-    // Use service role key to access admin API
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers()
-    
+    // Use the secure RPC function instead of Admin API
+    const { data, error } = await supabase.rpc('get_admin_users_only')
+
     if (error) {
       console.error('Error fetching admin users:', error)
       return []
     }
-    
-    // Filter for admin users and format the response
-    return data.users
-      .filter((user: any) => user.user_metadata?.role === 'admin')
-      .map((user: any) => ({
-        id: user.id,
-        email: user.email || '',
-        firstName: user.user_metadata?.first_name || '',
-        lastName: user.user_metadata?.last_name || '',
-        role: user.user_metadata?.role || 'user',
-        isAdmin: user.user_metadata?.role === 'admin',
-        createdAt: user.created_at,
-        lastSignInAt: user.last_sign_in_at
-      }))
+
+    // Format the response
+    return (data || []).map((user: any) => ({
+      id: user.user_id,
+      email: user.email || '',
+      firstName: user.first_name || '',
+      lastName: user.last_name || '',
+      role: user.role || 'user',
+      isAdmin: user.is_admin || false,
+      createdAt: user.created_at,
+      lastSignInAt: user.last_sign_in_at,
+    }))
   } catch (error) {
     console.error('Error fetching admin users:', error)
     return []
@@ -195,37 +193,34 @@ export const removeAdminRole = async (userEmail: string): Promise<boolean> => {
     if (!isAdmin) {
       throw new Error('Access denied: Admin privileges required')
     }
-    
+
     // First get the user by email
     const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers()
-    
+
     if (listError) {
       console.error('Error listing users:', listError)
       return false
     }
-    
+
     const user = users.users.find((u: any) => u.email === userEmail)
     if (!user) {
       console.error('User not found:', userEmail)
       return false
     }
-    
+
     // Update user metadata to remove admin role
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(
-      user.id,
-      {
-        user_metadata: { 
-          ...user.user_metadata,
-          role: 'user' 
-        }
-      }
-    )
-    
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
+      user_metadata: {
+        ...user.user_metadata,
+        role: 'user',
+      },
+    })
+
     if (error) {
       console.error('Error removing admin role:', error)
       return false
     }
-    
+
     return true
   } catch (error) {
     console.error('Error removing admin role:', error)
@@ -236,30 +231,24 @@ export const removeAdminRole = async (userEmail: string): Promise<boolean> => {
 // Get all users (admin only)
 export const getAllUsers = async (): Promise<AdminUser[]> => {
   try {
-    // Check if current user is admin first
-    const isAdmin = await isCurrentUserAdmin()
-    if (!isAdmin) {
-      throw new Error('Access denied: Admin privileges required')
-    }
-    
-    // Use service role key to access admin API
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers()
-    
+    // Use the secure RPC function instead of Admin API
+    const { data, error } = await supabase.rpc('get_all_users_admin')
+
     if (error) {
       console.error('Error fetching users:', error)
       return []
     }
-    
+
     // Format the response
-    return data.users.map((user: any) => ({
-      id: user.id,
+    return (data || []).map((user: any) => ({
+      id: user.user_id,
       email: user.email || '',
-      firstName: user.user_metadata?.first_name || '',
-      lastName: user.user_metadata?.last_name || '',
-      role: user.user_metadata?.role || 'user',
-      isAdmin: user.user_metadata?.role === 'admin',
+      firstName: user.first_name || '',
+      lastName: user.last_name || '',
+      role: user.role || 'user',
+      isAdmin: user.is_admin || false,
       createdAt: user.created_at,
-      lastSignInAt: user.last_sign_in_at
+      lastSignInAt: user.last_sign_in_at,
     }))
   } catch (error) {
     console.error('Error fetching users:', error)
@@ -268,136 +257,52 @@ export const getAllUsers = async (): Promise<AdminUser[]> => {
 }
 
 // Get student profiles (admin only) - Enhanced version with proper user data
-export const getStudentProfiles = async (filters?: StudentFilters): Promise<AdminStudentProfile[]> => {
+export const getStudentProfiles = async (
+  filters?: StudentFilters
+): Promise<AdminStudentProfile[]> => {
   try {
-    // Check if current user is admin first
-    const isAdmin = await isCurrentUserAdmin()
-    if (!isAdmin) {
-      throw new Error('Access denied: Admin privileges required')
-    }
-    
-    // Query student_profile table with proper relationships
-    const { data: profiles, error: profilesError } = await supabase
-      .from('student_profile')
-      .select(`
-        id,
-        user_id,
-        level_id,
-        is_active,
-        subscription_start_date,
-        subscription_end_date,
-        payment_status,
-        payment_amount,
-        payment_method,
-        payment_notes,
-        activated_by,
-        activated_at,
-        deactivated_at,
-        deactivated_by,
-        deactivation_reason,
-        created_at,
-        levels (
-          title
-        )
-      `)
+    // Use the secure RPC function instead of Admin API
+    const { data, error } = await supabase.rpc('get_students_with_user_data')
 
-    if (profilesError) {
-      throw new Error(`Failed to fetch profiles: ${profilesError.message}`)
+    if (error) {
+      console.error('Error fetching student profiles:', error)
+      return []
     }
 
-    // Get user information from auth.users using service role key
-    const { data: users, error: usersError } = await supabaseAdmin.auth.admin.listUsers()
-    
-    if (usersError) {
-      console.warn('Could not fetch user details from auth:', usersError.message)
-      // Fallback: return profiles without user details
-      return (profiles || []).map((profile: any) => {
-        let accountStatus: 'active' | 'inactive' | 'expired' = 'inactive'
-        if (profile.is_active) {
-          if (profile.subscription_end_date && new Date(profile.subscription_end_date) < new Date()) {
-            accountStatus = 'expired'
-          } else {
-            accountStatus = 'active'
-          }
-        }
-        
-        return {
-          profile_id: profile.user_id, // Use user_id instead of profile.id
-          user_id: profile.user_id,
-          email: 'Unknown',
-          username: '',
-          first_name: '',
-          last_name: '',
-          phone_number: '',
-          level_title: profile.levels?.title,
-          is_active: profile.is_active || false,
-          subscription_start_date: profile.subscription_start_date,
-          subscription_end_date: profile.subscription_end_date,
-          payment_status: profile.payment_status || 'pending' as const,
-          payment_amount: profile.payment_amount,
-          payment_method: profile.payment_method,
-          payment_notes: profile.payment_notes || '',
-          activated_by: profile.activated_by,
-          activated_at: profile.activated_at,
-          deactivated_at: profile.deactivated_at,
-          deactivated_by: profile.deactivated_by,
-          deactivation_reason: profile.deactivation_reason || '',
-          created_at: profile.created_at,
-          user_created_at: profile.created_at,
-          last_sign_in_at: undefined,
-          account_status: accountStatus
-        }
-      })
-    }
-
-    // Transform student_profile data to match AdminStudentProfile interface
-    let transformedData: AdminStudentProfile[] = (profiles || []).map((profile: any) => {
-      const user = users?.users?.find((u: any) => u.id === profile.user_id)
-      const userMetadata = user?.user_metadata || {}
-      
-      // Determine account status
-      let accountStatus: 'active' | 'inactive' | 'expired' = 'inactive'
-      if (profile.is_active) {
-        if (profile.subscription_end_date && new Date(profile.subscription_end_date) < new Date()) {
-          accountStatus = 'expired'
-        } else {
-          accountStatus = 'active'
-        }
-      }
-      
-      return {
-        profile_id: profile.user_id, // Use user_id instead of profile.id
-        user_id: profile.user_id,
-        email: user?.email || '',
-        username: userMetadata.username || '',
-        first_name: userMetadata.first_name || '',
-        last_name: userMetadata.last_name || '',
-        phone_number: userMetadata.phone || '',
-        level_title: profile.levels?.title,
-        is_active: profile.is_active || false,
-        subscription_start_date: profile.subscription_start_date,
-        subscription_end_date: profile.subscription_end_date,
-        payment_status: profile.payment_status || 'pending' as const,
-        payment_amount: profile.payment_amount,
-        payment_method: profile.payment_method,
-        payment_notes: profile.payment_notes || '',
-        activated_by: profile.activated_by,
-        activated_at: profile.activated_at,
-        deactivated_at: profile.deactivated_at,
-        deactivated_by: profile.deactivated_by,
-        deactivation_reason: profile.deactivation_reason || '',
-        created_at: profile.created_at,
-        user_created_at: user?.created_at || profile.created_at,
-        last_sign_in_at: user?.last_sign_in_at,
-        account_status: accountStatus
-      }
-    })
+    // Transform the data to match AdminStudentProfile interface
+    let transformedData: AdminStudentProfile[] = (data || []).map((student: any) => ({
+      profile_id: student.profile_id,
+      user_id: student.user_id,
+      email: student.email || '',
+      username: student.username || '',
+      first_name: student.first_name || '',
+      last_name: student.last_name || '',
+      phone_number: student.phone_number || '',
+      level_title: student.level_title,
+      is_active: student.is_active || false,
+      subscription_start_date: student.subscription_start_date,
+      subscription_end_date: student.subscription_end_date,
+      payment_status: student.payment_status || ('pending' as const),
+      payment_amount: student.payment_amount,
+      payment_method: student.payment_method,
+      payment_notes: student.payment_notes || '',
+      activated_by: student.activated_by,
+      activated_at: student.activated_at,
+      deactivated_at: student.deactivated_at,
+      deactivated_by: student.deactivated_by,
+      deactivation_reason: student.deactivation_reason || '',
+      created_at: student.created_at,
+      user_created_at: student.user_created_at,
+      last_sign_in_at: student.last_sign_in_at,
+      account_status: student.account_status as 'active' | 'inactive' | 'expired',
+    }))
 
     // Apply filters
     if (filters?.status && filters.status !== 'all') {
       if (filters.status === 'expired') {
-        transformedData = transformedData.filter((student) => 
-          student.subscription_end_date && new Date(student.subscription_end_date) < new Date()
+        transformedData = transformedData.filter(
+          (student) =>
+            student.subscription_end_date && new Date(student.subscription_end_date) < new Date()
         )
       } else if (filters.status === 'active') {
         transformedData = transformedData.filter((student) => student.is_active)
@@ -407,17 +312,18 @@ export const getStudentProfiles = async (filters?: StudentFilters): Promise<Admi
     }
 
     if (filters?.payment_status) {
-      transformedData = transformedData.filter((student) => 
-        student.payment_status === filters.payment_status
+      transformedData = transformedData.filter(
+        (student) => student.payment_status === filters.payment_status
       )
     }
 
     if (filters?.search) {
       const searchLower = filters.search.toLowerCase()
-      transformedData = transformedData.filter((student) => 
-        student.email?.toLowerCase().includes(searchLower) ||
-        student.first_name?.toLowerCase().includes(searchLower) ||
-        student.last_name?.toLowerCase().includes(searchLower)
+      transformedData = transformedData.filter(
+        (student) =>
+          student.email?.toLowerCase().includes(searchLower) ||
+          student.first_name?.toLowerCase().includes(searchLower) ||
+          student.last_name?.toLowerCase().includes(searchLower)
       )
     }
 
@@ -436,7 +342,9 @@ export const activateStudentAccount = async (request: ActivateStudentRequest): P
       throw new Error('Access denied: Admin privileges required')
     }
 
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) {
       throw new Error('User not authenticated')
     }
@@ -450,7 +358,7 @@ export const activateStudentAccount = async (request: ActivateStudentRequest): P
       subscription_months: request.subscription_months,
       payment_amount: request.payment_amount,
       payment_method: request.payment_method,
-      payment_notes: request.payment_notes
+      payment_notes: request.payment_notes,
     })
 
     const { data, error } = await supabase.rpc('activate_student_account', {
@@ -459,7 +367,7 @@ export const activateStudentAccount = async (request: ActivateStudentRequest): P
       subscription_months: request.subscription_months,
       payment_amount: request.payment_amount,
       payment_method: request.payment_method,
-      payment_notes: request.payment_notes
+      payment_notes: request.payment_notes,
     })
 
     if (error) {
@@ -476,7 +384,9 @@ export const activateStudentAccount = async (request: ActivateStudentRequest): P
 }
 
 // Deactivate student account
-export const deactivateStudentAccount = async (request: DeactivateStudentRequest): Promise<boolean> => {
+export const deactivateStudentAccount = async (
+  request: DeactivateStudentRequest
+): Promise<boolean> => {
   try {
     const isAdmin = await isCurrentUserAdmin()
     if (!isAdmin) {
@@ -484,7 +394,9 @@ export const deactivateStudentAccount = async (request: DeactivateStudentRequest
     }
 
     // Get current user ID
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) {
       throw new Error('User not authenticated')
     }
@@ -495,13 +407,13 @@ export const deactivateStudentAccount = async (request: DeactivateStudentRequest
     console.log('Deactivating student account:', {
       user_id: userId,
       admin_user_id: user.id,
-      reason: request.reason
+      reason: request.reason,
     })
 
     const { data, error } = await supabase.rpc('deactivate_student_account', {
       student_profile_id: userId, // Send as UUID
       admin_user_id: user.id,
-      reason: request.reason
+      reason: request.reason,
     })
 
     if (error) {
@@ -526,21 +438,23 @@ function isValidUUID(uuid: string): boolean {
 // Get user accessible exercises (admin can see all)
 export const getUserAccessibleExercises = async (userId?: string): Promise<any[]> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) {
       return []
     }
-    
+
     // Use the get_user_accessible_exercises function
     const { data, error } = await supabase.rpc('get_user_accessible_exercises', {
-      user_uuid: userId || user.id
+      user_uuid: userId || user.id,
     })
-    
+
     if (error) {
       console.error('Error fetching accessible exercises:', error)
       return []
     }
-    
+
     return data || []
   } catch (error) {
     console.error('Error fetching accessible exercises:', error)
@@ -552,17 +466,17 @@ export const getUserAccessibleExercises = async (userId?: string): Promise<any[]
 export const canAccessExercise = async (exerciseId: string): Promise<boolean> => {
   try {
     const { data, error } = await supabase.rpc('can_access_exercise', {
-      exercise_id: exerciseId
+      exercise_id: exerciseId,
     })
-    
+
     if (error) {
       console.error('Error checking exercise access:', error)
       return false
     }
-    
+
     return data || false
   } catch (error) {
     console.error('Error checking exercise access:', error)
     return false
   }
-} 
+}

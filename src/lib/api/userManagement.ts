@@ -49,11 +49,11 @@ export interface UserRole {
 export const getAllUsersWithStatus = async (): Promise<UserWithStatus[]> => {
   try {
     const { data, error } = await supabase.rpc('get_all_users_with_status')
-    
+
     if (error) {
       throw new Error(`Failed to fetch users: ${error.message}`)
     }
-    
+
     return data || []
   } catch (error: any) {
     console.error('Error fetching users with status:', error)
@@ -73,13 +73,13 @@ export const activateUserAccount = async (
       target_user_id: userId,
       subscription_type_param: subscriptionType,
       duration_months: durationMonths,
-      admin_notes: adminNotes
+      admin_notes: adminNotes,
     })
-    
+
     if (error) {
       throw new Error(`Failed to activate user: ${error.message}`)
     }
-    
+
     return data === true
   } catch (error: any) {
     console.error('Error activating user:', error)
@@ -97,13 +97,13 @@ export const deactivateUserAccount = async (
     const { data, error } = await supabase.rpc('deactivate_user_account', {
       target_user_id: userId,
       reason: reason,
-      admin_notes: adminNotes
+      admin_notes: adminNotes,
     })
-    
+
     if (error) {
       throw new Error(`Failed to deactivate user: ${error.message}`)
     }
-    
+
     return data === true
   } catch (error: any) {
     console.error('Error deactivating user:', error)
@@ -119,13 +119,13 @@ export const assignAdminRole = async (
   try {
     const { data, error } = await supabase.rpc('assign_admin_role', {
       target_user_id: userId,
-      role_type: roleType
+      role_type: roleType,
     })
-    
+
     if (error) {
       throw new Error(`Failed to assign admin role: ${error.message}`)
     }
-    
+
     return data === true
   } catch (error: any) {
     console.error('Error assigning admin role:', error)
@@ -134,18 +134,20 @@ export const assignAdminRole = async (
 }
 
 // Get user activation history
-export const getUserActivationHistory = async (userId: string): Promise<ActivationHistoryEntry[]> => {
+export const getUserActivationHistory = async (
+  userId: string
+): Promise<ActivationHistoryEntry[]> => {
   try {
     const { data, error } = await supabase
       .from('user_activation_history')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
-    
+
     if (error) {
       throw new Error(`Failed to fetch activation history: ${error.message}`)
     }
-    
+
     return data || []
   } catch (error: any) {
     console.error('Error fetching activation history:', error)
@@ -161,11 +163,11 @@ export const getAllActivationHistory = async (): Promise<ActivationHistoryEntry[
       .select('*')
       .order('created_at', { ascending: false })
       .limit(100) // Limit to recent 100 entries
-    
+
     if (error) {
       throw new Error(`Failed to fetch activation history: ${error.message}`)
     }
-    
+
     return data || []
   } catch (error: any) {
     console.error('Error fetching all activation history:', error)
@@ -181,11 +183,11 @@ export const getUserRoles = async (userId: string): Promise<UserRole[]> => {
       .select('*')
       .eq('user_id', userId)
       .eq('is_active', true)
-    
+
     if (error) {
       throw new Error(`Failed to fetch user roles: ${error.message}`)
     }
-    
+
     return data || []
   } catch (error: any) {
     console.error('Error fetching user roles:', error)
@@ -196,25 +198,27 @@ export const getUserRoles = async (userId: string): Promise<UserRole[]> => {
 // Check if current user is admin
 export const isCurrentUserAdmin = async (): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
     if (!user) {
       return false
     }
-    
+
     const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .in('role', ['admin', 'super_admin'])
-    
+
     if (error) {
       console.error('Error checking admin status:', error)
       return false
     }
-    
-    return (data && data.length > 0)
+
+    return data && data.length > 0
   } catch (error: any) {
     console.error('Error checking admin status:', error)
     return false
@@ -224,25 +228,27 @@ export const isCurrentUserAdmin = async (): Promise<boolean> => {
 // Check if current user has specific role
 export const hasRole = async (role: 'student' | 'admin' | 'super_admin'): Promise<boolean> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
     if (!user) {
       return false
     }
-    
+
     const { data, error } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
       .eq('role', role)
       .eq('is_active', true)
-    
+
     if (error) {
       console.error('Error checking user role:', error)
       return false
     }
-    
-    return (data && data.length > 0)
+
+    return data && data.length > 0
   } catch (error: any) {
     console.error('Error checking user role:', error)
     return false
@@ -256,26 +262,28 @@ export const getCurrentUserActivationStatus = async (): Promise<{
   subscription_type: string | null
 }> => {
   try {
-    const { data: { user } } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
     if (!user) {
       throw new Error('No authenticated user')
     }
-    
+
     const { data, error } = await supabase
       .from('profiles')
       .select('is_active, subscription_end_date, subscription_type')
       .eq('id', user.id)
       .single()
-    
+
     if (error) {
       throw new Error(`Failed to fetch user activation status: ${error.message}`)
     }
-    
+
     return {
       is_active: data.is_active || false,
       subscription_end_date: data.subscription_end_date,
-      subscription_type: data.subscription_type
+      subscription_type: data.subscription_type,
     }
   } catch (error: any) {
     console.error('Error fetching user activation status:', error)
@@ -292,9 +300,7 @@ export const getAccessibleExercises = async (
   levelId?: string
 ): Promise<any[]> => {
   try {
-    let query = supabase
-      .from('exercises')
-      .select(`
+    let query = supabase.from('exercises').select(`
         *,
         chapter:chapters(
           *,
@@ -304,7 +310,7 @@ export const getAccessibleExercises = async (
           )
         )
       `)
-    
+
     // Apply filters if provided
     if (chapterId) {
       query = query.eq('chapter_id', chapterId)
@@ -313,21 +319,22 @@ export const getAccessibleExercises = async (
     } else if (levelId) {
       query = query.eq('chapters.subjects.level_id', levelId)
     }
-    
+
     const { data, error } = await query.order('created_at', { ascending: false })
-    
+
     if (error) {
       throw new Error(`Failed to fetch accessible exercises: ${error.message}`)
     }
-    
+
     // Transform data to match expected format
-    const transformedData = data?.map(exercise => ({
-      ...exercise,
-      chapter_title: exercise.chapter?.title,
-      subject_title: exercise.chapter?.subject?.title,
-      level_title: exercise.chapter?.subject?.level?.title
-    })) || []
-    
+    const transformedData =
+      data?.map((exercise) => ({
+        ...exercise,
+        chapter_title: exercise.chapter?.title,
+        subject_title: exercise.chapter?.subject?.title,
+        level_title: exercise.chapter?.subject?.level?.title,
+      })) || []
+
     return transformedData
   } catch (error: any) {
     console.error('Error fetching accessible exercises:', error)
@@ -344,7 +351,8 @@ export const getPublicExercises = async (
   try {
     let query = supabase
       .from('exercises')
-      .select(`
+      .select(
+        `
         *,
         chapter:chapters(
           *,
@@ -353,9 +361,10 @@ export const getPublicExercises = async (
             level:levels(*)
           )
         )
-      `)
+      `
+      )
       .eq('is_public', true)
-    
+
     // Apply filters if provided
     if (chapterId) {
       query = query.eq('chapter_id', chapterId)
@@ -364,21 +373,22 @@ export const getPublicExercises = async (
     } else if (levelId) {
       query = query.eq('chapters.subjects.level_id', levelId)
     }
-    
+
     const { data, error } = await query.order('created_at', { ascending: false })
-    
+
     if (error) {
       throw new Error(`Failed to fetch public exercises: ${error.message}`)
     }
-    
+
     // Transform data to match expected format
-    const transformedData = data?.map(exercise => ({
-      ...exercise,
-      chapter_title: exercise.chapter?.title,
-      subject_title: exercise.chapter?.subject?.title,
-      level_title: exercise.chapter?.subject?.level?.title
-    })) || []
-    
+    const transformedData =
+      data?.map((exercise) => ({
+        ...exercise,
+        chapter_title: exercise.chapter?.title,
+        subject_title: exercise.chapter?.subject?.title,
+        level_title: exercise.chapter?.subject?.level?.title,
+      })) || []
+
     return transformedData
   } catch (error: any) {
     console.error('Error fetching public exercises:', error)
@@ -396,11 +406,11 @@ export const toggleExercisePublicStatus = async (
       .from('exercises')
       .update({ is_public: isPublic })
       .eq('id', exerciseId)
-    
+
     if (error) {
       throw new Error(`Failed to update exercise visibility: ${error.message}`)
     }
-    
+
     return true
   } catch (error: any) {
     console.error('Error updating exercise visibility:', error)
@@ -418,11 +428,11 @@ export const bulkUpdateExercisePublicStatus = async (
       .from('exercises')
       .update({ is_public: isPublic })
       .in('id', exerciseIds)
-    
+
     if (error) {
       throw new Error(`Failed to bulk update exercise visibility: ${error.message}`)
     }
-    
+
     return true
   } catch (error: any) {
     console.error('Error bulk updating exercise visibility:', error)
@@ -445,39 +455,39 @@ export const getUserStatistics = async (): Promise<{
     const { count: totalUsers } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
-    
+
     // Get active users
     const { count: activeUsers } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .eq('is_active', true)
-    
+
     // Get inactive users
     const { count: inactiveUsers } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .eq('is_active', false)
-    
+
     // Get expired subscriptions
     const { count: expiredSubscriptions } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .not('subscription_end_date', 'is', null)
       .lt('subscription_end_date', new Date().toISOString())
-    
+
     // Get admins
     const { count: admins } = await supabase
       .from('user_roles')
       .select('*', { count: 'exact', head: true })
       .in('role', ['admin', 'super_admin'])
       .eq('is_active', true)
-    
+
     return {
       total_users: totalUsers || 0,
       active_users: activeUsers || 0,
       inactive_users: inactiveUsers || 0,
       expired_subscriptions: expiredSubscriptions || 0,
-      admins: admins || 0
+      admins: admins || 0,
     }
   } catch (error: any) {
     console.error('Error fetching user statistics:', error)
@@ -492,21 +502,21 @@ export const getExerciseStatistics = async (): Promise<{
   private_exercises: number
 }> => {
   try {
-    // Get total exercises
+    // Get total exercises from secure view
     const { count: totalExercises } = await supabase
-      .from('exercises')
+      .from('user_accessible_exercises')
       .select('*', { count: 'exact', head: true })
-    
-    // Get public exercises
+
+    // Get public exercises from secure view
     const { count: publicExercises } = await supabase
-      .from('exercises')
+      .from('user_accessible_exercises')
       .select('*', { count: 'exact', head: true })
       .eq('is_public', true)
-    
+
     return {
       total_exercises: totalExercises || 0,
       public_exercises: publicExercises || 0,
-      private_exercises: (totalExercises || 0) - (publicExercises || 0)
+      private_exercises: (totalExercises || 0) - (publicExercises || 0),
     }
   } catch (error: any) {
     console.error('Error fetching exercise statistics:', error)
