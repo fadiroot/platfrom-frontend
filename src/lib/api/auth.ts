@@ -39,6 +39,18 @@ export interface AuthResponse {
   requiresVerification?: boolean
 }
 
+export interface ExtendedUser extends User {
+  level_id?: string | null
+  phoneNumber?: string | null
+  firstName?: string | null
+  lastName?: string | null
+  level?: {
+    id: string
+    title: string
+    description: string | null
+  } | null
+}
+
 // ===== Authentication Functions =====
 
 // Sign up new user with student profile
@@ -160,6 +172,61 @@ export const signIn = async (credentials: LoginCredentials): Promise<AuthRespons
   })
 
   return { user: data.user, session: data.session, error }
+}
+
+// Sign in with Google OAuth
+export const signInWithGoogle = async (): Promise<{ error: AuthError | null }> => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  })
+  return { error }
+}
+
+// Handle OAuth callback
+export const handleOAuthCallback = async (): Promise<{ user: ExtendedUser | null; session: Session | null; error: AuthError | null }> => {
+  const { data, error } = await supabase.auth.getSession()
+  
+  if (error) {
+    return { user: null, session: null, error }
+  }
+
+  if (!data.session?.user) {
+    return { 
+      user: null, 
+      session: null, 
+      error: { message: 'No session found' } as AuthError 
+    }
+  }
+
+  // Get user profile with level information
+  const userWithLevel = await getUserWithLevel(data.session.user)
+
+  // Check if user has phone number in metadata
+  const userPhone = data.session.user.user_metadata?.phone
+
+  // Check if user has a complete profile
+  const hasLevel = userWithLevel.levelId !== null && userWithLevel.levelId !== undefined
+  const hasPhone = userPhone !== null && userPhone !== undefined && userPhone !== ''
+
+  return { 
+    user: {
+      ...data.session.user,
+      level_id: userWithLevel.levelId,
+      phoneNumber: userPhone,
+      firstName: userWithLevel.firstName,
+      lastName: userWithLevel.lastName,
+      level: userWithLevel.level
+    } as ExtendedUser, 
+    session: data.session, 
+    error: null 
+  }
 }
 
 // Sign out user
@@ -465,4 +532,93 @@ export const getAccessToken = async (): Promise<string | null> => {
 export const refreshSession = async (): Promise<{ session: Session | null; error: AuthError | null }> => {
   const { data, error } = await supabase.auth.refreshSession()
   return { session: data.session, error }
+}
+
+// Check if user needs profile completion
+export const checkProfileCompletion = async (userId: string): Promise<{ needsCompletion: boolean; reason?: string }> => {
+  try {
+    // Get user data to check phone number in metadata
+    const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(userId)
+    
+    if (userError) {
+      throw userError
+    }
+
+    // Check if user has a student profile
+    const { data: profile, error: profileError } = await supabase
+      .from('student_profile')
+      .select('level_id')
+      .eq('user_id', userId)
+      .single()
+
+    if (profileError && profileError.code !== 'PGRST116') { // PGRST116 = no rows returned
+      throw profileError
+    }
+
+    // If no profile exists, user needs completion
+    if (!profile) {
+      return { needsCompletion: true, reason: 'no_profile' }
+    }
+
+    // Check if profile is missing required fields
+    if (!profile.level_id) {
+      return { needsCompletion: true, reason: 'no_level' }
+    }
+
+    // Check if user has phone number in metadata
+    const userPhone = user?.user_metadata?.phone
+    if (!userPhone) {
+      return { needsCompletion: true, reason: 'no_phone' }
+    }
+
+    return { needsCompletion: false }
+  } catch (error: any) {
+    console.error('Error checking profile completion:', error)
+    return { needsCompletion: true, reason: 'error' }
+  }
+}
+
+// Create or update student profile via API
+export const createStudentProfileAPI = async (profileData: {
+  levelId: string
+  phoneNumber: string
+}): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      return { success: false, error: 'User not authenticated' }
+    }
+
+    // Update user metadata with phone number and levelId
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: {
+        phone: profileData.phoneNumber,
+        levelId: profileData.levelId,
+      }
+    })
+
+    if (updateError) {
+      return { success: false, error: updateError.message }
+    }
+
+    // Create or update student profile (without phone - phone is in user metadata)
+    const { error: profileError } = await supabase
+      .from('student_profile')
+      .upsert({
+        user_id: user.id,
+        level_id: profileData.levelId,
+        is_active: false, // Set to false for profile completion
+      }, {
+        onConflict: 'user_id'
+      })
+
+    if (profileError) {
+      return { success: false, error: profileError.message }
+    }
+
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to create student profile' }
+  }
 }

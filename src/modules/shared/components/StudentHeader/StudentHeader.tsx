@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../store'
 import { logout } from '../../../auth/data/authThunk'
-import ThemeButton from '../ThemeButton/ThemeButton'
 import { useTranslation } from 'react-i18next'
 import './StudentHeader.scss'
 import logoImg from '/logo/astuceLogo.png'
@@ -107,8 +106,6 @@ const StudentHeader: React.FC = () => {
             )}
           </div>
 
-          <ThemeButton />
-          
           {user && (
             <div className="student-header__user">
               <div className="user-info">

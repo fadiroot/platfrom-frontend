@@ -63,6 +63,19 @@ const routes: RouteConfig[] = [
     component: lazy(() => import('../features/EmailConfirmation/EmailConfirmation')),
     layout: GuestLayout,
   },
+  {
+    exact: true,
+    guard: GuestGuard,
+    path: PATH.OAUTH_CALLBACK,
+    component: lazy(() => import('../features/OAuthCallback/OAuthCallback')),
+    layout: GuestLayout,
+  },
+  {
+    exact: true,
+    path: PATH.PROFILE_COMPLETION,
+    component: lazy(() => import('../features/ProfileCompletionPage/ProfileCompletionPage')),
+    layout: GuestLayout,
+  },
 ]
 
 export default routes

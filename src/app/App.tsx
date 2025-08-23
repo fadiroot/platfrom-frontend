@@ -2,6 +2,7 @@ import routes, { renderRoutes } from '../modules/shared/routes'
 import { useAppSelector } from '../modules/shared/store'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet-async'
+import ProfileCompletionGuard from '../modules/auth/guards/ProfileCompletionGuard'
 import newLogo from '/logo/astuceLogo.png'
 
 const App = () => {
@@ -28,7 +29,9 @@ const App = () => {
         <link rel="icon" type="image/png" href={newLogo} />
       </Helmet>
 
-      {renderRoutes(routes)}
+      <ProfileCompletionGuard>
+        {renderRoutes(routes)}
+      </ProfileCompletionGuard>
     </div>
   )
 }

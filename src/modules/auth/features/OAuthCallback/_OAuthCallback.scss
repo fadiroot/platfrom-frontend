@@ -1,0 +1,146 @@
+.oauth-callback-module {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+
+  &.arabic-fonts {
+    font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  .language-selector-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
+
+  .oauth-callback-card-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    margin-top: 80px;
+
+    .logo-container {
+      margin-bottom: 30px;
+      
+      .logo-image {
+        width: 120px;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .status-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+
+      .loading-state,
+      .success-state,
+      .error-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        text-align: center;
+
+        .spinner {
+          animation: spin 1s linear infinite;
+          color: #667eea;
+        }
+
+        .success-icon {
+          color: #10b981;
+        }
+
+        .error-icon {
+          color: #ef4444;
+        }
+
+        .message {
+          font-size: 16px;
+          color: #666;
+          margin: 0;
+          line-height: 1.5;
+        }
+      }
+
+      .retry-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .oauth-callback-module {
+    .oauth-callback-card-container {
+      margin: 60px 20px 20px;
+      padding: 30px 20px;
+
+      .title {
+        font-size: 24px;
+      }
+
+      .status-container {
+        .loading-state,
+        .success-state,
+        .error-state {
+          .message {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}

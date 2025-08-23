@@ -1,5 +1,3 @@
-import { ReactComponent as Sun } from './Light.svg'
-import { ReactComponent as Moon } from './Moon.svg'
 import { useState } from 'react'
 import { toggleTheme } from '../../store/slices/theme/themeSlice'
 import { useAppDispatch, useAppSelector } from '../../store'
@@ -24,8 +22,6 @@ const ThemeButton = () => {
         checked={isChecked}
       />
       <label className="dark_mode_label" htmlFor="darkmode-toggle">
-        <Sun />
-        <Moon />
       </label>
     </div>
   )

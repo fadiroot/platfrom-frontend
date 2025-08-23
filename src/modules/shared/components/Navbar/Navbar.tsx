@@ -1,11 +1,10 @@
 'use client'
 
-import type React from 'react'
+import React, { useState, useEffect } from 'react'
 import './_Navbar.scss'
 import menuIcon from '../../assets/icons/navbar/menu.svg'
-import { useLocation } from 'react-router-dom'
-import ThemeButton from '../ThemeButton/ThemeButton'
-import { Avatar, Button, Dropdown, type MenuProps, Space, Badge, Tooltip } from 'antd'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { Button, Space, Avatar, Badge, Dropdown, Tooltip, type MenuProps } from 'antd'
 import enFlagIcon from '../../assets/icons/Navbar/en-flag.png'
 import frFlagIcon from '../../assets/icons/Navbar/fr-flag.png'
 import arFlagIcon from '../../assets/icons/Navbar/ar-flag.png'
@@ -13,10 +12,9 @@ import { ReactComponent as ProfileIcon } from '../../assets/icons/sidebar/profil
 import { ReactComponent as SettingsIcon } from '../../assets/icons/navbar/settings.svg'
 import { ReactComponent as LogoutIcon } from '../../assets/icons/navbar/logout.svg'
 import { useAppDispatch, useAppSelector } from '../../store'
+import type { RootState } from '../../store'
 import { logout } from '../../../auth/data/authThunk'
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
-import type { RootState } from '../../store'
 
 interface INavbarProps {
   setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>
@@ -256,11 +254,6 @@ const Navbar: React.FC<INavbarProps> = ({
                 </Button>
               </Dropdown>
             </Tooltip>
-
-            {/* Theme Toggle */}
-            <div className="theme-toggle-container">
-              <ThemeButton />
-            </div>
 
             {/* User Profile */}
             <Dropdown

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { login, register, logout, initializeAuth, requestPasswordReset, resetUserPassword } from './authThunk'
+import { login, register, logout, initializeAuth, requestPasswordReset, resetUserPassword, loginWithGoogle, handleOAuthCallbackThunk, refreshUserData } from './authThunk'
 
 export interface AuthState {
   status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'verification_required'
@@ -18,8 +18,10 @@ export interface AuthState {
       title: string
       description: string | null
     } | null
+    phoneNumber: string | null
     role?: string // Add role field for admin detection
     isAdmin?: boolean // Add explicit admin flag
+    needsProfileCompletion?: boolean // Add profile completion flag
   } | null
   error: string | null
   resetPasswordStatus: 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -149,6 +151,58 @@ const authSlice = createSlice({
     builder.addCase(resetUserPassword.rejected, (state, action: PayloadAction<any>) => {
       state.resetPasswordStatus = 'failed'
       state.resetPasswordMessage = action?.payload || 'Failed to reset password'
+    })
+
+    // Google OAuth login cases
+    builder.addCase(loginWithGoogle.pending, (state) => {
+      state.error = null
+      state.status = 'loading'
+    })
+    builder.addCase(loginWithGoogle.fulfilled, (state) => {
+      // Google OAuth will redirect, so we just mark as loading
+      state.status = 'loading'
+    })
+    builder.addCase(loginWithGoogle.rejected, (state, action: PayloadAction<any>) => {
+      state.error = action?.payload
+      state.status = 'failed'
+    })
+
+    // OAuth callback cases
+    builder.addCase(handleOAuthCallbackThunk.pending, (state) => {
+      state.error = null
+      state.status = 'loading'
+    })
+    builder.addCase(handleOAuthCallbackThunk.fulfilled, (state, action: PayloadAction<any>) => {
+      const { user } = action.payload
+      state.isAuthenticated = true
+      state.user = user
+      state.status = 'succeeded'
+      state.isInitialised = true
+    })
+    builder.addCase(handleOAuthCallbackThunk.rejected, (state, action: PayloadAction<any>) => {
+      state.error = action?.payload
+      state.status = 'failed'
+      state.isAuthenticated = false
+      state.user = null
+    })
+
+    // Refresh user data cases
+    builder.addCase(refreshUserData.pending, (state) => {
+      state.error = null
+      state.status = 'loading'
+    })
+    builder.addCase(refreshUserData.fulfilled, (state, action: PayloadAction<any>) => {
+      const { user } = action.payload
+      state.isAuthenticated = true
+      state.user = user
+      state.status = 'succeeded'
+      state.isInitialised = true
+    })
+    builder.addCase(refreshUserData.rejected, (state, action: PayloadAction<any>) => {
+      state.error = action?.payload
+      state.status = 'failed'
+      state.isAuthenticated = false
+      state.user = null
     })
   },
 })

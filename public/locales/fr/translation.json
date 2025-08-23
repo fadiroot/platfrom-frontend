@@ -49,7 +49,16 @@
       "invalidCredentials": "Identifiants invalides",
       "accountNotVerified": "Compte non vérifié. Veuillez vérifier votre email",
       "tooManyAttempts": "Trop de tentatives. Veuillez réessayer plus tard",
-      "networkError": "Erreur réseau. Veuillez vérifier votre connexion internet"
+      "networkError": "Erreur réseau. Veuillez vérifier votre connexion internet",
+      "or": "ou",
+      "googleSignIn": "Continuer avec Google",
+      "googleSigningIn": "Connexion en cours...",
+      "validation": {
+        "emailRequired": "L'email est requis",
+        "emailInvalid": "Adresse email invalide",
+        "passwordRequired": "Le mot de passe est requis",
+        "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères"
+      }
     },
     "register": {
       "title": "Créer un Compte",
@@ -75,7 +84,25 @@
       "creatingAccount": "Création du compte...",
       "hasAccount": "Vous avez déjà un compte ?",
       "signIn": "Se Connecter",
-      "success": "Compte créé avec succès ! Veuillez vérifier votre email pour l'activation avant de vous connecter."
+      "or": "ou",
+      "googleSignIn": "Continuer avec Google",
+      "googleSigningIn": "Connexion en cours...",
+      "success": "Compte créé avec succès ! Veuillez vérifier votre email pour l'activation avant de vous connecter.",
+      "validation": {
+        "usernameRequired": "Le nom d'utilisateur est requis",
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom de famille est requis",
+        "emailRequired": "L'email est requis",
+        "emailInvalid": "Adresse email invalide",
+        "emailSpecialChars": "L'email contient des caractères non autorisés",
+        "passwordRequired": "Le mot de passe est requis",
+        "passwordTooShort": "Le mot de passe est trop court !",
+        "confirmPasswordRequired": "La confirmation du mot de passe est requise",
+        "passwordsMustMatch": "Les mots de passe doivent correspondre",
+        "phoneRequired": "Le numéro de téléphone est requis",
+        "phoneInvalid": "Le numéro de téléphone doit être de 8 chiffres et commencer par 2, 4, 5 ou 9",
+        "levelRequired": "Le niveau est requis"
+      }
     },
     "forgotPassword": {
       "title": "Mot de Passe Oublié",
@@ -115,12 +142,28 @@
       "resendConfirmation": "Renvoyer la Confirmation"
     },
     "emailVerificationModal": {
-      "title": "Vérification d'Email Requise",
-      "accountCreated": "Compte créé avec succès !",
+      "title": "Vérification d'email requise",
+      "accountCreated": "Compte créé avec succès ! 🎉",
       "emailSent": "Nous avons envoyé un email de vérification à",
       "checkEmail": "Veuillez vérifier votre email et cliquer sur le lien de vérification pour activer votre compte.",
-      "spamNote": "Note : Vérifiez votre dossier spam si vous ne voyez pas l'email dans votre boîte de réception.",
+      "spamNote": "💡 Conseil : Vous ne voyez pas l'email ? Vérifiez votre dossier <span class='spam-highlight'>spam</span> ou indésirable !",
       "gotIt": "Compris !"
+    },
+    "oauthCallback": {
+      "title": "Authentification",
+      "processing": "Traitement de l'authentification...",
+      "success": "Authentification réussie !",
+      "error": "Échec de l'authentification. Veuillez réessayer.",
+      "retry": "Réessayer"
+    },
+    "profileCompletion": {
+      "title": "Complétez Votre Profil",
+      "subtitle": "Veuillez fournir quelques informations supplémentaires pour finaliser la configuration de votre compte.",
+      "skip": "Passer pour l'instant",
+      "complete": "Compléter le Profil",
+      "completing": "Complétion...",
+      "academicInfo": "Informations Académiques",
+      "contactInfo": "Informations de Contact"
     }
   },
   "subjects": {

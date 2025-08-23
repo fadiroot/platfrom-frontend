@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { signIn, signUp, signOut, getCurrentUser, getUserWithLevel, onAuthStateChange, ensureStudentProfile, resetPassword, updatePassword, getCurrentSession } from '../../../lib/api/auth'
+import { signIn, signUp, signOut, getCurrentUser, getUserWithLevel, onAuthStateChange, ensureStudentProfile, resetPassword, updatePassword, getCurrentSession, signInWithGoogle, handleOAuthCallback } from '../../../lib/api/auth'
 import { LoginPayload, RegisterPayload } from './authTypes'
 import { supabase } from '../../../lib/supabase'
 
@@ -28,15 +28,16 @@ const isMagicLinkPage = () => {
   )
 }
 
+// Login user
 export const login = createAsyncThunk(
   'auth/login',
-  async (credentials: LoginPayload, { rejectWithValue }) => {
+  async (payload: LoginPayload, { rejectWithValue }) => {
     try {
       const { user, session, error } = await signIn({
-        email: credentials.email,
-        password: credentials.password
+        email: payload.email,
+        password: payload.password
       })
-
+      
       if (error) {
         throw new Error(error.message)
       }
@@ -45,51 +46,38 @@ export const login = createAsyncThunk(
         throw new Error('Login failed: No user or session returned')
       }
 
-      // Get user profile with level information from auth metadata
+      // Get user profile with level information
       const userWithLevel = await getUserWithLevel(user)
+      
+      // Check if user has phone number in metadata
+      const userPhone = user.user_metadata?.phone
 
-      // Check if user needs student profile created (for users who registered but needed email verification)
-      if (!userWithLevel.levelId && user.user_metadata?.levelId) {
-        const profileResult = await ensureStudentProfile(user.id, user.user_metadata.levelId)
-        
-        if (!profileResult.error) {
-          // Fetch updated user with level after profile creation
-          const updatedUserWithLevel = await getUserWithLevel(user)
-          return {
-            user: {
-              id: user.id,
-              email: user.email || '',
-              name: `${updatedUserWithLevel.firstName} ${updatedUserWithLevel.lastName}`.trim() || user.email || '',
-              firstName: updatedUserWithLevel.firstName || '',
-              lastName: updatedUserWithLevel.lastName || '',
-              level_id: updatedUserWithLevel.levelId || null,
-              level: updatedUserWithLevel.level || null,
-              role: user.user_metadata?.role || null,
-              isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin'
-            },
-            session: {
-              access_token: session.access_token,
-              refresh_token: session.refresh_token,
-              expires_at: session.expires_at
-            }
-          }
-        } else {
-          console.error('❌ Failed to create student profile on login:', profileResult.error)
-          // Continue with login even if profile creation fails
-        }
-      }
+      // Check if user needs to complete their profile
+      const hasLevel = userWithLevel.levelId !== null && userWithLevel.levelId !== undefined
+      const hasPhone = userPhone !== null && userPhone !== undefined && userPhone !== ''
+      const needsProfileCompletion = !hasLevel || !hasPhone
 
-      const loginResult = {
+      console.log('Login profile check:', {
+        hasLevel,
+        hasPhone,
+        needsProfileCompletion,
+        level_id: userWithLevel.levelId,
+        phoneNumber: userPhone
+      })
+
+      return {
         user: {
           id: user.id,
           email: user.email || '',
-          name: `${userWithLevel.firstName} ${userWithLevel.lastName}`.trim() || user.email || '',
+          name: `${userWithLevel.firstName || ''} ${userWithLevel.lastName || ''}`.trim() || user.email || '',
           firstName: userWithLevel.firstName || '',
           lastName: userWithLevel.lastName || '',
           level_id: userWithLevel.levelId || null,
           level: userWithLevel.level || null,
+          phoneNumber: userPhone || null,
           role: user.user_metadata?.role || null,
-          isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin'
+          isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin',
+          needsProfileCompletion
         },
         session: {
           access_token: session.access_token,
@@ -97,8 +85,6 @@ export const login = createAsyncThunk(
           expires_at: session.expires_at
         }
       }
-      
-      return loginResult
     } catch (err: any) {
       return rejectWithValue(err.message || 'Login failed')
     }
@@ -300,6 +286,127 @@ export const resetUserPassword = createAsyncThunk(
       }
     } catch (err: any) {
       return rejectWithValue(err.message || 'Failed to reset password')
+    }
+  }
+)
+
+// Sign in with Google OAuth
+export const loginWithGoogle = createAsyncThunk(
+  'auth/loginWithGoogle',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { error } = await signInWithGoogle()
+      
+      if (error) {
+        throw new Error(error.message)
+      }
+      
+      // The redirect will happen automatically, so we just return success
+      return { success: true }
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Google sign-in failed')
+    }
+  }
+)
+
+// Handle OAuth callback
+export const handleOAuthCallbackThunk = createAsyncThunk(
+  'auth/handleOAuthCallback',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { user, session, error } = await handleOAuthCallback()
+      
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      if (!user || !session) {
+        throw new Error('OAuth callback failed: No user or session returned')
+      }
+
+      // Check if user needs to complete their profile
+      // For new OAuth users, both level_id and phoneNumber will be null/undefined
+      const hasLevel = user.level_id !== null && user.level_id !== undefined
+      const hasPhone = user.phoneNumber !== null && user.phoneNumber !== undefined && user.phoneNumber !== ''
+      const needsProfileCompletion = !hasLevel || !hasPhone
+
+      console.log('OAuth callback profile check:', {
+        hasLevel,
+        hasPhone,
+        needsProfileCompletion,
+        level_id: user.level_id,
+        phoneNumber: user.phoneNumber
+      })
+
+      return {
+        user: {
+          id: user.id,
+          email: user.email || '',
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '',
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          level_id: user.level_id || null,
+          level: user.level || null,
+          phoneNumber: user.phoneNumber || null,
+          role: user.user_metadata?.role || null,
+          isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin',
+          needsProfileCompletion
+        },
+        session: {
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_at: session.expires_at
+        }
+      }
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'OAuth callback failed')
+    }
+  }
+)
+
+// Refresh user data after profile completion
+export const refreshUserData = createAsyncThunk(
+  'auth/refreshUserData',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser()
+      
+      if (error) {
+        throw new Error(error.message)
+      }
+
+      if (!user) {
+        throw new Error('No user found')
+      }
+
+      // Get user profile with level information
+      const userWithLevel = await getUserWithLevel(user)
+      
+      // Check if user has phone number in metadata
+      const userPhone = user.user_metadata?.phone
+
+      // Check if user needs to complete their profile
+      const hasLevel = userWithLevel.levelId !== null && userWithLevel.levelId !== undefined
+      const hasPhone = userPhone !== null && userPhone !== undefined && userPhone !== ''
+      const needsProfileCompletion = !hasLevel || !hasPhone
+
+      return {
+        user: {
+          id: user.id,
+          email: user.email || '',
+          name: `${userWithLevel.firstName || ''} ${userWithLevel.lastName || ''}`.trim() || user.email || '',
+          firstName: userWithLevel.firstName || '',
+          lastName: userWithLevel.lastName || '',
+          level_id: userWithLevel.levelId || null,
+          level: userWithLevel.level || null,
+          phoneNumber: userPhone || null,
+          role: user.user_metadata?.role || null,
+          isAdmin: user.user_metadata?.role === 'admin' || user.user_metadata?.role === 'super_admin',
+          needsProfileCompletion
+        }
+      }
+    } catch (err: any) {
+      return rejectWithValue(err.message || 'Failed to refresh user data')
     }
   }
 )

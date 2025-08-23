@@ -24,6 +24,71 @@
     }
   }
 
+  .select-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .error-icon {
+    color: #dc3545;
+    animation: pulse 2s infinite;
+  }
+
+  .success-icon {
+    color: #28a745;
+    animation: successPulse 0.6s ease;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes successPulse {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  &.error {
+    .select-trigger {
+      border-color: #dc3545;
+      box-shadow: 2px 2px 0px 0px #dc3545;
+      
+      &:hover {
+        box-shadow: 3px 3px 0px 0px #dc3545;
+      }
+    }
+  }
+
+  &.success {
+    .select-trigger {
+      border-color: #28a745;
+      box-shadow: 2px 2px 0px 0px #28a745;
+      
+      &:hover {
+        box-shadow: 3px 3px 0px 0px #28a745;
+      }
+    }
+  }
+
   &.disabled {
     cursor: not-allowed;
     opacity: 0.6;
@@ -53,6 +118,45 @@
     transform: rotate(180deg);
   }
 
+  .error-message {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #dc3545;
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 15;
+    animation: slideDown 0.3s ease;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: 16px;
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 4px solid #dc3545;
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .options-list {
     position: absolute;
     top: calc(100% + 8px);
@@ -67,6 +171,7 @@
     z-index: 10;
     max-height: 200px;
     overflow-y: auto;
+    animation: slideDown 0.2s ease;
   }
 
   .option {
@@ -79,20 +184,44 @@
     font-weight: 400;
     color: #000000;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    position: relative;
 
     &:hover {
-      background-color: #f5f5f5;
+      background-color: #f8f9fa;
       transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     &.selected {
-      background-color: #000000;
-      color: #ffffff !important;
+      background-color: #e3f2fd;
+      color: #1976d2;
       font-weight: 500;
-      span{
-        color: #ffffff !important;
+      
+      .check-icon {
+        color: #1976d2;
+        animation: checkAppear 0.3s ease;
       }
+    }
+
+    .check-icon {
+      color: #28a745;
+      transition: all 0.2s ease;
+    }
+  }
+
+  @keyframes checkAppear {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
     }
   }
 }
@@ -101,4 +230,23 @@
     outline: none;
     transform: translate(-1px, -1px);
     box-shadow: 3px 3px 0px 0px #000000;
+}
+
+// Improve scrollbar styling for options list
+.custom-select .options-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-select .options-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.custom-select .options-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+  
+  &:hover {
+    background: #a8a8a8;
+  }
 }

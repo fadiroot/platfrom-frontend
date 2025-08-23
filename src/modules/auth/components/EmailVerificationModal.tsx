@@ -58,7 +58,7 @@ const EmailVerificationModal: React.FC<EmailVerificationModalProps> = ({
           </p>
           
           <p className="spam-note">
-            <em>{t('auth.emailVerificationModal.spamNote')}</em>
+            <em dangerouslySetInnerHTML={{ __html: t('auth.emailVerificationModal.spamNote') }}></em>
           </p>
         </div>
         
