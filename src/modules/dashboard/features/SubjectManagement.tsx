@@ -1,51 +1,51 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { getSubjects, createSubject, updateSubject, deleteSubject } from '@/lib/api/subjects'
+import { getSubjects, createSubject, updateSubject, deleteSubject, type SubjectWithLevels } from '@/lib/api/subjects'
 import { getLevels } from '@/lib/api/levels'
 import type { Tables } from '@/lib/supabase'
 import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
 import './SubjectManagement.scss'
 
-type Subject = Tables<'subjects'>
 type Level = Tables<'levels'>
 
 // Predefined subject icons
 const SUBJECT_ICONS = [
   { id: 'math', name: '🧮 Mathématiques', icon: '🧮', url: '/doodles/rular.svg' },
-  { id: 'physics', name: '⚗️ Physique', icon: '⚗️', url: '/doodles/science-l.svg' },
+  { id: 'physics', name: '⚡ Physique', icon: '⚡', url: '/doodles/physics.svg' },
   { id: 'chemistry', name: '🧪 Chimie', icon: '🧪', url: '/doodles/science-d.svg' },
-  { id: 'computer', name: '💻 Informatique', icon: '💻', url: '/doodles/quiz.svg' },
+  { id: 'computer', name: '💻 Informatique', icon: '💻', url: '/computer.svg' },
   { id: 'literature', name: '📚 Littérature', icon: '📚', url: '/doodles/book.svg' },
   { id: 'history', name: '🏛️ Histoire', icon: '🏛️', url: '/doodles/cap-d.svg' },
   { id: 'geography', name: '🌍 Géographie', icon: '🌍', url: '/doodles/cap-l.svg' },
   { id: 'biology', name: '🧬 Biologie', icon: '🧬', url: '/doodles/science-d.svg' },
-  { id: 'philosophy', name: '🤔 Philosophie', icon: '🤔', url: '/doodles/idea.svg' },
+  { id: 'philosophy', name: '🤔 Philosophie', icon: '🤔', url: '/doodles/exmark.svg' },
   { id: 'language', name: '🗣️ Langues', icon: '🗣️', url: '/doodles/speaker.svg' },
   { id: 'art', name: '🎨 Arts', icon: '🎨', url: '/doodles/superman.svg' },
   { id: 'music', name: '🎵 Musique', icon: '🎵', url: '/doodles/speaker.svg' },
   { id: 'sports', name: '⚽ Sport', icon: '⚽', url: '/doodles/superman.svg' },
   { id: 'economics', name: '💰 Économie', icon: '💰', url: '/doodles/arrows.svg' },
+  { id: 'quiz', name: '❓ Quiz/Tests', icon: '❓', url: '/doodles/quiz.svg' },
   { id: 'custom', name: '🔗 URL personnalisée', icon: '🔗', url: null }
 ]
 
 interface SubjectFormData {
   title: string
   description: string | null
-  level_id: string | null
+  level_ids: string[]
   image_url: string | null
   selected_icon: string | null
 }
 
 const SubjectManagement: React.FC = () => {
-  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [subjects, setSubjects] = useState<SubjectWithLevels[]>([])
   const [levels, setLevels] = useState<Level[]>([])
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [editingSubject, setEditingSubject] = useState<Subject | null>(null)
+  const [editingSubject, setEditingSubject] = useState<SubjectWithLevels | null>(null)
   const [formData, setFormData] = useState<SubjectFormData>({
     title: '',
     description: '',
-    level_id: null,
+    level_ids: [],
     image_url: null,
     selected_icon: null
   })
@@ -142,7 +142,7 @@ const SubjectManagement: React.FC = () => {
       const submitData = {
         title: formData.title,
         description: formData.description,
-        level_id: formData.level_id,
+        level_ids: formData.level_ids,
         image_url: formData.image_url
       }
       
@@ -179,7 +179,7 @@ const SubjectManagement: React.FC = () => {
     }
   }
 
-  const handleEdit = (subject: Subject) => {
+  const handleEdit = (subject: SubjectWithLevels) => {
     setEditingSubject(subject)
     
     // Find which predefined icon matches the current image_url
@@ -188,14 +188,14 @@ const SubjectManagement: React.FC = () => {
     setFormData({
       title: subject.title,
       description: subject.description,
-      level_id: subject.level_id,
+      level_ids: subject.level_ids,
       image_url: subject.image_url,
       selected_icon: matchingIcon ? matchingIcon.id : 'custom'
     })
     setShowForm(true)
   }
 
-  const handleDelete = async (subject: Subject) => {
+  const handleDelete = async (subject: SubjectWithLevels) => {
     if (!confirm(`Êtes-vous sûr de vouloir supprimer la matière "${subject.title}" ?`)) {
       return
     }
@@ -217,7 +217,7 @@ const SubjectManagement: React.FC = () => {
   }
 
   const resetForm = () => {
-    setFormData({ title: '', description: '', level_id: null, image_url: null, selected_icon: null })
+    setFormData({ title: '', description: '', level_ids: [], image_url: null, selected_icon: null })
     setEditingSubject(null)
     setShowForm(false)
   }
@@ -231,18 +231,18 @@ const SubjectManagement: React.FC = () => {
   // Filter subjects by selected level
   const getFilteredSubjects = () => {
     if (!selectedLevel) return subjects
-    return subjects.filter(subject => subject.level_id === selectedLevel)
+    return subjects.filter(subject => subject.level_ids.includes(selectedLevel))
   }
 
   // Group subjects by level for display
   const getSubjectsByLevel = () => {
     const grouped = levels.reduce((acc, level) => {
-      acc[level.id] = subjects.filter(subject => subject.level_id === level.id)
+      acc[level.id] = subjects.filter(subject => subject.level_ids.includes(level.id))
       return acc
-    }, {} as Record<string, Subject[]>)
+    }, {} as Record<string, SubjectWithLevels[]>)
     
     // Add subjects without level
-    const noLevelSubjects = subjects.filter(subject => !subject.level_id)
+    const noLevelSubjects = subjects.filter(subject => subject.level_ids.length === 0)
     if (noLevelSubjects.length > 0) {
       grouped['no-level'] = noLevelSubjects
     }
@@ -321,20 +321,34 @@ const SubjectManagement: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="level_id">Niveau *</label>
-                <CustomSelect
-                  options={[
-                    { value: '', label: 'Sélectionner un niveau' },
-                    ...levels.map(level => ({
-                      value: level.id,
-                      label: level.title
-                    }))
-                  ]}
-                  value={formData.level_id || ''}
-                  onChange={(value) => setFormData(prev => ({ ...prev, level_id: value || null }))}
-                  onBlur={() => {}}
-                  placeholder="Sélectionner un niveau"
-                />
+                <label htmlFor="level_ids">Niveaux *</label>
+                <div className="multi-select-levels">
+                  {levels.map(level => (
+                    <label key={level.id} className="level-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={formData.level_ids.includes(level.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              level_ids: [...prev.level_ids, level.id]
+                            }))
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              level_ids: prev.level_ids.filter(id => id !== level.id)
+                            }))
+                          }
+                        }}
+                      />
+                      <span className="checkbox-label">{level.title}</span>
+                    </label>
+                  ))}
+                  {levels.length === 0 && (
+                    <p className="no-levels">Aucun niveau disponible</p>
+                  )}
+                </div>
               </div>
 
               <div className="form-group">
@@ -455,9 +469,17 @@ const SubjectManagement: React.FC = () => {
                 </p>
                 
                 <div className="card-meta">
-                  <span className="level-badge">
-                    🎓 {getLevelName(subject.level_id)}
-                  </span>
+                  <div className="level-badges">
+                    {subject.level_ids.length > 0 ? (
+                      subject.level_ids.map(levelId => (
+                        <span key={levelId} className="level-badge">
+                          🎓 {getLevelName(levelId)}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="level-badge no-level">🎓 Aucun niveau</span>
+                    )}
+                  </div>
                   <span className="date">
                     Créé le {new Date(subject.created_at).toLocaleDateString('fr-FR')}
                   </span>
@@ -516,6 +538,17 @@ const SubjectManagement: React.FC = () => {
                         </p>
                         
                         <div className="card-meta">
+                          <div className="level-badges">
+                            {subject.level_ids.length > 0 ? (
+                              subject.level_ids.map(levelId => (
+                                <span key={levelId} className="level-badge">
+                                  🎓 {getLevelName(levelId)}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="level-badge no-level">🎓 Aucun niveau</span>
+                            )}
+                          </div>
                           <span className="date">
                             Créé le {new Date(subject.created_at).toLocaleDateString('fr-FR')}
                           </span>

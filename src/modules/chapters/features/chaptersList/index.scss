@@ -1,9 +1,20 @@
 @use '../../../shared/assets/styles/abstracts/student-theme' as *;
 
+.chapters-list-cap {
+  width: 60px;
+  height: 60px;
+  position: absolute;
+  top: 120px;
+  right: 20px;
+  opacity: 0.6;
+  transform: rotate(15deg);
+}
+
 // Main Container
 .chapters-container {
   @include student-container;
   min-height: 100vh;
+  position: relative;
 }
 
 // Header Section
@@ -12,21 +23,44 @@
 
   .back-btn {
     @include student-back-button;
-    box-shadow: 2px 2px 0px 0px var(--student-text-primary);
-    border: 2px solid var(--student-text-primary);
-    padding: 0.5rem 1rem;
-    &:hover{
-        transition: all 0.3s ease;
-        transform: translate(-1px, -1px);
-        background-color: var(--student-text-primary);
-        color: var(--student-bg-primary);
-        box-shadow: 2px 2px 0px 0px var(--student-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(44, 73, 129, 0.1);
+    border: 2px solid #2c4981;
+    color: #2c4981;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
 
-        svg{
-            transition: all 0.3s ease;
-            stroke: var(--student-bg-primary);
-            color: var(--student-bg-primary);
-        }
+    svg {
+      width: 16px;
+      height: 16px;
+      stroke: #2c4981;
+      transition: all 0.3s ease;
+    }
+
+    &:hover {
+      background: #2c4981;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(44, 73, 129, 0.3);
+
+      svg {
+        stroke: white;
+        color: white;
+        transform: translateX(-2px);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(44, 73, 129, 0.2);
     }
   }
 
@@ -51,51 +85,55 @@
     margin-bottom: 1rem;
 
     .stat-card {
-    //   @include student-card;
-        border: 1px solid var(--student-text-primary);
-        border-radius: 4px;
-        box-shadow: 2px 2px 0px 0px var(--student-text-primary);
-
-      padding: 1.25rem;
+      border: 2px solid #2c4981;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      box-shadow: 0 4px 12px rgba(44, 73, 129, 0.15);
+      padding: 1.5rem;
       display: flex;
       align-items: center;
       gap: 1rem;
       transition: all 0.3s ease;
 
       &:hover {
-        transform: translateY(-1px);
-        box-shadow: 3px 3px 0px 0px var(--student-text-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(44, 73, 129, 0.2);
+        border-color: #1e3461;
       }
 
       .stat-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--student-bg-tertiary);
-        border-radius: 8px;
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, rgba(44, 73, 129, 0.1) 0%, rgba(44, 73, 129, 0.05) 100%);
+        border: 2px solid rgba(44, 73, 129, 0.2);
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
 
         svg {
-          color: var(--student-primary);
+          color: #2c4981;
+          stroke: #2c4981;
         }
       }
 
       .stat-content {
         display: flex;
         flex-direction: column;
+        gap: 4px;
 
         .stat-label {
           font-size: 0.875rem;
           font-weight: 500;
+          color: #64748b;
           transition: color 0.3s ease;
         }
 
         .stat-value {
-          font-size: 1.5rem;
+          font-size: 1.75rem;
           font-weight: 700;
-          color: var(--student-text-primary);
+          color: #1a202c;
           transition: color 0.3s ease;
         }
       }
@@ -130,68 +168,144 @@
 .chapters-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 // Chapter Card
 .chapter-card {
-//   @include student-card;
-border:  1px solid var(--student-text-primary);
-border-radius:4px;
-box-shadow: 2px 2px 0px 0px var(--student-text-primary);
+  border: 2px solid #2c4981;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 6px 20px rgba(44, 73, 129, 0.12);
   overflow: hidden;
   cursor: pointer;
-   .action-btn {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-        border: 2px solid var(--student-text-primary);
-        padding: 0.5rem 1rem;
-        box-shadow: 2px 2px 0px 0px var(--student-text-primary) !important;
-    &:hover{
-        transition: all 0.3s ease;
-        transform: translate(-1px, -1px);
-        background-color: var(--student-text-primary);
-        color: var(--student-bg-primary);
-        box-shadow: 2px 2px 0px 0px var(--student-text-primary);
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2c4981 0%, #3d5a94 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
 
-        svg{
-            transition: all 0.3s ease;
-            stroke: var(--student-bg-primary);
-            color: var(--student-bg-primary);
-        }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: #2c4981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(44, 73, 129, 0.3);
+    min-width: 120px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      color: white;
+      stroke: white;
+      fill: none;
+      transition: all 0.3s ease;
     }
+
+    &:hover {
+      background: #3d5a94;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(44, 73, 129, 0.4);
+      
+      svg {
+        color: white;
+        stroke: white;
+      }
     }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(44, 73, 129, 0.3);
+    }
+
+    // All button states use same styling as exercise buttons
+    &.start-btn,
+    &.continue-btn,
+    &.review-btn {
+      background: #2c4981;
+      color: white;
+      box-shadow: 0 4px 12px rgba(44, 73, 129, 0.3);
+
+      svg {
+        stroke: white;
+        color: white;
+      }
+
+      &:hover {
+        background: #3d5a94;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(44, 73, 129, 0.4);
+      }
+    }
+  }
 
   &:hover {
-    transition: all 0.3s ease;
-    transform: translateY(-1px);
-    box-shadow: 3px 3px 0px 0px var(--student-text-primary);
-    .chapter-number {
-      background: var(--student-primary);
-      color: var(--student-text-inverse);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(44, 73, 129, 0.2);
+    border: 2px solid transparent;
+
+    &::before {
+      transform: scaleX(1);
     }
 
+    .chapter-number {
+      background: #2c4981;
+      color: white;
+      transform: scale(1.08);
+      box-shadow: 0 4px 12px rgba(44, 73, 129, 0.3);
+    }
 
+    .chapter-title {
+      color: #1a202c;
+      transform: translateY(-1px);
+    }
   }
 
   .chapter-header {
-    padding: 1.5rem;
+    padding: 2rem;
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 1.5rem;
 
     .chapter-number {
-      width: 48px;
-      height: 48px;
-      background: var(--student-bg-tertiary);
-      color: var(--student-text-secondary);
-      border-radius: 8px;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, rgba(44, 73, 129, 0.1) 0%, rgba(44, 73, 129, 0.05) 100%);
+      color: #2c4981;
+      border: 2px solid rgba(44, 73, 129, 0.2);
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 1.2rem;
       flex-shrink: 0;
-      transition: all 0.2s ease-in-out;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(44, 73, 129, 0.1);
     }
 
     .chapter-main {
@@ -206,12 +320,13 @@ box-shadow: 2px 2px 0px 0px var(--student-text-primary);
         margin-bottom: 0.75rem;
 
         .chapter-title {
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: var(--student-text-primary);
+          font-size: 1.35rem;
+          font-weight: 700;
+          color: #1a202c;
           line-height: 1.3;
           margin: 0;
           transition: color 0.3s ease;
+          letter-spacing: -0.01em;
         }
 
         .chapter-badges {
@@ -223,27 +338,36 @@ box-shadow: 2px 2px 0px 0px var(--student-text-primary);
       }
 
       .chapter-description {
-        color: var(--student-text-secondary);
-        line-height: 1.5;
-        margin-bottom: 1rem;
-        font-size: 0.9rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
         transition: color 0.3s ease;
       }
 
       .chapter-meta {
         display: flex;
         gap: 1.5rem;
+        margin-top: 0.75rem;
 
         .meta-item {
           display: flex;
           align-items: center;
-          gap: 0.5rem;
-          color: var(--student-text-muted);
+          gap: 0.75rem;
+          color: #64748b;
           font-size: 0.875rem;
+          font-weight: 500;
           transition: color 0.3s ease;
+          background: rgba(44, 73, 129, 0.08);
+          padding: 6px 12px;
+          border-radius: 20px;
+          border: 1px solid rgba(44, 73, 129, 0.15);
 
           svg {
             flex-shrink: 0;
+            width: 14px;
+            height: 14px;
+            stroke: #2c4981;
           }
         }
       }
@@ -252,6 +376,9 @@ box-shadow: 2px 2px 0px 0px var(--student-text-primary);
     .chapter-actions {
       display: flex;
       flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 1rem;
       align-items: flex-end;
       gap: 0.75rem;
       flex-shrink: 0;
@@ -288,26 +415,48 @@ box-shadow: 2px 2px 0px 0px var(--student-text-primary);
       }
 
       .action-btn {
-        @include student-button-primary;
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.25rem;
-        box-shadow: var(--student-shadow-md);
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 20px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        background: #2c4981;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 12px rgba(44, 73, 129, 0.3);
+        min-width: 120px;
 
         svg {
-          transition: all 0.2s ease;
-          width: 14px;
-          height: 14px;
+          width: 16px;
+          height: 16px;
+          color: white;
+          stroke: white;
+          fill: none;
+          transition: all 0.3s ease;
         }
 
         &:hover {
-          box-shadow: var(--student-shadow-hover);
+          background: #3d5a94;
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(44, 73, 129, 0.4);
+          
+          svg {
+            color: white;
+            stroke: white;
+          }
         }
 
         &:active {
           transform: translateY(0);
-          box-shadow: var(--student-shadow-md);
+          box-shadow: 0 4px 12px rgba(44, 73, 129, 0.3);
         }
       }
     }
@@ -452,6 +601,14 @@ box-shadow: 2px 2px 0px 0px var(--student-text-primary);
     padding: 1rem 1rem;
   }
 
+  .chapters-list-cap {
+    width: 40px;
+    height: 40px;
+    top: 80px;
+    right: 15px;
+    opacity: 0.5;
+  }
+
   .chapters-header {
     .header-content {
       .course-title {
@@ -499,6 +656,14 @@ box-shadow: 2px 2px 0px 0px var(--student-text-primary);
 @media (max-width: 480px) {
   .chapters-container {
     padding: 0.75rem;
+  }
+
+  .chapters-list-cap {
+    width: 35px;
+    height: 35px;
+    top: 60px;
+    right: 10px;
+    opacity: 0.4;
   }
 
   .chapter-card {

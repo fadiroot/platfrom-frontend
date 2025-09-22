@@ -219,6 +219,12 @@
     "solution": "Solution",
     "files": "Fichiers",
     "loadingPDF": "Chargement du PDF...",
+    "filterByDifficulty": "Filtrer par Difficulté",
+    "all": "Tous",
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile",
+    "noExercisesFound": "Aucun exercice trouvé pour le niveau de difficulté sélectionné.",
     "difficulty": {
       "easy": "FACILE",
       "medium": "MOYEN",

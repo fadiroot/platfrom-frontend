@@ -272,6 +272,12 @@
     "solution": "الحل",
     "files": "الملفات",
     "loadingPDF": "جاري تحميل PDF...",
+    "filterByDifficulty": "اختيار حسب الصعوبة",
+    "all": "الكل",
+    "easy": "سهل",
+    "medium": "متوسط",
+    "hard": "صعب",
+    "noExercisesFound": "لم يتم العثور على تمارين لمستوى الصعوبة المحدد.",
     "difficulty": {
       "easy": "سهل",
       "medium": "متوسط",

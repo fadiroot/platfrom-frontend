@@ -1,25 +1,25 @@
-// Minimal black and white theme variables for header
+// Professional blue theme variables for student header
 :root {
-  --header-bg: #ffffff;
-  --header-border: #000000;
-  --header-text-primary: #000000;
-  --header-text-secondary: #666666;
-  --header-text-muted: #999999;
-  --header-button-border: #000000;
-  --header-button-hover-bg: #f5f5f5;
-  --header-button-hover-border: #000000;
+  --header-bg: #2c4981;
+  --header-border: #1e3461;
+  --header-text-primary: #ffffff;
+  --header-text-secondary: #e0e7ff;
+  --header-text-muted: #cbd5e1;
+  --header-button-border: #1e3461;
+  --header-button-hover-bg: #3d5a94;
+  --header-button-hover-border: #1e3461;
 }
 
-// Dark theme variables for header (maintaining minimal design)
+// Dark theme variables for header (maintaining professional blue design)
 #dark {
-  --header-bg: #1a1a1a;
-  --header-border: #ffffff;
+  --header-bg: #2c4981;
+  --header-border: #1e3461;
   --header-text-primary: #ffffff;
-  --header-text-secondary: #cccccc;
-  --header-text-muted: #888888;
-  --header-button-border: #ffffff;
-  --header-button-hover-bg: #2a2a2a;
-  --header-button-hover-border: #ffffff;
+  --header-text-secondary: #e0e7ff;
+  --header-text-muted: #cbd5e1;
+  --header-button-border: #1e3461;
+  --header-button-hover-bg: #3d5a94;
+  --header-button-hover-border: #1e3461;
 }
 
 .student-header {
@@ -123,24 +123,34 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    background: var(--header-bg);
-    border: 2px solid var(--header-button-border);
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
-    color: var(--header-text-secondary);
+    color: var(--header-text-primary);
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 2px 2px 0px 0px var(--header-border);
+    box-shadow: 2px 2px 0px 0px rgba(255, 255, 255, 0.1);
+
+    svg {
+      stroke: var(--header-text-primary);
+      color: var(--header-text-primary);
+    }
 
     &:hover {
-      background: var(--header-button-hover-bg);
+      background: rgba(255, 255, 255, 0.2);
       color: var(--header-text-primary);
       transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0px 0px var(--header-border);
+      box-shadow: 3px 3px 0px 0px rgba(255, 255, 255, 0.15);
+
+      svg {
+        stroke: var(--header-text-primary);
+        color: var(--header-text-primary);
+      }
     }
 
     &:active {
       transform: translate(0px, 0px);
-      box-shadow: 2px 2px 0px 0px var(--header-border);
+      box-shadow: 2px 2px 0px 0px rgba(255, 255, 255, 0.1);
     }
   }
 
@@ -151,18 +161,18 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      background: var(--header-bg);
-      border: 2px solid var(--header-button-border);
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
       padding: 0.5rem 0.75rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 2px 2px 0px 0px var(--header-border);
+      box-shadow: 2px 2px 0px 0px rgba(255, 255, 255, 0.1);
 
       &:hover {
-        background: var(--header-button-hover-bg);
+        background: rgba(255, 255, 255, 0.2);
         transform: translate(-1px, -1px);
-        box-shadow: 3px 3px 0px 0px var(--header-border);
+        box-shadow: 3px 3px 0px 0px rgba(255, 255, 255, 0.15);
       }
 
       .current-flag {
@@ -177,12 +187,14 @@
       }
 
       svg {
-        color: var(--header-text-secondary);
+        color: var(--header-text-primary);
+        stroke: var(--header-text-primary);
         transition: all 0.3s ease;
       }
 
       &:hover svg {
         color: var(--header-text-primary);
+        stroke: var(--header-text-primary);
       }
     }
 
@@ -190,10 +202,11 @@
       position: absolute;
       top: 100%;
       right: 0;
-      background: var(--header-bg);
-      border: 2px solid var(--header-border);
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 8px;
-      box-shadow: 4px 4px 0px 0px var(--header-border);
+      box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
       z-index: 1000;
       min-width: 160px;
       overflow: hidden;
@@ -206,23 +219,23 @@
         padding: 0.75rem 1rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        border-bottom: 1px solid var(--header-border);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 
         &:last-child {
           border-bottom: none;
         }
 
         &:hover {
-          background: var(--header-button-hover-bg);
+          background: rgba(44, 73, 129, 0.1);
           transform: translateY(-1px);
         }
 
         &.active {
-          background: var(--header-text-primary);
-          color: var(--header-bg);
+          background: var(--header-bg);
+          color: var(--header-text-primary);
 
           .language-name {
-            color: var(--header-bg);
+            color: var(--header-text-primary);
           }
         }
 
@@ -240,13 +253,13 @@
         .language-name {
           font-size: 0.875rem;
           font-weight: 500;
-          color: var(--header-text-primary);
+          color: var(--header-bg);
           transition: color 0.2s ease;
         }
 
         .language-active-indicator {
           margin-left: auto;
-          color: var(--header-bg);
+          color: var(--header-text-primary);
           font-weight: bold;
         }
       }
@@ -283,25 +296,25 @@
     &__logout {
       width: 32px;
       height: 32px;
-      box-shadow: 1px 1px 0px 0px var(--header-border);
+      box-shadow: 1px 1px 0px 0px rgba(255, 255, 255, 0.1);
 
       &:hover {
-        box-shadow: 2px 2px 0px 0px var(--header-border);
+        box-shadow: 2px 2px 0px 0px rgba(255, 255, 255, 0.15);
       }
     }
 
     &__language-switcher {
       .language-selector {
         padding: 0.25rem 0.5rem;
-        box-shadow: 1px 1px 0px 0px var(--header-border);
+        box-shadow: 1px 1px 0px 0px rgba(255, 255, 255, 0.1);
 
         &:hover {
-          box-shadow: 2px 2px 0px 0px var(--header-border);
+          box-shadow: 2px 2px 0px 0px rgba(255, 255, 255, 0.15);
         }
       }
 
       .language-dropdown {
-        box-shadow: 2px 2px 0px 0px var(--header-border);
+        box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.1);
       }
     }
   }

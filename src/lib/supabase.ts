@@ -88,7 +88,6 @@ export interface Database {
           title: string
           description: string | null
           image_url: string | null
-          level_id: string | null
           created_at: string
           updated_at: string
         }
@@ -97,7 +96,6 @@ export interface Database {
           title: string
           description?: string | null
           image_url?: string | null
-          level_id?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -106,7 +104,29 @@ export interface Database {
           title?: string
           description?: string | null
           image_url?: string | null
-          level_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      subject_levels: {
+        Row: {
+          id: string
+          subject_id: string
+          level_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          subject_id: string
+          level_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          subject_id?: string
+          level_id?: string
           created_at?: string
           updated_at?: string
         }

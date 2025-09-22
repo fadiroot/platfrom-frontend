@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { getExercises, createExercise, updateExercise, deleteExercise } from '@/lib/api/exercises'
 import { getChapters } from '@/lib/api/chapters'
-import { getSubjects } from '@/lib/api/subjects'
+import { getSubjects, type SubjectWithLevels } from '@/lib/api/subjects'
 import { getLevels } from '@/lib/api/levels'
 import { uploadExercisePDF } from '@/lib/api/storage'
 import type { Tables } from '@/lib/supabase'
@@ -21,7 +21,7 @@ const uploadInfoStyle: React.CSSProperties = {
 
 type Exercise = Tables<'exercises'>
 type Chapter = Tables<'chapters'>
-type Subject = Tables<'subjects'>
+type Subject = SubjectWithLevels // Use the new type
 type Level = Tables<'levels'>
 
 interface ExerciseFormData {
@@ -182,7 +182,7 @@ const ExerciseManagement: React.FC = () => {
       const subject = chapter ? subjects.find(s => s.id === chapter.subject_id) : null
       
       // Level filter
-      if (filters.level_id && subject?.level_id !== filters.level_id) {
+      if (filters.level_id && (!subject?.level_ids || !subject.level_ids.includes(filters.level_id))) {
         return false
       }
       
@@ -213,7 +213,7 @@ const ExerciseManagement: React.FC = () => {
   // Get filtered subjects for filter dropdown
   const getFilteredSubjects = () => {
     if (!filters.level_id) return subjects
-    return subjects.filter(subject => subject.level_id === filters.level_id)
+    return subjects.filter(subject => subject.level_ids && subject.level_ids.includes(filters.level_id))
   }
 
   // Get filtered chapters for filter dropdown
@@ -234,7 +234,7 @@ const ExerciseManagement: React.FC = () => {
     if (levelId) {
       try {
         const subjectsData = await getSubjects()
-        const filteredSubjects = subjectsData.filter(subject => subject.level_id === levelId)
+        const filteredSubjects = subjectsData.filter(subject => subject.level_ids && subject.level_ids.includes(levelId))
         setSubjects(filteredSubjects)
       } catch (error) {
         console.error('Error fetching subjects:', error)
@@ -411,16 +411,18 @@ const ExerciseManagement: React.FC = () => {
         const subjectsData = await getSubjects()
         const subject = subjectsData.find(s => s.id === chapter.subject_id)
         
-        if (subject) {
+        if (subject && subject.level_ids && subject.level_ids.length > 0) {
+          // Use the first level_id from the array (or you could show all levels)
+          const firstLevelId = subject.level_ids[0]
           // Set the level and subject in form data
           setFormData(prev => ({
             ...prev,
-            level_id: subject.level_id,
+            level_id: firstLevelId,
             subject_id: subject.id
           }))
           
           // Populate the dropdowns
-          await handleLevelChange(subject.level_id)
+          await handleLevelChange(firstLevelId)
           await handleSubjectChange(subject.id)
         }
       }
@@ -484,9 +486,11 @@ const ExerciseManagement: React.FC = () => {
     if (!chapter) return 'Niveau inconnu'
     
     const subject = subjects.find(s => s.id === chapter.subject_id)
-    if (!subject) return 'Niveau inconnu'
+    if (!subject || !subject.level_ids || subject.level_ids.length === 0) return 'Niveau inconnu'
     
-    return getLevelName(subject.level_id)
+    // Since subjects can now have multiple levels, we'll show the first one
+    const firstLevelId = subject.level_ids[0]
+    return getLevelName(firstLevelId)
   }
 
   const getExerciseSubjectName = (exercise: Exercise) => {

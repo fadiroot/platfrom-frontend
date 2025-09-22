@@ -40,8 +40,9 @@
 
 // Subject Grid
 .subject-grid {
-  @include student-grid(320px);
-  gap: 2rem;
+  @include student-grid(350px);
+  gap: 2.5rem;
+  margin-top: 3rem;
 }
 
 // No Subjects Empty State
@@ -89,122 +90,162 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--student-text-primary);
-  background-color: var(--student-bg-secondary);
+  border: 2px solid #2c4981;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   font-weight: 700;
   color: var(--student-text-primary);
-  box-shadow: 2px 2px 2px 2px var(--student-text-primary);
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(44, 73, 129, 0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  padding: 1rem 1.5rem;
+  padding: 2rem 1.5rem;
   flex-direction: column;
   align-items: flex-start;
-  border-radius: 3px;
+  border-radius: 12px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2c4981 0%, #3d5a94 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
 
   &:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0px 0px var(--student-text-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(44, 73, 129, 0.25);
+    border-color: #1e3461;
+
+    &::before {
+      transform: scaleX(1);
+    }
+
+    .subject-icon {
+      transform: scale(1.05);
+    }
+
+    .explore-button {
+      background: #2c4981;
+      color: white;
+      transform: translateY(-1px);
+    }
   }
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
 
     &:hover {
-      transform: translate(0, 0);
-      box-shadow: 2px 2px 0px 0px var(--student-text-primary);
+      transform: none;
+      box-shadow: 0 4px 12px rgba(44, 73, 129, 0.15);
+      border-color: #2c4981;
+
+      &::before {
+        transform: scaleX(0);
+      }
     }
   }
 }
 
 .subject-icon {
   font-size: 2.7rem;
-  color: var(--student-text-primary);
-  transition: color 0.3s ease;
+  color: #2c4981;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
-  margin-bottom: 1rem;
+  width: 70px;
+  height: 70px;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, rgba(44, 73, 129, 0.1) 0%, rgba(44, 73, 129, 0.05) 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(44, 73, 129, 0.2);
 
   .subject-icon-img {
-    width: 100%;
-    height: 100%;
+    width: 70%;
+    height: 70%;
     object-fit: contain;
-    filter: brightness(0) saturate(100%);
-    transition: filter 0.3s ease;
+    filter: hue-rotate(200deg) saturate(1.2);
+    transition: all 0.3s ease;
   }
 
   .default-icon {
-    font-size: 2.7rem;
+    font-size: 2.2rem;
   }
 }
 
 .subject-name {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: var(--student-text-primary);
-  letter-spacing: 0.01em;
+  margin-bottom: 0.75rem;
+  color: #1a202c;
+  letter-spacing: -0.01em;
   transition: color 0.3s ease;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.3;
 }
 
 .subject-description {
-  color: var(--student-text-secondary);
-  margin-bottom: 1.2rem;
-  line-height: 1.5;
-  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
   transition: color 0.3s ease;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .subject-meta {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   margin-top: auto;
   width: 100%;
 }
 
 .chapter-count {
-  color: var(--student-text-secondary);
-  font-size: 0.9rem;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 500;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: rgba(44, 73, 129, 0.08);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(44, 73, 129, 0.15);
 }
 
 .explore-button {
   display: flex;
-  width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  border: 2px solid #000000;
-  background-color: #000000;
-  font-weight: 700;
-  color: var(--student-bg-secondary);
-  box-shadow: 2px 2px 0px 0px #000000;
+  background: rgba(44, 73, 129, 0.1);
+  border: 2px solid #2c4981;
+  color: #2c4981;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
   transition: all 0.3s ease;
   cursor: pointer;
-  padding: 0.5rem 1.2rem;
-  font-size: 1rem;
-  border-radius: 3px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
-  &:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 3px 3px 0px 0px #000000;
-  }
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  gap: 0.5rem;
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
 
     &:hover {
-      transform: translate(0, 0);
-      box-shadow: 2px 2px 0px 0px #000000;
+      transform: none;
+      background: rgba(44, 73, 129, 0.1);
+      color: #2c4981;
     }
   }
 }

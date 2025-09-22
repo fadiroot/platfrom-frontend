@@ -52,12 +52,15 @@ export const getChaptersByLevel = async (levelId: string): Promise<Chapter[]> =>
       `
       *,
       subject:subjects!inner(
-        level_id
+        id,
+        subject_levels!inner(
+          level_id
+        )
       ),
       exercises:user_accessible_exercises(count)
     `
     )
-    .eq('subject.level_id', levelId)
+    .eq('subject.subject_levels.level_id', levelId)
     .order('created_at', { ascending: true })
 
   if (error) {
@@ -88,7 +91,7 @@ export const getChapterById = async (id: string): Promise<Chapter | null> => {
 // Get chapters with subject and level information
 export const getChaptersWithDetails = async (): Promise<
   (Chapter & {
-    subject: (Tables<'subjects'> & { level: Tables<'levels'> | null }) | null
+    subject: (Tables<'subjects'> & { levels: Tables<'levels'>[] }) | null
   })[]
 > => {
   const { data, error } = await supabase
@@ -98,7 +101,9 @@ export const getChaptersWithDetails = async (): Promise<
       *,
       subject:subjects(
         *,
-        level:levels(*)
+        subject_levels(
+          level:levels(*)
+        )
       )
     `
     )
@@ -108,7 +113,16 @@ export const getChaptersWithDetails = async (): Promise<
     throw new Error(`Failed to fetch chapters with details: ${error.message}`)
   }
 
-  return data || []
+  // Transform the data to flatten the levels array
+  const transformedData = (data || []).map((chapter) => ({
+    ...chapter,
+    subject: chapter.subject ? {
+      ...chapter.subject,
+      levels: chapter.subject.subject_levels?.map((sl: any) => sl.level).filter(Boolean) || []
+    } : null
+  }))
+
+  return transformedData
 }
 
 // Get chapter with progress for a specific user

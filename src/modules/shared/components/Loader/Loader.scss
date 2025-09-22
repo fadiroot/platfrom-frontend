@@ -156,21 +156,84 @@
 
 // Modern spin animation
 @keyframes spin {
-  0% { 
-    transform: rotate(0deg); 
+  0% {
+    transform: rotate(0deg);
   }
-  100% { 
-    transform: rotate(360deg); 
+  100% {
+    transform: rotate(360deg);
   }
 }
 
-// Subtle pulse animation for text
-@keyframes pulse {
-  0%, 100% { 
-    opacity: 1; 
+// Astuce text loader animations
+.astuce-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1em;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  
+  &.small {
+    font-size: 2rem;
   }
-  50% { 
-    opacity: 0.7; 
+  
+  &.medium {
+    font-size: 3rem;
+  }
+  
+  &.large {
+    font-size: 4rem;
+  }
+  
+  .letter {
+    display: inline-block;
+    animation: bounce 1.4s ease-in-out infinite;
+    color: #2c4981;
+    text-shadow: 0 2px 4px rgba(44, 73, 129, 0.3);
+    
+    &.a { animation-delay: 0s; }
+    &.s { animation-delay: 0.1s; }
+    &.t { animation-delay: 0.2s; }
+    &.u { animation-delay: 0.3s; }
+    &.c { animation-delay: 0.4s; }
+    &.e { animation-delay: 0.5s; }
+  }
+}
+
+@keyframes bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    color: #2c4981;
+  }
+  30% {
+    transform: translateY(-20px);
+    color: #3d5a94;
+    text-shadow: 0 4px 8px rgba(44, 73, 129, 0.4);
+  }
+}
+
+// Alternative wave animation
+@keyframes wave {
+  0%, 60%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-15px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+// Pulse animation option for letters
+@keyframes letterPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
   }
 }
 
@@ -218,6 +281,21 @@
   .loader-text {
     font-size: 0.9rem;
     margin-top: 1.25rem;
+  }
+  
+  // Responsive Astuce loader
+  .astuce-loader {
+    &.large {
+      font-size: 3rem;
+    }
+    
+    &.medium {
+      font-size: 2.2rem;
+    }
+    
+    &.small {
+      font-size: 1.5rem;
+    }
   }
 }
 

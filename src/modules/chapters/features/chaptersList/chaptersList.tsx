@@ -9,6 +9,7 @@ import { getChaptersBySubject, getChaptersByLevel } from '@/lib/api/chapters'
 import { getSubjectById } from '@/lib/api/subjects'
 import { getLevelById } from '@/lib/api/levels'
 import Loader from '../../../shared/components/Loader/Loader'
+import Cap from '@/modules/shared/svgs/Cap'
 
 // Define the Chapter interface to match the database schema
 interface Chapter {
@@ -90,6 +91,7 @@ const ChaptersList: React.FC = () => {
         <div className="header-content">
           <h1 className="course-title">{subjectName}</h1>
         </div>
+        <Cap className="chapters-list-cap" />
 
         {/* Course Statistics */}
         <div className="course-stats">
@@ -178,15 +180,23 @@ const ChaptersList: React.FC = () => {
                   </div>
 
                   <div className="chapter-actions">
-                    <button className="action-btn">
+                    <button 
+                      className={`action-btn ${
+                        chapter.progress === 100 
+                          ? 'review-btn' 
+                          : chapter.progress 
+                          ? 'continue-btn' 
+                          : 'start-btn'
+                      }`}
+                    >
                       {chapter.progress === 100
                         ? t('chapters.review')
                         : chapter.progress
                         ? t('chapters.continue')
                         : t('chapters.start')}
                       <svg
-                        width="16"
-                        height="16"
+                        width="18"
+                        height="18"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"

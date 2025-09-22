@@ -10,6 +10,7 @@ import { getChapterById } from '@/lib/api/chapters';
 import type { Exercise as SupabaseExercise } from '@/lib/api/exercises';
 import { Exercise } from '../../types/exercise';
 import Loader from '../../../shared/components/Loader/Loader';
+import Cap from '@/modules/shared/svgs/Cap';
 import './index.scss';
 
 const ExercisesList: React.FC = () => {
@@ -26,6 +27,7 @@ const ExercisesList: React.FC = () => {
   const [accessibleExercises, setAccessibleExercises] = useState<string[]>([]);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumExerciseId, setPremiumExerciseId] = useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
   // Get exercise ID from URL search params
   const exerciseIdFromUrl = searchParams.get('exercise');
@@ -149,13 +151,27 @@ const ExercisesList: React.FC = () => {
     }
   };
 
+  const handleDifficultyFilter = (difficulty: string) => {
+    setSelectedDifficulty(difficulty);
+  };
+
+  // Filter exercises based on selected difficulty
+  const filteredExercises = exercises.filter(exercise => {
+    if (selectedDifficulty === 'all') return true;
+    
+    // Normalize difficulty values for comparison
+    const exerciseDifficulty = String(exercise.difficulty || '').toLowerCase();
+    const filterDifficulty = selectedDifficulty.toLowerCase();
+    
+    return exerciseDifficulty === filterDifficulty;
+  });
+
   if (loading) {
     return (
       <div className="exercises-list-container">
         <Loader 
           size="large" 
           color="primary" 
-          text="Loading exercises..." 
           context="exercise"
           fullScreen={true}
         />
@@ -209,10 +225,44 @@ const ExercisesList: React.FC = () => {
               <h1>{chapterTitle}</h1>
               <p>{t('exercises.subtitle')}</p>
             </div>
+            <Cap className="exercises-list-cap" />
+          </div>
+
+          {/* Difficulty Filters */}
+          <div className="difficulty-filters">
+            <div className="filters-container">
+              <span className="filters-label">{t('exercises.filterByDifficulty')}:</span>
+              <div className="filter-buttons">
+                <button
+                  className={`filter-btn ${selectedDifficulty === 'all' ? 'active' : ''}`}
+                  onClick={() => handleDifficultyFilter('all')}
+                >
+                  {t('exercises.all')} ({exercises.length})
+                </button>
+                <button
+                  className={`filter-btn easy ${selectedDifficulty === 'easy' ? 'active' : ''}`}
+                  onClick={() => handleDifficultyFilter('easy')}
+                >
+                  {t('exercises.easy')} ({exercises.filter(ex => String(ex.difficulty || '').toLowerCase() === 'easy').length})
+                </button>
+                <button
+                  className={`filter-btn medium ${selectedDifficulty === 'medium' ? 'active' : ''}`}
+                  onClick={() => handleDifficultyFilter('medium')}
+                >
+                  {t('exercises.medium')} ({exercises.filter(ex => String(ex.difficulty || '').toLowerCase() === 'medium').length})
+                </button>
+                <button
+                  className={`filter-btn hard ${selectedDifficulty === 'hard' ? 'active' : ''}`}
+                  onClick={() => handleDifficultyFilter('hard')}
+                >
+                  {t('exercises.hard')} ({exercises.filter(ex => String(ex.difficulty || '').toLowerCase() === 'hard').length})
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="exercises-grid">
-            {exercises.map((exercise, index) => {
+            {filteredExercises.map((exercise, index) => {
               // Check if user has access to this exercise
               const hasAccess = accessibleExercises.includes(exercise.id);
               const isPremium = !hasAccess; // Premium if user doesn't have access
@@ -227,6 +277,11 @@ const ExercisesList: React.FC = () => {
                 />
               );
             })}
+            {filteredExercises.length === 0 && (
+              <div className="no-exercises-message">
+                <p>{t('exercises.noExercisesFound')}</p>
+              </div>
+            )}
           </div>
         </div>
       )}

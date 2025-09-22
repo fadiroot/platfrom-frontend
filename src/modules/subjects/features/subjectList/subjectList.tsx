@@ -3,25 +3,14 @@ import './index.scss'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { getSubjectsWithLevel, getSubjectsByLevelWithLevel } from '@/lib/api/subjects'
+import { getSubjects, getSubjectsByLevel, type SubjectWithLevels } from '@/lib/api/subjects'
 import { RootState } from '@/modules/shared/store'
 import Cap from '@/modules/shared/svgs/Cap'
 import HandDrawnArrow from '@/modules/shared/svgs/HandDrawnArrow'
 import Loader from '../../../shared/components/Loader/Loader'
 
-// Define the Subject interface with level information
-interface Subject {
-  id: string
-  title: string
-  description: string | null
-  image_url: string | null
-  level_id: string | null
-  level?: {
-    id: string
-    title: string
-    description: string | null
-  } | null
-}
+// Use the new SubjectWithLevels type from the API
+type Subject = SubjectWithLevels
 
 const SubjectList: React.FC = () => {
   const navigate = useNavigate()
@@ -42,12 +31,13 @@ const SubjectList: React.FC = () => {
       try {
         let subjects: Subject[]
         
-        // If user has a level_id, fetch subjects for that level with level information
+        // If user has a level_id, fetch subjects for that level
+        // This will include subjects that are shared between multiple levels
         if (user?.level_id) {
-          subjects = await getSubjectsByLevelWithLevel(user.level_id)
+          subjects = await getSubjectsByLevel(user.level_id)
         } else {
-          // Fallback to all subjects with level information if no level_id (shouldn't happen for students)
-          subjects = await getSubjectsWithLevel()
+          // Fallback to all subjects if no level_id (shouldn't happen for students)
+          subjects = await getSubjects()
         }
         
         setSubjects(subjects)

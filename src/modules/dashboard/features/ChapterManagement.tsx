@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { getChapters, createChapter, updateChapter, deleteChapter } from '@/lib/api/chapters'
-import { getSubjects, getSubjectsByLevel } from '@/lib/api/subjects'
+import { getSubjects, getSubjectsByLevel, type SubjectWithLevels } from '@/lib/api/subjects'
 import { getLevels } from '@/lib/api/levels'
 import type { Tables } from '@/lib/supabase'
 import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
 import './ChapterManagement.scss'
 
 type Chapter = Tables<'chapters'>
-type Subject = Tables<'subjects'>
+type Subject = SubjectWithLevels // Use the new type
 type Level = Tables<'levels'>
 
 interface ChapterFormData {
@@ -221,10 +221,12 @@ const ChapterManagement: React.FC = () => {
   const fetchSubjectDetails = async (subjectId: string) => {
     try {
       const subject = subjects.find(s => s.id === subjectId)
-      if (subject && subject.level_id) {
-        setFormData(prev => ({ ...prev, level_id: subject.level_id }))
+      if (subject && subject.level_ids && subject.level_ids.length > 0) {
+        // Use the first level_id from the array (or you could show all levels)
+        const firstLevelId = subject.level_ids[0]
+        setFormData(prev => ({ ...prev, level_id: firstLevelId }))
         // Fetch subjects for this level
-        const subjectsForLevel = await getSubjectsByLevel(subject.level_id)
+        const subjectsForLevel = await getSubjectsByLevel(firstLevelId)
         if (isMountedRef.current) {
           setFilteredSubjects(subjectsForLevel)
         }
@@ -279,8 +281,15 @@ const ChapterManagement: React.FC = () => {
     const subject = subjects.find(s => s.id === subjectId)
     if (!subject) return 'Niveau inconnu'
     
-    const level = levels.find(l => l.id === subject.level_id)
-    return level ? level.title : 'Niveau inconnu'
+    // Since subjects can now have multiple levels, we'll show the first one
+    // or you could show all levels
+    if (subject.level_ids && subject.level_ids.length > 0) {
+      const firstLevelId = subject.level_ids[0]
+      const level = levels.find(l => l.id === firstLevelId)
+      return level ? level.title : 'Niveau inconnu'
+    }
+    
+    return 'Niveau inconnu'
   }
 
   if (loading) {

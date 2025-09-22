@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { IoArrowBack, IoDocumentText, IoCheckmarkCircle } from 'react-icons/io5'
+import { IoArrowBack, IoBookOutline, IoShieldCheckmarkOutline } from 'react-icons/io5'
 import { getSecureExerciseFiles, getSecureFileUrl } from '@/lib/api/exercises'
 import { supabase } from '@/lib/supabase'
 import { ExerciseViewerProps, Exercise } from './types'
@@ -14,8 +14,8 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
   const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState<'exercise' | 'solution'>('exercise')
   
-  // Determine if current language is RTL
-  const isRTL = i18n.language === 'ar'
+  // Always use LTR direction for all languages
+  const isRTL = false
   const [selectedFileIdx, setSelectedFileIdx] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [secureExerciseFiles, setSecureExerciseFiles] = useState<string[]>([])
@@ -24,6 +24,10 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
   const [loadingFiles, setLoadingFiles] = useState(true)
   const [isTestMode, setIsTestMode] = useState(false)
   const preloadedFiles = useRef(new Set<string>())
+  
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const correctionIframeRef = useRef<HTMLIFrameElement>(null)
+  const [preloadedTabs, setPreloadedTabs] = useState<Set<string>>(new Set())
 
   // Preload PDFs for better performance
 
@@ -64,36 +68,52 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
     loadSecureFiles()
   }, [exercise.id, exerciseIndex])
 
-  // Preload adjacent files for faster switching
+  // Preload both tabs for instant switching
   useEffect(() => {
     if (!hasAccess || loadingFiles) return
     
-    const currentFiles = getCurrentFiles()
-    if (currentFiles.length === 0) return
+    const exerciseFiles = secureExerciseFiles
+    const correctionFiles = secureCorrectionFiles
     
-    // Preload current file if not already loaded
-    const currentFile = currentFiles[selectedFileIdx]
-    if (currentFile) {
-      // Preload logic can be added here if needed
+    // Preload both exercise and correction files
+    const preloadTab = (files: string[], tabName: string) => {
+      if (files.length > 0 && selectedFileIdx < files.length) {
+        const fileUrl = files[selectedFileIdx]
+        if (fileUrl && !preloadedTabs.has(`${tabName}-${selectedFileIdx}`)) {
+          // Mark as preloaded
+          setPreloadedTabs(prev => new Set([...prev, `${tabName}-${selectedFileIdx}`]))
+        }
+      }
     }
     
-    // Preload next and previous files
-    const nextIdx = selectedFileIdx + 1
-    const prevIdx = selectedFileIdx - 1
+    // Preload current file index for both tabs
+    preloadTab(exerciseFiles, 'exercise')
+    preloadTab(correctionFiles, 'correction')
     
-    if (nextIdx < currentFiles.length) {
-      // Preload next file
+  }, [selectedFileIdx, hasAccess, loadingFiles, secureExerciseFiles, secureCorrectionFiles, preloadedTabs])
+
+  // Update iframe sources when file index changes
+  useEffect(() => {
+    if (!hasAccess || loadingFiles) return
+
+    // Update exercise iframe
+    if (iframeRef.current && secureExerciseFiles.length > 0 && selectedFileIdx < secureExerciseFiles.length) {
+      const exerciseUrl = secureExerciseFiles[selectedFileIdx]
+      const newSrc = `https://docs.google.com/gview?url=${encodeURIComponent(exerciseUrl)}&embedded=true&rm=minimal`
+      if (iframeRef.current.src !== newSrc) {
+        iframeRef.current.src = newSrc
+      }
     }
-    if (prevIdx >= 0) {
-      // Preload previous file
+
+    // Update correction iframe
+    if (correctionIframeRef.current && secureCorrectionFiles.length > 0 && selectedFileIdx < secureCorrectionFiles.length) {
+      const correctionUrl = secureCorrectionFiles[selectedFileIdx]
+      const newSrc = `https://docs.google.com/gview?url=${encodeURIComponent(correctionUrl)}&embedded=true&rm=minimal`
+      if (correctionIframeRef.current.src !== newSrc) {
+        correctionIframeRef.current.src = newSrc
+      }
     }
-    
-    // Preload files from the other tab (exercise/solution)
-    const otherFiles = activeTab === 'exercise' ? secureCorrectionFiles : secureExerciseFiles
-    if (otherFiles.length > 0 && selectedFileIdx < otherFiles.length) {
-      // Preload other tab file
-    }
-  }, [selectedFileIdx, activeTab, hasAccess, loadingFiles, secureExerciseFiles, secureCorrectionFiles])
+  }, [selectedFileIdx, secureExerciseFiles, secureCorrectionFiles, hasAccess, loadingFiles])
 
   // Get current files based on active tab
   const getCurrentFiles = () => {
@@ -175,13 +195,13 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
     return extension
   }
 
+
   if (loadingFiles) {
     return (
       <div className="exercise-viewer-modern">
         <Loader 
           size="large" 
           color="primary" 
-          text="Loading exercise files..." 
           context="exercise"
           fullScreen={true}
         />
@@ -239,7 +259,7 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
                 setSelectedFileIdx(0)
               }}
             >
-              <IoDocumentText style={{ strokeWidth: '2.5px' }} />
+              <IoBookOutline style={{ strokeWidth: '2.5px' }} />
               <span>{t('exerciseViewer.exerciseTab')}</span>
             </div>
             <div 
@@ -249,7 +269,7 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
                 setSelectedFileIdx(0)
               }}
             >
-              <IoCheckmarkCircle style={{ strokeWidth: '2.5px' }} />
+              <IoShieldCheckmarkOutline style={{ strokeWidth: '2.5px' }} />
               <span>{t('exerciseViewer.correctionTab')}</span>
             </div>
           </div>
@@ -301,125 +321,188 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
           </div>
         )}
 
-        {/* Main PDF Viewer - Full Width with Download Protection */}
-        <div className="custom-pdf-viewer full-width">
+        {/* Enhanced Fast PDF Viewer */}
+        <div className="modern-pdf-viewer">
           {getCurrentPDFUrl() ? (
-            <div 
-              style={{
-                width: '100%',
-                height: '100%',
-                position: 'relative',
-                background: 'white',
-                overflow: 'hidden'
-              }}
-              onContextMenu={(e) => e.preventDefault()}
-              onDragStart={(e) => e.preventDefault()}
-              onDrop={(e) => e.preventDefault()}
-              onCopy={(e) => e.preventDefault()}
-              onCut={(e) => e.preventDefault()}
-              onKeyDown={(e) => {
-                // Block common download/save shortcuts
-                if (
-                  (e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
-                  (e.metaKey && (e.key === 's' || e.key === 'd' || e.key === 'p')) ||
-                        e.key === 'F12' ||
-                  (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
-                  (e.ctrlKey && e.key === 'u') ||
-                  (e.ctrlKey && e.shiftKey && e.key === 'i')
-                      ) {
+            <div className="pdf-viewer-container">
+              {/* Main PDF Content */}
+              <div 
+                className="pdf-content-area"
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                onDrop={(e) => e.preventDefault()}
+                onCopy={(e) => e.preventDefault()}
+                onCut={(e) => e.preventDefault()}
+                onKeyDown={(e) => {
+                  // Block all dangerous keyboard shortcuts
+                  if (
+                    // Save, Download, Print, View Source
+                    (e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
+                    (e.metaKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
+                    // Developer tools
+                    e.key === 'F12' ||
+                    (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
+                    (e.metaKey && e.altKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
+                    // New window/tab
+                    (e.ctrlKey && (e.key === 'n' || e.key === 't')) ||
+                    (e.metaKey && (e.key === 'n' || e.key === 't')) ||
+                    // Refresh
+                    (e.key === 'F5') ||
+                    (e.ctrlKey && e.key === 'r') ||
+                    (e.metaKey && e.key === 'r')
+                  ) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                  }
+                }}
+                tabIndex={0}
+              >
+                {/* Dual Iframe System for Fast Tab Switching */}
+                <div className="secure-pdf-container">
+                  {/* Exercise Tab Iframe */}
+                  <iframe
+                    ref={iframeRef}
+                    src={secureExerciseFiles.length > 0 && selectedFileIdx < secureExerciseFiles.length ? 
+                      `https://docs.google.com/gview?url=${encodeURIComponent(secureExerciseFiles[selectedFileIdx])}&embedded=true&rm=minimal` : 
+                      ''}
+                    className={`fast-pdf-iframe ${activeTab === 'exercise' ? 'active' : 'hidden'}`}
+                    title="Exercise PDF Viewer"
+                    loading="eager"
+                    sandbox="allow-scripts allow-same-origin"
+                    onLoad={(e) => {
+                      const iframe = e.currentTarget;
+                      // Hide loading indicator when active tab loads
+                      if (activeTab === 'exercise') {
+                        const loader = document.querySelector('.pdf-loading-indicator');
+                        if (loader) loader.remove();
+                      }
+                      
+                      // Inject security CSS
+                      try {
+                        if (iframe.contentDocument) {
+                          const style = iframe.contentDocument.createElement('style');
+                          style.textContent = `
+                            .ndfHFb-c4YZDc-Wrql6b, 
+                            .ndfHFb-c4YZDc-to915-LgbsSe,
+                            .ndfHFb-c4YZDc-LgbsSe,
+                            [data-tooltip="Open in new window"],
+                            [aria-label="Open in new window"],
+                            [title="Open in new window"],
+                            .ndfHFb-c4YZDc-Wrql6b-LgbsSe-OWXEXe-IT5dJd,
+                            .docs-icon-acrobat,
+                            .docs-icon-download,
+                            .docs-icon-print {
+                              display: none !important;
+                              visibility: hidden !important;
+                            }
+                            body {
+                              -webkit-user-select: none;
+                              -moz-user-select: none;
+                              -ms-user-select: none;
+                              user-select: none;
+                            }
+                          `;
+                          iframe.contentDocument.head.appendChild(style);
+                        }
+                      } catch (error) {
+                        console.log('Cannot inject styles due to CORS policy');
+                      }
+                    }}
+                  />
+
+                  {/* Correction Tab Iframe */}
+                  <iframe
+                    ref={correctionIframeRef}
+                    src={secureCorrectionFiles.length > 0 && selectedFileIdx < secureCorrectionFiles.length ? 
+                      `https://docs.google.com/gview?url=${encodeURIComponent(secureCorrectionFiles[selectedFileIdx])}&embedded=true&rm=minimal` : 
+                      ''}
+                    className={`fast-pdf-iframe ${activeTab === 'solution' ? 'active' : 'hidden'}`}
+                    title="Solution PDF Viewer"
+                    loading="eager"
+                    sandbox="allow-scripts allow-same-origin"
+                    onLoad={(e) => {
+                      const iframe = e.currentTarget;
+                      // Hide loading indicator when active tab loads
+                      if (activeTab === 'solution') {
+                        const loader = document.querySelector('.pdf-loading-indicator');
+                        if (loader) loader.remove();
+                      }
+                      
+                      // Inject security CSS
+                      try {
+                        if (iframe.contentDocument) {
+                          const style = iframe.contentDocument.createElement('style');
+                          style.textContent = `
+                            .ndfHFb-c4YZDc-Wrql6b, 
+                            .ndfHFb-c4YZDc-to915-LgbsSe,
+                            .ndfHFb-c4YZDc-LgbsSe,
+                            [data-tooltip="Open in new window"],
+                            [aria-label="Open in new window"],
+                            [title="Open in new window"],
+                            .ndfHFb-c4YZDc-Wrql6b-LgbsSe-OWXEXe-IT5dJd,
+                            .docs-icon-acrobat,
+                            .docs-icon-download,
+                            .docs-icon-print {
+                              display: none !important;
+                              visibility: hidden !important;
+                            }
+                            body {
+                              -webkit-user-select: none;
+                              -moz-user-select: none;
+                              -ms-user-select: none;
+                              user-select: none;
+                            }
+                          `;
+                          iframe.contentDocument.head.appendChild(style);
+                        }
+                      } catch (error) {
+                        console.log('Cannot inject styles due to CORS policy');
+                      }
+                    }}
+                  />
+                  
+                  {/* Security Overlay - Prevents Right Click and Selection */}
+                  <div 
+                    className="security-overlay"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                    onMouseDown={(e) => {
+                      // Prevent middle mouse button (open in new tab)
+                      if (e.button === 1) {
                         e.preventDefault();
-                        e.stopPropagation();
-                }
-              }}
-            >
-              {/* Custom PDF Viewer with embedded PDF.js */}
-              <iframe
-                src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(getCurrentPDFUrl()!)}&zoom=page-fit&pagemode=none`}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  border: 'none',
-                  background: 'white',
-                  pointerEvents: 'auto'
-                }}
-                title="PDF Viewer"
-                sandbox="allow-scripts allow-same-origin allow-forms"
-                onLoad={() => {
-                  console.log('PDF viewer loaded with download protection');
-                }}
-              />
-              
-              {/* Overlay to prevent direct interaction with PDF content */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  pointerEvents: 'none',
-                  zIndex: 10
-                }}
-              />
+                      }
+                    }}
+                  ></div>
+                </div>
+                
+                {/* Loading Indicator */}
+                <div className="pdf-loading-indicator">
+                  <div className="loading-spinner"></div>
+                  <span>Loading document...</span>
+                </div>
+
+                {/* Protection Layer */}
+                <div className="pdf-protection-layer"></div>
+              </div>
+
+              {/* Performance Status */}
+              <div className="viewer-footer">
+                <div className="performance-indicator">
+                  <div className="speed-indicator">
+                    <span className="speed-dot"></span>
+                    <span>Fast Mode</span>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
-            // Test mode: Show sample PDF when no files are available
-            <div 
-              style={{
-                width: '100%',
-                height: '100%',
-                position: 'relative',
-                background: 'white',
-                overflow: 'hidden'
-              }}
-              onContextMenu={(e) => e.preventDefault()}
-              onDragStart={(e) => e.preventDefault()}
-              onDrop={(e) => e.preventDefault()}
-              onCopy={(e) => e.preventDefault()}
-              onCut={(e) => e.preventDefault()}
-              onKeyDown={(e) => {
-                // Block common download/save shortcuts
-                if (
-                  (e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
-                  (e.metaKey && (e.key === 's' || e.key === 'd' || e.key === 'p')) ||
-                        e.key === 'F12' ||
-                  (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
-                  (e.ctrlKey && e.key === 'u') ||
-                  (e.ctrlKey && e.shiftKey && e.key === 'i')
-                      ) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                }
-              }}
-            >
-              <iframe
-                src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf&zoom=page-fit&pagemode=none"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  border: 'none',
-                  background: 'white',
-                  pointerEvents: 'auto'
-                }}
-                title="PDF Viewer"
-                sandbox="allow-scripts allow-same-origin allow-forms"
-                onLoad={() => {
-                  console.log('Test PDF viewer loaded with download protection');
-                }}
-              />
-              
-              {/* Overlay to prevent direct interaction with PDF content */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  pointerEvents: 'none',
-                  zIndex: 10
-                }}
-              />
+            <div className="no-document-state">
+              <div className="empty-state">
+                <div className="empty-icon">📋</div>
+                <h3>No Document Available</h3>
+                <p>This exercise doesn't have a PDF document attached.</p>
+              </div>
             </div>
           )}
         </div>

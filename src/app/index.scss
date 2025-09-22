@@ -5,6 +5,21 @@
 
 @forward './dark.scss';
 
+// Force LTR direction for all languages including Arabic
+* {
+  direction: ltr !important;
+}
+
+html, body {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+// Ensure all components use LTR layout
+.app, #root, [data-reactroot] {
+  direction: ltr !important;
+}
+
 .global-header {
   display: flex;
   align-items: center;

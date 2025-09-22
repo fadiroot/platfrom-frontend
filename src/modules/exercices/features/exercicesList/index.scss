@@ -1,8 +1,19 @@
 @use '../../../shared/assets/styles/abstracts/student-theme' as *;
 
+.exercises-list-cap {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 150px;
+  right: 40px;
+  opacity: 0.7;
+  transform: rotate(-20deg);
+}
+
 .exercises-list-container {
   @include student-container;
   min-height: 100vh;
+  position: relative;
   
   // Error Container
   .error-container {
@@ -31,28 +42,121 @@
     }
   }
   
+  // Difficulty Filters
+  .difficulty-filters {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(44, 73, 129, 0.05);
+    border: 1px solid rgba(44, 73, 129, 0.1);
+    border-radius: 12px;
+
+    .filters-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      .filters-label {
+        font-weight: 600;
+        color: #2c4981;
+        font-size: 0.95rem;
+        margin-right: 0.5rem;
+      }
+
+      .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+
+        .filter-btn {
+          padding: 0.4rem 0.8rem;
+          border: 1px solid #64748b;
+          background: #f8fafc;
+          color: #64748b;
+          border-radius: 3px;
+          font-size: 0.75rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          text-transform: capitalize;
+          letter-spacing: 0.2px;
+
+          &:hover {
+            background: #e2e8f0;
+            transform: translateY(-1px);
+          }
+
+          &.active {
+            background: #64748b;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(100, 116, 139, 0.2);
+          }
+
+          // Difficulty-specific colors
+          &.easy.active {
+            background: #10b981;
+            border-color: #10b981;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+          }
+
+          &.medium.active {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+          }
+
+          &.hard.active {
+            background: #dc2626;
+            border-color: #dc2626;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.2);
+          }
+        }
+      }
+    }
+  }
+
+  // No exercises message
+  .no-exercises-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--student-text-secondary);
+    font-size: 1.1rem;
+    background: rgba(44, 73, 129, 0.05);
+    border: 2px dashed rgba(44, 73, 129, 0.2);
+    border-radius: 12px;
+    margin: 2rem 0;
+
+    p {
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+
   // Exercises Header
   .exercises-header {
     margin-bottom: 2rem;
 
     .back-btn {
       @include student-back-button;
-      box-shadow: 2px 2px 0px 0px var(--student-text-primary);
-      border: 2px solid var(--student-text-primary);
-      padding: 0.5rem 1rem;
-      margin-bottom: 1rem;
+      background: rgba(44, 73, 129, 0.1);
+      border: 2px solid #2c4981;
+      color: #2c4981;
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
       
       &:hover {
-        transition: all 0.3s ease;
-        transform: translate(-1px, -1px);
-        background-color: var(--student-text-primary);
-        color: var(--student-bg-primary);
-        box-shadow: 2px 2px 0px 0px var(--student-text-primary);
+        background: #2c4981;
+        color: white;
+        transform: translateY(-1px);
 
         svg {
-          transition: all 0.3s ease;
-          stroke: var(--student-bg-primary);
-          color: var(--student-bg-primary);
+          stroke: white;
+          color: white;
         }
       }
     }
@@ -114,8 +218,10 @@
   }
   
   .exercises-grid {
-    @include student-grid(320px);
-    gap: 1.8rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
   }
 }
 
@@ -152,6 +258,32 @@
   .exercises-list-container {
     padding: 1rem 1rem;
     
+    .difficulty-filters {
+      padding: 1rem;
+      
+      .filters-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        
+        .filters-label {
+          margin-right: 0;
+        }
+        
+        .filter-buttons {
+          width: 100%;
+          justify-content: center;
+          
+          .filter-btn {
+            flex: 1;
+            min-width: 0;
+            font-size: 0.7rem;
+            padding: 0.35rem 0.6rem;
+          }
+        }
+      }
+    }
+    
     .exercises-header {
       h1 {
         font-size: 1.875rem;
@@ -178,6 +310,14 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .exercises-list-cap {
+    width: 35px;
+    height: 35px;
+    top: 100px;
+    right: 15px;
+    opacity: 0.5;
+  }
 }
 
 @media (max-width: 480px) {
@@ -197,5 +337,13 @@
         }
       }
     }
+  }
+
+  .exercises-list-cap {
+    width: 30px;
+    height: 30px;
+    top: 80px;
+    right: 10px;
+    opacity: 0.4;
   }
 }
