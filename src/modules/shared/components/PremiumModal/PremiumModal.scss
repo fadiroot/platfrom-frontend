@@ -39,7 +39,7 @@
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  background: linear-gradient(135deg, #2c4981, #3a5998);
   padding: 16px 20px;
   display: flex;
   align-items: center;
@@ -115,7 +115,7 @@
     .lock-icon {
       width: 48px;
       height: 48px;
-      color: #ff6b35;
+      color: #2c4981;
       opacity: 0.8;
     }
   }
@@ -167,7 +167,7 @@
         .contact-icon {
           width: 16px;
           height: 16px;
-          color: #ff6b35;
+          color: #2c4981;
           flex-shrink: 0;
         }
 
@@ -263,11 +263,11 @@
   }
 
   .contact-button {
-    background: #ff6b35;
+    background: #2c4981;
     color: #ffffff;
 
     &:hover {
-      background: #e55a2b;
+      background: #1e3461;
     }
   }
 

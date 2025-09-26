@@ -4,39 +4,22 @@
   position: relative;
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 2px solid #2c4981;
-  border-radius: 16px;
+  border-radius: 7px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   min-height: 220px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 6px 20px rgba(44, 73, 129, 0.12);
+  box-shadow: none;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   isolation: isolate;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #2c4981 0%, #3d5a94 100%);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
 
   &:hover {
     transform: translateY(-6px);
     box-shadow: none;
     border: 2px solid transparent;
     filter: blur(0.3px);
-
-    &::before {
-      transform: scaleX(1);
-    }
 
     &::after {
       content: '';
@@ -108,24 +91,35 @@
   }
 
   &.premium-locked {
-    border-color: #94a3b8;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    opacity: 0.8;
-
-    &::before {
-      background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+    border-color: #2c4981;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    opacity: 0.9;
+    
+    .exercise-title {
+      color: #64748b;
+    }
+    
+    .difficulty-badge {
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      color: #64748b;
     }
 
     &:hover {
-      border: 2px solid transparent;
-      transform: translateY(-3px);
+      transform: translateY(-6px);
       box-shadow: none;
+      border: 2px solid transparent;
+      filter: blur(0.3px);
     }
   }
 
   // Available exercise state
   &.available {
     border-color: #2c4981;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(44, 73, 129, 0.15);
+    }
   }
 
 }
@@ -235,9 +229,9 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      background: rgba(168, 85, 247, 0.1);
-      color: #7c3aed;
+      border: 1px solid rgba(44, 73, 129, 0.3);
+      background: rgba(44, 73, 129, 0.1);
+      color: #2c4981;
 
       .premium-icon {
         width: 14px;
@@ -505,17 +499,19 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 107, 53, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(2px);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 3px;
+  border-radius: 7px;
   pointer-events: none;
-  z-index: 2;
-  border: 2px solid #000000;
+  z-index: 10;
+  border: 2px solid #2c4981;
 
   .overlay-content {
     display: flex;
@@ -527,14 +523,14 @@
     .lock-icon {
       width: 32px;
       height: 32px;
-      color: #000000;
+      color: #2c4981;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .overlay-text {
       font-size: 14px;
       font-weight: 600;
-      color: #000000;
+      color: #2c4981;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
   }
@@ -554,7 +550,7 @@
     }
     
     .overlay-text {
-      color: #000000;
+      color: #2c4981;
       font-weight: 600;
     }
   }

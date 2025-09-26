@@ -184,19 +184,6 @@
   position: relative;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #2c4981 0%, #3d5a94 100%);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
-
   .action-btn {
     display: flex;
     align-items: center;
@@ -267,10 +254,6 @@
     transform: translateY(-6px);
     box-shadow: 0 12px 30px rgba(44, 73, 129, 0.2);
     border: 2px solid transparent;
-
-    &::before {
-      transform: scaleX(1);
-    }
 
     .chapter-number {
       background: #2c4981;

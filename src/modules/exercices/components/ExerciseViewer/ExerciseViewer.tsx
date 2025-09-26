@@ -7,6 +7,7 @@ import { getSecureExerciseFiles, getSecureFileUrl } from '@/lib/api/exercises'
 import { supabase } from '@/lib/supabase'
 import { ExerciseViewerProps, Exercise } from './types'
 import Loader from '../../../shared/components/Loader/Loader'
+import WebPDFViewer from './WebPDFViewer'
 
 import './ExerciseViewer.scss'
 
@@ -254,20 +255,14 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
           >
             <div 
               className={`tab-btn-header ${activeTab === 'exercise' ? 'active' : ''}`}
-              onClick={() => {
-                setActiveTab('exercise')
-                setSelectedFileIdx(0)
-              }}
+              onClick={() => setActiveTab('exercise')}
             >
               <IoBookOutline style={{ strokeWidth: '2.5px' }} />
               <span>{t('exerciseViewer.exerciseTab')}</span>
             </div>
             <div 
               className={`tab-btn-header ${activeTab === 'solution' ? 'active' : ''}`}
-              onClick={() => {
-                setActiveTab('solution')
-                setSelectedFileIdx(0)
-              }}
+              onClick={() => setActiveTab('solution')}
             >
               <IoShieldCheckmarkOutline style={{ strokeWidth: '2.5px' }} />
               <span>{t('exerciseViewer.correctionTab')}</span>
@@ -321,181 +316,19 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
           </div>
         )}
 
-        {/* Enhanced Fast PDF Viewer */}
+        {/* Web PDF Viewer */}
         <div className="modern-pdf-viewer">
           {getCurrentPDFUrl() ? (
-            <div className="pdf-viewer-container">
-              {/* Main PDF Content */}
-              <div 
-                className="pdf-content-area"
-                onContextMenu={(e) => e.preventDefault()}
-                onDragStart={(e) => e.preventDefault()}
-                onDrop={(e) => e.preventDefault()}
-                onCopy={(e) => e.preventDefault()}
-                onCut={(e) => e.preventDefault()}
-                onKeyDown={(e) => {
-                  // Block all dangerous keyboard shortcuts
-                  if (
-                    // Save, Download, Print, View Source
-                    (e.ctrlKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
-                    (e.metaKey && (e.key === 's' || e.key === 'd' || e.key === 'p' || e.key === 'u')) ||
-                    // Developer tools
-                    e.key === 'F12' ||
-                    (e.ctrlKey && e.shiftKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
-                    (e.metaKey && e.altKey && (e.key === 'i' || e.key === 'j' || e.key === 'c')) ||
-                    // New window/tab
-                    (e.ctrlKey && (e.key === 'n' || e.key === 't')) ||
-                    (e.metaKey && (e.key === 'n' || e.key === 't')) ||
-                    // Refresh
-                    (e.key === 'F5') ||
-                    (e.ctrlKey && e.key === 'r') ||
-                    (e.metaKey && e.key === 'r')
-                  ) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                  }
-                }}
-                tabIndex={0}
-              >
-                {/* Dual Iframe System for Fast Tab Switching */}
-                <div className="secure-pdf-container">
-                  {/* Exercise Tab Iframe */}
-                  <iframe
-                    ref={iframeRef}
-                    src={secureExerciseFiles.length > 0 && selectedFileIdx < secureExerciseFiles.length ? 
-                      `https://docs.google.com/gview?url=${encodeURIComponent(secureExerciseFiles[selectedFileIdx])}&embedded=true&rm=minimal` : 
-                      ''}
-                    className={`fast-pdf-iframe ${activeTab === 'exercise' ? 'active' : 'hidden'}`}
-                    title="Exercise PDF Viewer"
-                    loading="eager"
-                    sandbox="allow-scripts allow-same-origin"
-                    onLoad={(e) => {
-                      const iframe = e.currentTarget;
-                      // Hide loading indicator when active tab loads
-                      if (activeTab === 'exercise') {
-                        const loader = document.querySelector('.pdf-loading-indicator');
-                        if (loader) loader.remove();
-                      }
-                      
-                      // Inject security CSS
-                      try {
-                        if (iframe.contentDocument) {
-                          const style = iframe.contentDocument.createElement('style');
-                          style.textContent = `
-                            .ndfHFb-c4YZDc-Wrql6b, 
-                            .ndfHFb-c4YZDc-to915-LgbsSe,
-                            .ndfHFb-c4YZDc-LgbsSe,
-                            [data-tooltip="Open in new window"],
-                            [aria-label="Open in new window"],
-                            [title="Open in new window"],
-                            .ndfHFb-c4YZDc-Wrql6b-LgbsSe-OWXEXe-IT5dJd,
-                            .docs-icon-acrobat,
-                            .docs-icon-download,
-                            .docs-icon-print {
-                              display: none !important;
-                              visibility: hidden !important;
-                            }
-                            body {
-                              -webkit-user-select: none;
-                              -moz-user-select: none;
-                              -ms-user-select: none;
-                              user-select: none;
-                            }
-                          `;
-                          iframe.contentDocument.head.appendChild(style);
-                        }
-                      } catch (error) {
-                        console.log('Cannot inject styles due to CORS policy');
-                      }
-                    }}
-                  />
-
-                  {/* Correction Tab Iframe */}
-                  <iframe
-                    ref={correctionIframeRef}
-                    src={secureCorrectionFiles.length > 0 && selectedFileIdx < secureCorrectionFiles.length ? 
-                      `https://docs.google.com/gview?url=${encodeURIComponent(secureCorrectionFiles[selectedFileIdx])}&embedded=true&rm=minimal` : 
-                      ''}
-                    className={`fast-pdf-iframe ${activeTab === 'solution' ? 'active' : 'hidden'}`}
-                    title="Solution PDF Viewer"
-                    loading="eager"
-                    sandbox="allow-scripts allow-same-origin"
-                    onLoad={(e) => {
-                      const iframe = e.currentTarget;
-                      // Hide loading indicator when active tab loads
-                      if (activeTab === 'solution') {
-                        const loader = document.querySelector('.pdf-loading-indicator');
-                        if (loader) loader.remove();
-                      }
-                      
-                      // Inject security CSS
-                      try {
-                        if (iframe.contentDocument) {
-                          const style = iframe.contentDocument.createElement('style');
-                          style.textContent = `
-                            .ndfHFb-c4YZDc-Wrql6b, 
-                            .ndfHFb-c4YZDc-to915-LgbsSe,
-                            .ndfHFb-c4YZDc-LgbsSe,
-                            [data-tooltip="Open in new window"],
-                            [aria-label="Open in new window"],
-                            [title="Open in new window"],
-                            .ndfHFb-c4YZDc-Wrql6b-LgbsSe-OWXEXe-IT5dJd,
-                            .docs-icon-acrobat,
-                            .docs-icon-download,
-                            .docs-icon-print {
-                              display: none !important;
-                              visibility: hidden !important;
-                            }
-                            body {
-                              -webkit-user-select: none;
-                              -moz-user-select: none;
-                              -ms-user-select: none;
-                              user-select: none;
-                            }
-                          `;
-                          iframe.contentDocument.head.appendChild(style);
-                        }
-                      } catch (error) {
-                        console.log('Cannot inject styles due to CORS policy');
-                      }
-                    }}
-                  />
-                  
-                  {/* Security Overlay - Prevents Right Click and Selection */}
-                  <div 
-                    className="security-overlay"
-                    onContextMenu={(e) => e.preventDefault()}
-                    onDragStart={(e) => e.preventDefault()}
-                    onMouseDown={(e) => {
-                      // Prevent middle mouse button (open in new tab)
-                      if (e.button === 1) {
-                        e.preventDefault();
-                      }
-                    }}
-                  ></div>
-                </div>
-                
-                {/* Loading Indicator */}
-                <div className="pdf-loading-indicator">
-                  <div className="loading-spinner"></div>
-                  <span>Loading document...</span>
-                </div>
-
-                {/* Protection Layer */}
-                <div className="pdf-protection-layer"></div>
-              </div>
-
-              {/* Performance Status */}
-              <div className="viewer-footer">
-                <div className="performance-indicator">
-                  <div className="speed-indicator">
-                    <span className="speed-dot"></span>
-                    <span>Fast Mode</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <WebPDFViewer
+              url={getCurrentPDFUrl()}
+              onLoad={() => {
+                console.log('PDF loaded successfully');
+              }}
+              onError={(error) => {
+                console.error('PDF loading error:', error);
+                setError(error);
+              }}
+            />
           ) : (
             <div className="no-document-state">
               <div className="empty-state">

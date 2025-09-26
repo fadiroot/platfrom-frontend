@@ -43,15 +43,13 @@ import PDFViewer from './PDFViewer';
 
 ## Dependencies
 
-- `pdfjs-dist` - PDF.js library for PDF rendering
-- `react-icons` - Icons for the UI components
+- `react-pdf` - React PDF viewer library for PDF rendering
+- `react-icons` - Icon library for UI components
 
 ## Installation
 
-The required dependencies are already installed:
-
 ```bash
-npm install pdfjs-dist @types/pdfjs-dist react-icons
+npm install react-pdf react-icons
 ```
 
 ## Features

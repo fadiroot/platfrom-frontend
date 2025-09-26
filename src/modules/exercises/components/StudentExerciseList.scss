@@ -135,27 +135,10 @@
     position: relative;
     overflow: hidden;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #2c4981 0%, #3d5a94 100%);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s ease;
-    }
-
     &:hover {
       transform: translateY(-4px);
       box-shadow: 0 8px 25px rgba(44, 73, 129, 0.25);
       border-color: #1e3461;
-
-      &::before {
-        transform: scaleX(1);
-      }
     }
 
     .exercise-header {
