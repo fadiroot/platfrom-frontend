@@ -3,6 +3,8 @@ import { useAppSelector } from '../modules/shared/store'
 import { useTranslation } from 'react-i18next'
 import { Helmet } from 'react-helmet-async'
 import ProfileCompletionGuard from '../modules/auth/guards/ProfileCompletionGuard'
+import { observePlaceholderDirection } from '../utils/placeholderDirection'
+import { useEffect } from 'react'
 import newLogo from '/logo/astuceLogo.png'
 
 const App = () => {
@@ -19,6 +21,19 @@ const App = () => {
   } else {
     document.body.classList.remove('arabic-fonts')
   }
+
+  // Set HTML lang attribute dynamically based on selected language
+  document.documentElement.lang = i18n?.language || 'en'
+
+  // Initialize placeholder direction observer
+  useEffect(() => {
+    const observer = observePlaceholderDirection()
+    
+    // Cleanup observer on unmount
+    return () => {
+      observer.disconnect()
+    }
+  }, [i18n?.language]) // Re-run when language changes
 
   const theme = useAppSelector((state: { theme: { mode: string } }) => state.theme.mode)
 

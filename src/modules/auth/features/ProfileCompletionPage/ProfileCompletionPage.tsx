@@ -4,85 +4,21 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Loader2, AlertCircle, CheckCircle, User, Mail, Phone, GraduationCap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../../../../modules/shared/store'
 import { fetchPublicLevels } from '../../../levels/data/levelThunk'
-import { Level } from '../../../levels/data/levelTypes'
-import CustomSelect from '../../../shared/components/CustomSelect/CustomSelect'
-import { createStudentProfileAPI } from '../../../../lib/api/auth'
-import { supabase } from '../../../../lib/supabase'
 import { refreshUserData } from '../../data/authThunk'
+import { AlertCircle, CheckCircle, User, Mail, Phone, GraduationCap } from 'lucide-react'
+import SimpleLoader from '../../../shared/components/SimpleLoader/SimpleLoader'
+import { supabase } from '../../../../lib/supabase'
+import CustomSelect from '../../../shared/components/CustomSelect/CustomSelect'
 import LanguageSelector from '../../../shared/components/LanguageSelector/LanguageSelector'
 import './_ProfileCompletionPage.scss'
 import logoImg from '/logo/astuceLogo.png'
 
-// Enhanced Input Component
-interface InputProps {
-  name: string
-  formik: any
-  placeholder?: string
-  label: string
-  type?: string
-  required?: boolean
-  autoComplete?: string
-  icon?: React.ReactNode
-}
-
-const Input = ({
-  name,
-  formik,
-  placeholder,
-  label,
-  type = 'text',
-  required,
-  autoComplete,
-  icon,
-}: InputProps) => {
-  const [hasInteracted, setHasInteracted] = useState(false)
-  
-  const isTouched = formik.touched[name]
-  const hasError = formik.errors[name]
-  const hasValue = formik.values[name]
-  const showError = isTouched && hasInteracted && hasError
-  const showSuccess = isTouched && hasInteracted && hasValue && !hasError
-  const isInvalid = showError || (required && hasInteracted && !hasValue)
-
-  const handleBlur = (e: React.FocusEvent) => {
-    setHasInteracted(true)
-    formik.handleBlur(e)
-  }
-
-  return (
-    <div className="form-field">
-      <label htmlFor={name} className="label">
-        {icon && <span className="label-icon">{icon}</span>}
-        {label} {required && <span className="required-asterisk">*</span>}
-      </label>
-      <div className={`input-container ${isInvalid ? 'error' : ''} ${showSuccess ? 'success' : ''}`}>
-        <input
-          id={name}
-          name={name}
-          type={type}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          value={formik.values[name]}
-          onChange={formik.handleChange}
-          onBlur={handleBlur}
-          className="input"
-        />
-        <div className="input-icons">
-          {isInvalid && <AlertCircle size={16} className="error-icon" />}
-          {showSuccess && <CheckCircle size={16} className="success-icon" />}
-        </div>
-      </div>
-      {showError && (
-        <div className="error-message">
-          {formik.errors[name]}
-        </div>
-      )}
-    </div>
-  )
+interface Level {
+  id: string
+  title: string
 }
 
 const initialValues = {
@@ -101,8 +37,17 @@ const ProfileCompletionPage = () => {
   const [loading, setLoading] = useState(true)
   const { levels, loading: levelsLoading } = useAppSelector((state: any) => state.levels)
 
-  // Add Arabic font class when Arabic language is selected
+  // Add Arabic font class and RTL direction when Arabic language is selected
   const isArabic = i18n?.language === 'ar'
+  const isRTL = isArabic
+
+  // Create validation schema with translated messages
+  const validationSchema = Yup.object({
+    levelId: Yup.string().required(t('auth.register.validation.levelRequired', 'Level is required')),
+    phoneNumber: Yup.string()
+      .required(t('auth.register.validation.phoneRequired', 'Phone number is required'))
+      .matches(/^[+]?[\d\s-()]+$/, t('auth.register.validation.phoneInvalid', 'Please enter a valid phone number'))
+  })
 
   useEffect(() => {
     const checkUserAndProfile = async () => {
@@ -121,89 +66,126 @@ const ProfileCompletionPage = () => {
         setUser(currentUser)
 
         // Check if user already has a complete profile
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('student_profile')
-          .select('level_id')
+          .select('*')
           .eq('user_id', currentUser.id)
           .single()
 
-        // Check if user has phone number in metadata
-        const hasPhone = currentUser.user_metadata?.phone
+        if (profileError && profileError.code !== 'PGRST116') {
+          // PGRST116 is "not found" error, which is expected for new users
+          console.error('Error fetching profile:', profileError)
+        }
 
-        if (profile && profile.level_id && hasPhone) {
-          // User has complete profile, redirect to subjects
+        if (profile && profile.level_id) {
+          // Profile is already complete, redirect to dashboard
           navigate('/subjects')
           return
         }
 
-        // Load levels for the form
-        dispatch(fetchPublicLevels())
-        
+        setLoading(false)
       } catch (error) {
         console.error('Error checking user profile:', error)
-        setErrorMessage('Failed to load user information')
-        setShowError(true)
-      } finally {
         setLoading(false)
       }
     }
 
     checkUserAndProfile()
-  }, [dispatch, navigate])
+  }, [navigate])
+
+  // Load levels when component mounts
+  useEffect(() => {
+    console.log('ProfileCompletionPage: Levels state:', { levels, levelsLoading, levelsLength: levels.length })
+    if (!levelsLoading && levels.length === 0) {
+      console.log('ProfileCompletionPage: Dispatching fetchPublicLevels')
+      dispatch(fetchPublicLevels())
+    }
+  }, [dispatch, levelsLoading, levels.length])
 
   const formik = useFormik({
     initialValues,
-    validationSchema: Yup.object().shape({
-      phoneNumber: Yup.string()
-        .required(t('auth.register.validation.phoneRequired'))
-        .matches(/^[2459]\d{7}$/, t('auth.register.validation.phoneInvalid')),
-      levelId: Yup.string().required(t('auth.register.validation.levelRequired')),
-    }),
-    validateOnMount: false,
-    validateOnChange: false,
-    validateOnBlur: true,
+    validationSchema,
     onSubmit: async (values) => {
-      setSubmitting(true)
-      setShowError(false)
-      
       try {
-        const result = await createStudentProfileAPI({
-          levelId: values.levelId,
-          phoneNumber: values.phoneNumber,
+        setSubmitting(true)
+        setShowError(false)
+        setErrorMessage('')
+
+        const { data: { user: currentUser } } = await supabase.auth.getUser()
+        
+        if (!currentUser) {
+          throw new Error('User not authenticated')
+        }
+
+        // Update user metadata with phone number
+        const { error: userError } = await supabase.auth.updateUser({
+          data: {
+            phone_number: values.phoneNumber
+          }
         })
 
-        if (result.success) {
-          // Profile created successfully, refresh user data
+        if (userError) {
+          throw userError
+        }
+
+        // Update or create student profile
+        const { error } = await supabase
+          .from('student_profile')
+          .upsert({
+            user_id: currentUser.id,
+            level_id: values.levelId,
+            updated_at: new Date().toISOString()
+          })
+
+        if (error) {
+          throw error
+        }
+
+        // Success - refresh user data in the application state
+        try {
+          // Dispatch refreshUserData to update the application state with new profile data
           await dispatch(refreshUserData()).unwrap()
           
-          // Navigate to subjects page
+          // Redirect to subjects page with updated user data
           navigate('/subjects')
-        } else {
-          throw new Error(result.error || 'Failed to create profile')
+        } catch (error) {
+          console.error('Error refreshing user data:', error)
+          // Fallback: redirect anyway
+          navigate('/subjects')
         }
-        
-      } catch (err: any) {
-        setErrorMessage(err?.message || 'Failed to complete profile')
+      } catch (error: any) {
+        console.error('Profile completion error:', error)
+        setErrorMessage(error.message || 'Failed to complete profile. Please try again.')
         setShowError(true)
       } finally {
         setSubmitting(false)
       }
-    },
+    }
   })
+
+  // Re-validate form when language changes to update error messages
+  useEffect(() => {
+    if (formik && formik.validateForm) {
+      formik.validateForm()
+    }
+  }, [i18n.language]) // Removed formik from dependencies to prevent infinite loop
 
   if (loading) {
     return (
-      <div className={`profile-completion-page ${isArabic ? 'arabic-fonts' : ''}`}>
+      <div className={`profile-completion-page ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="language-selector-container">
+          <LanguageSelector />
+        </div>
         <div className="loading-container">
-          <Loader2 size={48} className="spinner" />
-          <p>{t('common.loading', 'Loading...')}</p>
+          <SimpleLoader size={48} />
+          <p>{t('auth.profileCompletion.loading', 'Loading...')}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={`profile-completion-page ${isArabic ? 'arabic-fonts' : ''}`}>
+    <div className={`profile-completion-page ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="language-selector-container">
         <LanguageSelector />
       </div>
@@ -213,7 +195,6 @@ const ProfileCompletionPage = () => {
           <div className="logo-container">
             <img src={logoImg} alt="Platform Logo" className="logo-image" />
           </div>
-          
           <h1 className="title">{t('auth.profileCompletion.title', 'Complete Your Profile')}</h1>
           <p className="subtitle">
             {t('auth.profileCompletion.subtitle', 'Please provide some additional information to complete your account setup.')}
@@ -224,19 +205,15 @@ const ProfileCompletionPage = () => {
           <div className="user-info-section">
             <div className="user-avatar">
               {user.user_metadata?.avatar_url ? (
-                <img src={user.user_metadata.avatar_url} alt="Profile" />
+                <img src={user.user_metadata.avatar_url} alt="User Avatar" />
               ) : (
                 <div className="avatar-placeholder">
-                  {user.user_metadata?.first_name?.[0] || user.email?.[0] || 'U'}
+                  {user.email?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
             </div>
             <div className="user-details">
-              <h3 className="user-name">
-                {user.user_metadata?.first_name && user.user_metadata?.last_name
-                  ? `${user.user_metadata.first_name} ${user.user_metadata.last_name}`
-                  : user.email}
-              </h3>
+              <h3 className="user-name">{user.user_metadata?.full_name || user.email}</h3>
               <p className="user-email">
                 <Mail size={16} />
                 {user.email}
@@ -245,74 +222,83 @@ const ProfileCompletionPage = () => {
           </div>
         )}
 
+        {showError && (
+          <div className="error-banner">
+            <AlertCircle size={20} />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
         <form onSubmit={formik.handleSubmit} noValidate className="profile-form">
-          <div className="form-section">
-            <h3 className="section-title">
-              <GraduationCap size={20} />
-              {t('auth.profileCompletion.academicInfo', 'Academic Information')}
-            </h3>
-            
-            <div className="form-field">
-              <label htmlFor="levelId" className="label">
-                <span className="label-icon">
-                  <GraduationCap size={16} />
-                </span>
-                {t('auth.register.level')} <span className="required-asterisk">*</span>
-              </label>
-              <CustomSelect
-                options={levels.map((level: Level) => ({
+          <div className="form-field">
+            <label htmlFor="levelId" className="label">
+              <span className="label-icon">
+                <GraduationCap size={18} />
+              </span>
+              {t('auth.register.level')} <span className="required-asterisk">*</span>
+            </label>
+            <CustomSelect
+              options={levels.map((level: Level) => {
+                console.log('ProfileCompletionPage: Mapping level:', level)
+                return {
                   value: level.id,
                   label: level.title,
-                }))}
-                value={formik.values.levelId}
-                onChange={(value: string) => formik.setFieldValue("levelId", value)}
-                onBlur={() => formik.setFieldTouched("levelId", true)}
-                placeholder={t('auth.register.levelPlaceholder')}
-                disabled={levelsLoading}
-                error={formik.touched.levelId && formik.errors.levelId ? formik.errors.levelId : undefined}
-                touched={formik.touched.levelId}
-                required
-              />
-            </div>
+                }
+              })}
+              value={formik.values.levelId}
+              onChange={(value: string) => formik.setFieldValue("levelId", value)}
+              onBlur={() => formik.setFieldTouched("levelId", true)}
+              placeholder={t('auth.register.levelPlaceholder')}
+              disabled={levelsLoading}
+              error={formik.touched.levelId && formik.errors.levelId ? formik.errors.levelId : undefined}
+              touched={formik.touched.levelId}
+              required
+            />
           </div>
 
-          <div className="form-section">
-            <h3 className="section-title">
-              <Phone size={20} />
-              {t('auth.profileCompletion.contactInfo', 'Contact Information')}
-            </h3>
-            
-            <Input
-              name="phoneNumber"
-              formik={formik}
-              placeholder={t('auth.register.phoneNumberPlaceholder')}
-              label={t('auth.register.phoneNumber')}
-              required
-              autoComplete="tel"
-              icon={<Phone size={16} />}
-            />
+          <div className="form-field">
+            <label htmlFor="phoneNumber" className="label">
+              <span className="label-icon">
+                <Phone size={18} />
+              </span>
+              {t('auth.register.phoneNumber')} <span className="required-asterisk">*</span>
+            </label>
+            <div className="input-container">
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                className="input"
+                placeholder={t('auth.register.phoneNumberPlaceholder')}
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik?.values.phoneNumber}
+                autoComplete="tel"
+              />
+            </div>
+            {formik.touched.phoneNumber && formik.errors.phoneNumber && (
+              <div className="error-message">
+                {formik.errors.phoneNumber}
+              </div>
+            )}
           </div>
 
           <div className="form-actions">
             <button type="submit" className="complete-button" disabled={submitting}>
               {submitting ? (
                 <>
-                  <Loader2 size={18} className="spinner" />
+                  <SimpleLoader size={20} />
                   {t('auth.profileCompletion.completing', 'Completing...')}
                 </>
               ) : (
-                t('auth.profileCompletion.complete', 'Complete Profile')
+                <>
+                  <CheckCircle size={20} />
+                  {t('auth.profileCompletion.complete', 'Complete Profile')}
+                </>
               )}
             </button>
           </div>
         </form>
-
-        {showError && (
-          <div className="error-banner">
-            <AlertCircle size={16} />
-            <span>{errorMessage}</span>
-          </div>
-        )}
       </div>
     </div>
   )

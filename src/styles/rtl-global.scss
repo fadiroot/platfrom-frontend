@@ -1,0 +1,206 @@
+// Global RTL/LTR support for placeholders
+// This ensures all placeholder text is always LTR regardless of page direction
+
+// Force all input placeholders to be LTR with maximum specificity
+input::placeholder,
+textarea::placeholder,
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder,
+input::-moz-placeholder,
+textarea::-moz-placeholder,
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+// For RTL pages and containers, override the text-align for placeholders specifically
+[dir="rtl"] input::placeholder,
+[dir="rtl"] textarea::placeholder,
+[dir="rtl"] input::-webkit-input-placeholder,
+[dir="rtl"] textarea::-webkit-input-placeholder,
+[dir="rtl"] input::-moz-placeholder,
+[dir="rtl"] textarea::-moz-placeholder,
+[dir="rtl"] input:-ms-input-placeholder,
+[dir="rtl"] textarea:-ms-input-placeholder {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+// Additional support for common input classes with maximum specificity
+.input::placeholder,
+.form-control::placeholder,
+.search-input::placeholder,
+.form-field input::placeholder,
+.input::-webkit-input-placeholder,
+.form-control::-webkit-input-placeholder,
+.search-input::-webkit-input-placeholder,
+.form-field input::-webkit-input-placeholder {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+// Support for RTL containers with maximum specificity
+.rtl input::placeholder,
+.rtl textarea::placeholder,
+.rtl .input::placeholder,
+.rtl .form-control::placeholder,
+.rtl .search-input::placeholder,
+.rtl .form-field input::placeholder,
+.rtl input::-webkit-input-placeholder,
+.rtl textarea::-webkit-input-placeholder,
+.rtl .input::-webkit-input-placeholder,
+.rtl .form-control::-webkit-input-placeholder,
+.rtl .search-input::-webkit-input-placeholder,
+.rtl .form-field input::-webkit-input-placeholder {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+// Specific support for auth components
+.register-module input::placeholder,
+.login-module input::placeholder,
+.forgot-password-module input::placeholder,
+.reset-password-module input::placeholder,
+.email-confirmation-module input::placeholder,
+.register-module input::-webkit-input-placeholder,
+.login-module input::-webkit-input-placeholder,
+.forgot-password-module input::-webkit-input-placeholder,
+.reset-password-module input::-webkit-input-placeholder,
+.email-confirmation-module input::-webkit-input-placeholder {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: normal !important;
+}
+
+// Utility class for forcing RTL placeholders in Arabic
+.force-rtl-placeholder::placeholder,
+.force-rtl-placeholder::-webkit-input-placeholder,
+.force-rtl-placeholder::-moz-placeholder,
+.force-rtl-placeholder:-ms-input-placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  text-indent: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 12px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(0) !important;
+}
+
+// Additional aggressive approach using CSS custom properties
+input[style*="--placeholder-direction"]::placeholder,
+input[style*="--placeholder-direction"]::-webkit-input-placeholder,
+input[style*="--placeholder-direction"]::-moz-placeholder,
+input[style*="--placeholder-direction"]:-ms-input-placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  text-indent: 0 !important;
+}
+
+// Ultra-aggressive approach for Arabic language - RTL placeholders
+html[lang="ar"] input::placeholder,
+html[lang="ar"] textarea::placeholder,
+html[lang="ar"] input::-webkit-input-placeholder,
+html[lang="ar"] textarea::-webkit-input-placeholder,
+html[lang="ar"] input::-moz-placeholder,
+html[lang="ar"] textarea::-moz-placeholder,
+html[lang="ar"] input:-ms-input-placeholder,
+html[lang="ar"] textarea:-ms-input-placeholder,
+body[dir="rtl"] input::placeholder,
+body[dir="rtl"] textarea::placeholder,
+body[dir="rtl"] input::-webkit-input-placeholder,
+body[dir="rtl"] textarea::-webkit-input-placeholder,
+body[dir="rtl"] input::-moz-placeholder,
+body[dir="rtl"] textarea::-moz-placeholder,
+body[dir="rtl"] input:-ms-input-placeholder,
+body[dir="rtl"] textarea:-ms-input-placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  text-indent: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 12px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+// Force RTL for all Arabic text in placeholders
+*[dir="rtl"] input::placeholder,
+*[dir="rtl"] textarea::placeholder,
+*[dir="rtl"] input::-webkit-input-placeholder,
+*[dir="rtl"] textarea::-webkit-input-placeholder,
+*[dir="rtl"] input::-moz-placeholder,
+*[dir="rtl"] textarea::-moz-placeholder,
+*[dir="rtl"] input:-ms-input-placeholder,
+*[dir="rtl"] textarea:-ms-input-placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  writing-mode: horizontal-tb !important;
+  text-indent: 0 !important;
+}
+
+// Maximum specificity approach - target all possible selectors for RTL
+html[lang="ar"] .login-module input::placeholder,
+html[lang="ar"] .register-module input::placeholder,
+html[lang="ar"] .forgot-password-module input::placeholder,
+html[lang="ar"] .reset-password-module input::placeholder,
+html[lang="ar"] .profile-completion-module input::placeholder,
+html[lang="ar"] .test-password-reset-module input::placeholder,
+html[lang="ar"] .login-module input::-webkit-input-placeholder,
+html[lang="ar"] .register-module input::-webkit-input-placeholder,
+html[lang="ar"] .forgot-password-module input::-webkit-input-placeholder,
+html[lang="ar"] .reset-password-module input::-webkit-input-placeholder,
+html[lang="ar"] .profile-completion-module input::-webkit-input-placeholder,
+html[lang="ar"] .test-password-reset-module input::-webkit-input-placeholder,
+html[lang="ar"] .login-module input::-moz-placeholder,
+html[lang="ar"] .register-module input::-moz-placeholder,
+html[lang="ar"] .forgot-password-module input::-moz-placeholder,
+html[lang="ar"] .reset-password-module input::-moz-placeholder,
+html[lang="ar"] .profile-completion-module input::-moz-placeholder,
+html[lang="ar"] .test-password-reset-module input::-moz-placeholder,
+html[lang="ar"] .login-module input:-ms-input-placeholder,
+html[lang="ar"] .register-module input:-ms-input-placeholder,
+html[lang="ar"] .forgot-password-module input:-ms-input-placeholder,
+html[lang="ar"] .reset-password-module input:-ms-input-placeholder,
+html[lang="ar"] .profile-completion-module input:-ms-input-placeholder,
+html[lang="ar"] .test-password-reset-module input:-ms-input-placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  font-family: var(--student-font-primary) !important;
+  text-indent: 0 !important;
+}
+
+// Global override for all inputs in Arabic mode - RTL direction
+html[lang="ar"] input,
+html[lang="ar"] textarea {
+  &::placeholder,
+  &::-webkit-input-placeholder,
+  &::-moz-placeholder,
+  &:-ms-input-placeholder {
+    direction: rtl !important;
+    text-align: start !important;
+    unicode-bidi: embed !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    font-family: var(--student-font-primary) !important;
+    text-indent: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 12px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: translateX(0) !important;
+  }
+}

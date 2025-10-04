@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Loader2, CheckCircle, XCircle, ArrowLeft, LogIn } from 'lucide-react'
+import { CheckCircle, XCircle, ArrowLeft, LogIn } from 'lucide-react'
+import SimpleLoader from '../../../shared/components/SimpleLoader/SimpleLoader'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch } from '../../../shared/store'
 import { PATH } from '../../routes/paths'
@@ -22,8 +23,9 @@ const EmailConfirmationComponent = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null)
   const [isDirectLoginMode, setIsDirectLoginMode] = useState(false)
 
-  // Add Arabic font class when Arabic language is selected
+  // Add Arabic font class and RTL direction when Arabic language is selected
   const isArabic = i18n?.language === 'ar'
+  const isRTL = isArabic
 
   // Get URL parameters - check both search params and hash params
   const tokenHash =
@@ -202,7 +204,10 @@ const EmailConfirmationComponent = () => {
 
   if (loading) {
     return (
-      <div className={`email-confirmation-module ${isArabic ? 'arabic-fonts' : ''}`}>
+      <div 
+        className={`email-confirmation-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="language-selector-container">
           <LanguageSelector />
         </div>
@@ -211,7 +216,7 @@ const EmailConfirmationComponent = () => {
             <img src={logoImg} alt="Platform Logo" className="logo-image" />
           </div>
           <div className="loading-state">
-            <Loader2 size={24} className="spinner" />
+            <SimpleLoader size={24} />
             <p>{t('auth.emailConfirmation.confirming', 'Confirming your email...')}</p>
           </div>
         </div>
@@ -220,7 +225,10 @@ const EmailConfirmationComponent = () => {
   }
 
   return (
-    <div className={`email-confirmation-module ${isArabic ? 'arabic-fonts' : ''}`}>
+    <div 
+      className={`email-confirmation-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="language-selector-container">
         <LanguageSelector />
       </div>

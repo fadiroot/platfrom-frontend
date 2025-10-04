@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
+import SimpleLoader from '../../../shared/components/SimpleLoader/SimpleLoader'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch } from '../../../shared/store'
 import { requestPasswordReset } from '../../data/authThunk'
@@ -16,8 +17,12 @@ const initialValues = {
 }
 
 const ForgotPassword = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const dispatch = useAppDispatch()
+  
+  // Add Arabic font class and RTL direction when Arabic language is selected
+  const isArabic = i18n?.language === 'ar'
+  const isRTL = isArabic
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -46,7 +51,10 @@ const ForgotPassword = () => {
 
   if (success) {
     return (
-      <div className="forgot-password-module">
+      <div 
+        className={`forgot-password-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="language-selector-container">
           <LanguageSelector />
         </div>
@@ -75,7 +83,10 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="forgot-password-module">
+    <div 
+      className={`forgot-password-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="language-selector-container">
         <LanguageSelector />
       </div>
@@ -110,7 +121,11 @@ const ForgotPassword = () => {
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="input"
+              className="input force-ltr-placeholder"
+              style={{
+                '--placeholder-direction': 'ltr',
+                '--placeholder-text-align': 'left'
+              } as React.CSSProperties}
             />
             {formik.touched.email && formik.errors.email && (
               <div className="error-text">{formik.errors.email}</div>
@@ -124,7 +139,7 @@ const ForgotPassword = () => {
           >
             {submitting ? (
               <>
-                <Loader2 size={18} className="spinner" />
+                <SimpleLoader size={18} />
                 {t('auth.forgotPassword.sending', 'Sending')}...
               </>
             ) : (

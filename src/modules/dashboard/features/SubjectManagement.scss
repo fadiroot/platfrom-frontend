@@ -139,6 +139,12 @@
             border: 2px solid #000;
             border-radius: 8px;
             font-size: 1rem;
+
+            // Force placeholder text to be LTR
+            &::placeholder {
+              direction: ltr;
+              text-align: left;
+            }
             font-weight: 500;
             transition: all 0.2s;
             background: white;

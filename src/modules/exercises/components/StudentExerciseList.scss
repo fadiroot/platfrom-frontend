@@ -2,6 +2,32 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  // Arabic font support
+  &.arabic-fonts {
+    font-family: 'Cairo', 'Noto Sans Arabic', 'Inter', sans-serif;
+  }
+
+  // RTL support
+  &.rtl {
+    direction: rtl;
+    text-align: right;
+
+    .search-box input {
+      text-align: right;
+    }
+
+    .filter-buttons {
+      flex-direction: row-reverse;
+    }
+  }
+
+  // LTR support (explicit)
+  &.ltr {
+    direction: ltr;
+    text-align: left;
+  }
 
   &__header {
     margin-bottom: 30px;
@@ -86,6 +112,8 @@
 
         &::placeholder {
           color: #a0aec0;
+          direction: ltr;
+          text-align: left;
         }
       }
     }

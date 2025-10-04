@@ -1,0 +1,76 @@
+/**
+ * High-specificity CSS overrides for Arabic RTL placeholder alignment
+ * This file ensures placeholder text starts from the right side in Arabic mode
+ */
+
+/* Maximum specificity override for all placeholder variants */
+html[lang="ar"] body input::placeholder,
+html[lang="ar"] body textarea::placeholder,
+html[lang="ar"] body input::-webkit-input-placeholder,
+html[lang="ar"] body textarea::-webkit-input-placeholder,
+html[lang="ar"] body input::-moz-placeholder,
+html[lang="ar"] body textarea::-moz-placeholder,
+html[lang="ar"] body input:-ms-input-placeholder,
+html[lang="ar"] body textarea:-ms-input-placeholder,
+html[lang="ar"] body div input::placeholder,
+html[lang="ar"] body div textarea::placeholder,
+html[lang="ar"] body div input::-webkit-input-placeholder,
+html[lang="ar"] body div textarea::-webkit-input-placeholder,
+html[lang="ar"] body div input::-moz-placeholder,
+html[lang="ar"] body div textarea::-moz-placeholder,
+html[lang="ar"] body div input:-ms-input-placeholder,
+html[lang="ar"] body div textarea:-ms-input-placeholder,
+html[lang="ar"] body form input::placeholder,
+html[lang="ar"] body form textarea::placeholder,
+html[lang="ar"] body form input::-webkit-input-placeholder,
+html[lang="ar"] body form textarea::-webkit-input-placeholder,
+html[lang="ar"] body form input::-moz-placeholder,
+html[lang="ar"] body form textarea::-moz-placeholder,
+html[lang="ar"] body form input:-ms-input-placeholder,
+html[lang="ar"] body form textarea:-ms-input-placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  text-indent: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 12px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(0) !important;
+  box-sizing: border-box !important;
+  font-family: var(--student-font-primary) !important;
+}
+
+/* Specific overrides for common input types */
+html[lang="ar"] body input[type="text"]::placeholder,
+html[lang="ar"] body input[type="email"]::placeholder,
+html[lang="ar"] body input[type="password"]::placeholder,
+html[lang="ar"] body input[type="search"]::placeholder,
+html[lang="ar"] body input[type="tel"]::placeholder,
+html[lang="ar"] body input[type="url"]::placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  padding-left: 0 !important;
+  padding-right: 12px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(0) !important;
+}
+
+/* Override for any framework-specific classes */
+html[lang="ar"] .input-field input::placeholder,
+html[lang="ar"] .form-input input::placeholder,
+html[lang="ar"] .text-input input::placeholder,
+html[lang="ar"] .form-control::placeholder {
+  direction: rtl !important;
+  text-align: start !important;
+  unicode-bidi: embed !important;
+  padding-left: 0 !important;
+  padding-right: 12px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: translateX(0) !important;
+}

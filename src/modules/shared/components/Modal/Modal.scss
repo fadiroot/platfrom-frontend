@@ -25,11 +25,11 @@
   max-height: 90vh;
   overflow-y: auto;
   animation: slideIn 0.3s ease-out;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--student-font-primary);
   
   // Arabic font support
   &.arabic-fonts {
-    font-family: 'Cairo', 'Noto Sans Arabic', 'Inter', sans-serif;
+    font-family: var(--student-font-arabic);
   }
 
   &--success {

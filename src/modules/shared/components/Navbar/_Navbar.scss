@@ -185,6 +185,7 @@ $active-bg: #2d2d2d;
       background: rgba(30, 30, 30, 0.7);
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       cursor: pointer;
+      touch-action: manipulation; // Optimize for touch
       .language-flag-container {
         .current-flag {
           width: 22px;
@@ -274,31 +275,89 @@ $active-bg: #2d2d2d;
   }
   @media (max-width: 768px) {
     .navbar-container {
-      height: 60px;
+      height: 56px;
       padding: 0 12px;
-      gap: 10px;
+      gap: 8px;
     }
     .navbar-left {
-      gap: 7px;
+      gap: 6px;
       .brand-section .brand-logo {
-        gap: 7px;
+        gap: 6px;
         .logo-icon {
-          width: 36px;
-          height: 36px;
-          .logo-symbol {
-            font-size: 16px;
-          }
+          display: none; // Hide logo on mobile
         }
         .brand-text .brand-name {
-          font-size: 14px;
+          font-size: 13px;
+        }
+        .brand-text .brand-tagline {
+          display: none;
+        }
+      }
+    }
+    .navbar-center .page-info {
+      .page-title {
+        font-size: 14px;
+      }
+      .page-breadcrumb {
+        display: none;
+      }
+    }
+    .navbar-right .navbar-actions {
+      gap: 6px;
+      
+      .language-selector {
+        width: 36px;
+        height: 36px;
+      }
+      
+      .user-profile-trigger {
+        padding: 3px 8px 3px 3px;
+        
+        .user-profile-container .user-info-preview {
+          display: none;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .navbar-container {
+      height: 52px;
+      padding: 0 8px;
+      gap: 6px;
+    }
+    .navbar-left {
+      gap: 4px;
+      .brand-section .brand-logo {
+        gap: 4px;
+        .logo-icon {
+          display: none; // Hide logo on small mobile
+        }
+        .brand-text .brand-name {
+          font-size: 12px;
         }
       }
     }
     .navbar-center .page-info .page-title {
-      font-size: 16px;
+      font-size: 12px;
     }
     .navbar-right .navbar-actions {
-      gap: 8px;
+      gap: 4px;
+      
+      .language-selector {
+        width: 32px;
+        height: 32px;
+      }
+      
+      .user-profile-trigger {
+        padding: 2px 6px 2px 2px;
+        
+        .user-profile-container .navbar-user-avatar {
+          width: 24px;
+          height: 24px;
+          font-size: 12px;
+        }
+      }
     }
   }
 }
@@ -539,3 +598,4 @@ $active-bg: #2d2d2d;
     }
   }
 }
+

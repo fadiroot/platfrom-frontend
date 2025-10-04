@@ -3,6 +3,30 @@
   display: inline-block;
   z-index: 1000;
 
+  // Mobile backdrop for better UX
+  .language-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    cursor: default;
+    touch-action: manipulation;
+    
+    // Only show backdrop on mobile devices
+    @media (max-width: 768px) {
+      display: block;
+      backdrop-filter: blur(2px);
+      animation: fadeIn 0.2s ease;
+    }
+    
+    @media (min-width: 769px) {
+      display: none;
+    }
+  }
+
   .language-trigger {
     display: flex;
     align-items: center;
@@ -17,6 +41,8 @@
     font-size: 14px;
     font-weight: 600;
     box-shadow: 2px 2px 0px 0px #000000;
+    min-height: 48px; // Touch-friendly base height
+    touch-action: manipulation; // Optimize for touch
 
     &:hover {
       background: #f5f5f5;
@@ -63,6 +89,35 @@
     min-width: 160px;
     overflow: hidden;
     animation: slideDown 0.2s ease;
+    z-index: 1001;
+    
+    // RTL support for desktop
+    [dir="rtl"] & {
+      right: auto;
+      left: 0;
+    }
+    
+    // Mobile-specific positioning
+    @media (max-width: 768px) {
+      position: fixed;
+      top: 80px; // Position below the header
+      left: 20px;
+      right: 20px;
+      margin-top: 0;
+      min-width: auto;
+      width: auto;
+      max-width: 300px;
+      margin: 0 auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      animation: slideDown 0.3s ease;
+      
+      // RTL support for mobile
+      [dir="rtl"] & {
+        left: 20px;
+        right: 20px;
+      }
+    }
 
     .language-option {
       display: flex;
@@ -78,13 +133,21 @@
       font-size: 14px;
       font-weight: 500;
       text-align: left;
+      min-height: 48px; // Touch-friendly base height
+      touch-action: manipulation; // Optimize for touch
+      
+      // RTL support
+      [dir="rtl"] & {
+        text-align: right;
+        flex-direction: row-reverse;
+      }
 
       &:hover {
         background: rgba(0, 0, 0, 0.05);
       }
 
       &.active {
-        background: #667eea;
+        background: #2c4981; // Same blue as header background
         color: #ffffff;
         font-weight: 600;
       }
@@ -119,38 +182,88 @@
   }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 // Mobile responsiveness
 @media (max-width: 768px) {
   .language-selector {
     .language-trigger {
-      padding: 8px 12px;
-      font-size: 13px;
-      gap: 6px;
+      padding: 10px 14px; // Increased padding for better touch targets
+      font-size: 14px; // Slightly larger text for mobile
+      gap: 8px;
+      min-height: 48px; // Increased touch target size
+      border-radius: 10px; // More rounded corners for mobile
 
       .flag-icon {
-        width: 24px;
-        height: 18px;
-        font-size: 18px;
+        width: 26px;
+        height: 20px;
+        font-size: 20px;
       }
 
       .language-name {
-        min-width: 50px;
+        min-width: 60px;
+        font-weight: 600; // Bolder text for better readability
       }
     }
 
     .language-dropdown {
-      min-width: 140px;
-      right: -10px;
-
+      // Mobile dropdown is now positioned at bottom of screen
+      // Styles are handled in the main dropdown section above
+      
       .language-option {
-        padding: 10px 12px;
-        font-size: 13px;
-        gap: 6px;
+        padding: 16px 20px; // Larger padding for better touch targets
+        font-size: 14px;
+        gap: 12px;
+        min-height: 56px; // Larger touch targets
+        border-radius: 8px;
+        margin: 4px 8px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        text-align: left; // Ensure left alignment for mobile
 
         .flag-icon {
-          width: 24px;
-          height: 18px;
-          font-size: 18px;
+          width: 28px;
+          height: 21px;
+          font-size: 22px;
+        }
+
+        .language-name {
+          font-weight: 500;
+        }
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.08);
+          transform: translateY(-1px);
+        }
+
+        &.active {
+          background: #2c4981; // Same blue as header background
+          color: #ffffff;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(44, 73, 129, 0.3);
+        }
+        
+        // RTL support for mobile
+        [dir="rtl"] & {
+          text-align: right;
+          flex-direction: row-reverse;
         }
       }
     }
@@ -160,9 +273,67 @@
 @media (max-width: 480px) {
   .language-selector {
     .language-trigger {
+      padding: 8px 12px;
+      font-size: 13px;
+      gap: 6px;
+      min-height: 44px; // Maintain touch-friendly height
+      border-radius: 8px;
+
+      .flag-icon {
+        width: 22px;
+        height: 17px;
+        font-size: 18px;
+      }
+
+      .language-name {
+        min-width: 50px;
+        font-weight: 600;
+      }
+    }
+
+    .language-dropdown {
+      top: 70px; // Position below the header for small mobile
+      left: 16px;
+      right: 16px;
+      border-radius: 10px;
+      animation: slideDown 0.3s ease;
+
+      .language-option {
+        padding: 14px 16px;
+        font-size: 13px;
+        gap: 10px;
+        min-height: 48px;
+        margin: 3px 6px;
+
+        .flag-icon {
+          width: 24px;
+          height: 18px;
+          font-size: 20px;
+        }
+
+        .language-name {
+          font-weight: 500;
+        }
+        
+        // RTL support for small mobile
+        [dir="rtl"] & {
+          text-align: right;
+          flex-direction: row-reverse;
+        }
+      }
+    }
+  }
+}
+
+// Extra small screens (320px and below)
+@media (max-width: 320px) {
+  .language-selector {
+    .language-trigger {
       padding: 6px 10px;
       font-size: 12px;
       gap: 4px;
+      min-height: 40px;
+      border-radius: 6px;
 
       .flag-icon {
         width: 20px;
@@ -171,23 +342,39 @@
       }
 
       .language-name {
-        min-width: 40px;
+        min-width: 45px;
+        font-weight: 600;
       }
     }
 
     .language-dropdown {
-      min-width: 120px;
-      right: -15px;
+      top: 65px; // Position below the header for ultra-small mobile
+      left: 12px;
+      right: 12px;
+      border-radius: 8px;
+      animation: slideDown 0.3s ease;
 
       .language-option {
-        padding: 8px 10px;
+        padding: 12px 14px;
         font-size: 12px;
-        gap: 4px;
+        gap: 8px;
+        min-height: 44px;
+        margin: 2px 4px;
 
         .flag-icon {
-          width: 20px;
-          height: 15px;
-          font-size: 16px;
+          width: 22px;
+          height: 17px;
+          font-size: 18px;
+        }
+
+        .language-name {
+          font-weight: 500;
+        }
+        
+        // RTL support for ultra-small mobile
+        [dir="rtl"] & {
+          text-align: right;
+          flex-direction: row-reverse;
         }
       }
     }
@@ -220,7 +407,7 @@
         }
 
         &.active {
-          background: #667eea;
+          background: #2c4981; // Same blue as header background
           color: #ffffff;
         }
       }

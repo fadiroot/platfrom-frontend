@@ -5,7 +5,8 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from "lucide-react"
+import { Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react"
+import SimpleLoader from '../../../shared/components/SimpleLoader/SimpleLoader'
 import { useTranslation } from "react-i18next"
 import { useAppDispatch, useAppSelector } from "../../../shared/store"
 import { register, loginWithGoogle } from "../../data/authThunk"
@@ -16,6 +17,7 @@ import CustomSelect from "../../../shared/components/CustomSelect/CustomSelect"
 import EmailVerificationModal from "../../components/EmailVerificationModal"
 import ErrorModal from "../../components/ErrorModal"
 import LanguageSelector from "../../../shared/components/LanguageSelector/LanguageSelector"
+import { forcePlaceholdersLTR } from "../../../../utils/placeholderRTL"
 import "./_Register.scss"
 import logoImg from '/logo/astuceLogo.png'
 
@@ -81,7 +83,11 @@ const Input = ({
           value={formik.values[name]}
           onChange={handleChange}
           onBlur={handleBlur}
-          className="input"
+          className="input force-ltr-placeholder"
+          style={{
+            '--placeholder-direction': 'ltr',
+            '--placeholder-text-align': 'left'
+          } as React.CSSProperties}
         />
         <div className="input-icons">
           {isInvalid && <AlertCircle size={16} className="error-icon" />}
@@ -122,7 +128,7 @@ const initialValues = {
 const RegisterComponent = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [submitting, setSubmitting] = useState(false)
   const [googleSubmitting, setGoogleSubmitting] = useState(false)
   const [showEmailVerification, setShowEmailVerification] = useState(false)
@@ -130,10 +136,19 @@ const RegisterComponent = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const [userEmail, setUserEmail] = useState('')
   const { levels, loading: levelsLoading } = useAppSelector((state: any) => state.levels)
+  
+  // Add Arabic font class and RTL direction when Arabic language is selected
+  const isArabic = i18n?.language === 'ar'
+  const isRTL = isArabic
 
   useEffect(() => {
     dispatch(fetchPublicLevels())
   }, [dispatch])
+
+  // Force placeholders to be LTR when component mounts or language changes
+  useEffect(() => {
+    forcePlaceholdersLTR();
+  }, [isRTL])
 
   const formik = useFormik({
     initialValues,
@@ -211,7 +226,10 @@ const RegisterComponent = () => {
   }
 
   return (
-    <div className="register-module">
+    <div 
+      className={`register-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="language-selector-container">
         <LanguageSelector />
       </div>
@@ -330,7 +348,7 @@ const RegisterComponent = () => {
           <button type="submit" className="submit-button" disabled={submitting}>
             {submitting ? (
               <>
-                <Loader2 size={18} className="spinner" />
+                <SimpleLoader size={18} />
                 {t('auth.register.creatingAccount')}
               </>
             ) : (
@@ -350,7 +368,7 @@ const RegisterComponent = () => {
           disabled={googleSubmitting}
         >
           {googleSubmitting ? (
-            <Loader2 size={18} className="spinner" />
+            <SimpleLoader size={18} />
           ) : (
             <svg className="google-icon" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

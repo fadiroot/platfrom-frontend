@@ -5,9 +5,42 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  // Add animated background elements
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+    animation: float 6s ease-in-out infinite;
+  }
 
   &.arabic-fonts {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  // RTL support for Arabic language
+  &.rtl {
+    direction: rtl;
+    text-align: right;
+
+    .language-selector-container {
+      right: auto;
+      left: 20px;
+    }
+  }
+
+  // LTR support (explicit)
+  &.ltr {
+    direction: ltr;
+    text-align: left;
   }
 
   .language-selector-container {
@@ -15,100 +48,127 @@
     top: 20px;
     right: 20px;
     z-index: 10;
+    
+    // Ensure language selector stays at top on mobile
+    @media (max-width: 768px) {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      left: auto;
+      bottom: auto;
+      z-index: 1000;
+    }
+    
+    @media (max-width: 480px) {
+      top: 16px;
+      right: 16px;
+    }
   }
 
-  .oauth-callback-card-container {
-    flex: 1;
+  .loading-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  .success-container,
+  .error-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    padding: 20px;
-    max-width: 400px;
-    margin: 0 auto;
+    gap: 24px;
+    text-align: center;
+    padding: 40px;
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    margin-top: 80px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    z-index: 10;
+    max-width: 400px;
+    width: 90%;
 
-    .logo-container {
-      margin-bottom: 30px;
-      
-      .logo-image {
-        width: 120px;
-        height: auto;
-        object-fit: contain;
-      }
+    .success-icon {
+      color: #10b981;
+      filter: drop-shadow(0 4px 8px rgba(16, 185, 129, 0.3));
+      animation: successPulse 0.6s ease;
     }
 
-    .title {
-      font-size: 28px;
+    .error-icon {
+      color: #ef4444;
+      filter: drop-shadow(0 4px 8px rgba(239, 68, 68, 0.3));
+    }
+
+    .message {
+      font-size: 18px;
+      color: #374151;
+      margin: 0;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .retry-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 16px;
       font-weight: 700;
-      color: #333;
-      margin-bottom: 30px;
-      text-align: center;
-    }
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 16px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      letter-spacing: -0.1px;
+      position: relative;
+      overflow: hidden;
 
-    .status-container {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+      }
 
-      .loading-state,
-      .success-state,
-      .error-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        text-align: center;
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 
-        .spinner {
-          animation: spin 1s linear infinite;
-          color: #667eea;
-        }
-
-        .success-icon {
-          color: #10b981;
-        }
-
-        .error-icon {
-          color: #ef4444;
-        }
-
-        .message {
-          font-size: 16px;
-          color: #666;
-          margin: 0;
-          line-height: 1.5;
+        &::before {
+          left: 100%;
         }
       }
 
-      .retry-button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 10px;
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        &:active {
-          transform: translateY(0);
-        }
+      &:active {
+        transform: translateY(-1px);
       }
     }
+  }
+}
+
+// Animations
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-1deg);
   }
 }
 
@@ -121,25 +181,54 @@
   }
 }
 
+@keyframes successPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .oauth-callback-module {
-    .oauth-callback-card-container {
-      margin: 60px 20px 20px;
-      padding: 30px 20px;
+    // Ensure language selector container is properly positioned
+    .language-selector-container {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      left: auto !important;
+      bottom: auto !important;
+      z-index: 1000 !important;
+    }
+    
+    .loading-container {
+      .simple-loader {
+        width: 60px;
+        height: 60px;
+      }
+    }
 
-      .title {
-        font-size: 24px;
+    .success-container,
+    .error-container {
+      padding: 32px 24px;
+      max-width: 350px;
+      width: 85%;
+
+      .message {
+        font-size: 16px;
       }
 
-      .status-container {
-        .loading-state,
-        .success-state,
-        .error-state {
-          .message {
-            font-size: 14px;
-          }
-        }
+      .retry-button {
+        padding: 14px 28px;
+        font-size: 15px;
       }
     }
   }

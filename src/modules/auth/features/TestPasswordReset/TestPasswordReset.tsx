@@ -97,7 +97,11 @@ const TestPasswordResetComponent = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email address"
-              className="input"
+              className="input force-ltr-placeholder"
+              style={{
+                '--placeholder-direction': 'ltr',
+                '--placeholder-text-align': 'left'
+              } as React.CSSProperties}
               required
             />
           </div>

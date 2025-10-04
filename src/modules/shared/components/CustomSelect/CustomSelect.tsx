@@ -61,16 +61,7 @@ const CustomSelect = ({
     }
   };
 
-  // Auto-focus and open dropdown when component mounts if it's the first field
-  useEffect(() => {
-    if (selectRef.current && !value && !disabled) {
-      // Add a small delay to ensure the component is fully rendered
-      const timer = setTimeout(() => {
-        selectRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+  // Removed auto-focus behavior to prevent dropdown from opening on mount
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -116,10 +107,8 @@ const CustomSelect = ({
       ref={selectRef} 
       tabIndex={disabled ? -1 : 0}
       onFocus={() => {
-        if (!disabled && !isOpen) {
-          setIsOpen(true);
-          // Don't set hasInteracted on focus - only after actual interaction
-        }
+        // Don't auto-open on focus - only open when user explicitly clicks
+        // This prevents the dropdown from opening when component mounts or receives focus programmatically
       }}
     >
       <div className="select-trigger" onClick={handleToggle}>
@@ -133,24 +122,36 @@ const CustomSelect = ({
         </div>
       </div>
       {isOpen && (
-        <ul className="options-list">
-          {options.map(option => (
-            <li
-              key={option.value}
-              className={`option ${option.value === value ? 'selected' : ''}`}
-              onClick={() => handleSelect(option.value)}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f8f9fa';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = option.value === value ? '#e3f2fd' : 'transparent';
-              }}
-            >
-              <span>{option.label}</span>
-              {option.value === value && <Check size={18} className="check-icon" />}
-            </li>
-          ))}
-        </ul>
+        <>
+          {/* Backdrop to prevent clicking on other elements */}
+          <div 
+            className="select-backdrop" 
+            onClick={() => {
+              setIsOpen(false);
+              setTimeout(() => {
+                handleBlur();
+              }, 100);
+            }}
+          />
+          <ul className="options-list">
+            {options.map(option => (
+              <li
+                key={option.value}
+                className={`option ${option.value === value ? 'selected' : ''}`}
+                onClick={() => handleSelect(option.value)}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8f9fa';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = option.value === value ? '#e3f2fd' : 'transparent';
+                }}
+              >
+                <span>{option.label}</span>
+                {option.value === value && <Check size={18} className="check-icon" />}
+              </li>
+            ))}
+          </ul>
+        </>
       )}
       {isInvalid && (
         <div className="error-message">

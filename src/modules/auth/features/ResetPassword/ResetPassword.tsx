@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Loader2, ArrowLeft, Eye, EyeOff, LogIn } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff, LogIn } from 'lucide-react'
+import SimpleLoader from '../../../shared/components/SimpleLoader/SimpleLoader'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '../../../shared/store'
 import { resetUserPassword, login } from '../../data/authThunk'
@@ -32,8 +33,12 @@ const initialValues = {
 }
 
 const ResetPasswordComponent = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const dispatch = useAppDispatch()
+  
+  // Add Arabic font class and RTL direction when Arabic language is selected
+  const isArabic = i18n?.language === 'ar'
+  const isRTL = isArabic
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
@@ -263,7 +268,10 @@ const ResetPasswordComponent = () => {
 
   if (loading) {
     return (
-      <div className="reset-password-module">
+      <div 
+        className={`reset-password-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="language-selector-container">
           <LanguageSelector />
         </div>
@@ -272,7 +280,7 @@ const ResetPasswordComponent = () => {
             <img src={logoImg} alt="Platform Logo" className="logo-image" />
           </div>
           <div className="loading-state">
-            <Loader2 size={24} className="spinner" />
+            <SimpleLoader size={24} />
             <p>{t('auth.resetPassword.checkingLink', 'Checking reset link...')}</p>
           </div>
         </div>
@@ -285,7 +293,10 @@ const ResetPasswordComponent = () => {
     const isAlreadyAuthenticated = error.includes('already logged in')
     
     return (
-      <div className="reset-password-module">
+      <div 
+        className={`reset-password-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="language-selector-container">
           <LanguageSelector />
         </div>
@@ -362,7 +373,10 @@ const ResetPasswordComponent = () => {
 
   if (success) {
     return (
-      <div className="reset-password-module">
+      <div 
+        className={`reset-password-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="language-selector-container">
           <LanguageSelector />
         </div>
@@ -412,7 +426,10 @@ const ResetPasswordComponent = () => {
 
   if (isDirectLoginMode) {
     return (
-      <div className="reset-password-module">
+      <div 
+        className={`reset-password-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="language-selector-container">
           <LanguageSelector />
         </div>
@@ -461,7 +478,10 @@ const ResetPasswordComponent = () => {
   }
 
   return (
-    <div className="reset-password-module">
+    <div 
+      className={`reset-password-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="language-selector-container">
         <LanguageSelector />
       </div>
@@ -512,8 +532,12 @@ const ResetPasswordComponent = () => {
                 value={formik.values.password}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`input ${formik.touched.password && formik.errors.password ? 'error' : ''}`}
+                className={`input force-ltr-placeholder ${formik.touched.password && formik.errors.password ? 'error' : ''}`}
                 autoComplete="new-password"
+                style={{
+                  '--placeholder-direction': 'ltr',
+                  '--placeholder-text-align': 'left'
+                } as React.CSSProperties}
               />
               <button
                 type="button"
@@ -541,8 +565,12 @@ const ResetPasswordComponent = () => {
                 value={formik.values.confirmPassword}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`input ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'error' : ''}`}
+                className={`input force-ltr-placeholder ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'error' : ''}`}
                 autoComplete="new-password"
+                style={{
+                  '--placeholder-direction': 'ltr',
+                  '--placeholder-text-align': 'left'
+                } as React.CSSProperties}
               />
               <button
                 type="button"
@@ -570,7 +598,7 @@ const ResetPasswordComponent = () => {
           >
             {resetPasswordStatus === 'loading' ? (
               <>
-                <Loader2 size={18} className="spinner" />
+                <SimpleLoader size={18} />
                 {isAuthenticatedUserMode 
                   ? t('auth.resetPassword.updating', 'Updating...') 
                   : t('auth.resetPassword.updating', 'Updating...')

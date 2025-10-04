@@ -2,23 +2,27 @@
 @use '../modules/shared/assets/styles/abstracts' as *;
 
 @use '../modules' as *;
+@use '../styles/rtl-global';
+@use '../styles/rtl-placeholder-override';
 
 @forward './dark.scss';
 
-// Force LTR direction for all languages including Arabic
-* {
-  direction: ltr !important;
-}
+// Allow RTL for Arabic language but force placeholders to be LTR
+// This is handled by the rtl-global.scss file
 
+// Default LTR for non-Arabic languages
 html, body {
-  direction: ltr !important;
-  text-align: left !important;
+  direction: ltr;
+  text-align: left;
 }
 
-// Ensure all components use LTR layout
-.app, #root, [data-reactroot] {
-  direction: ltr !important;
+// Allow RTL for Arabic language
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
 }
+
+// Ensure placeholders are always LTR (handled by rtl-global.scss)
 
 .global-header {
   display: flex;
@@ -41,7 +45,7 @@ html, body {
     font-weight: 700;
     letter-spacing: 0.07em;
     color: #1697d6;
-    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-family: var(--student-font-primary);
     text-transform: uppercase;
   }
 }

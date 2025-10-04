@@ -182,7 +182,7 @@
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--student-font-primary);
 
   .action-btn {
     display: flex;
@@ -345,6 +345,8 @@
           padding: 6px 12px;
           border-radius: 20px;
           border: 1px solid rgba(44, 73, 129, 0.15);
+          min-width: 140px; // Fixed width for consistent sizing
+          justify-content: flex-start; // Ensure content alignment
 
           svg {
             flex-shrink: 0;
@@ -623,6 +625,11 @@
         .chapter-meta {
           flex-direction: column;
           gap: 0.5rem;
+
+          .meta-item {
+            min-width: 120px; // Slightly smaller width for mobile
+            align-self: flex-start; // Align to start on mobile
+          }
         }
       }
 

@@ -1,7 +1,12 @@
 .custom-select {
   position: relative;
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--student-font-primary);
+  z-index: 1;
+
+  &:focus-within {
+    z-index: 1000;
+  }
 
   .select-trigger {
     display: flex;
@@ -129,7 +134,7 @@
     border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 500;
-    z-index: 15;
+    z-index: 1001;
     animation: slideDown 0.3s ease;
     box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
     
@@ -157,6 +162,17 @@
     }
   }
 
+  .select-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    z-index: 999;
+    cursor: default;
+  }
+
   .options-list {
     position: absolute;
     top: calc(100% + 8px);
@@ -168,7 +184,7 @@
     box-shadow: 4px 4px 0px 0px #000000;
     padding: 8px;
     list-style: none;
-    z-index: 10;
+    z-index: 1000;
     max-height: 200px;
     overflow-y: auto;
     animation: slideDown 0.2s ease;

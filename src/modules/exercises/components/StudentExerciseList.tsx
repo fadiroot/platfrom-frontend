@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   getAccessibleExercises,
   getPublicExercises,
   getCurrentUserActivationStatus
 } from '@/lib/api/userManagement'
+import { getDashboardPlaceholders } from '../../../utils/rtlUtils'
 import './StudentExerciseList.scss'
 
 interface Exercise {
@@ -32,6 +34,7 @@ const StudentExerciseList: React.FC<StudentExerciseListProps> = ({
   subjectId,
   levelId
 }) => {
+  const { i18n } = useTranslation();
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [loading, setLoading] = useState(true)
   const [userStatus, setUserStatus] = useState<{
@@ -41,6 +44,10 @@ const StudentExerciseList: React.FC<StudentExerciseListProps> = ({
   } | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all')
+  
+  // RTL support
+  const isRTL = i18n?.language === 'ar';
+  const placeholders = getDashboardPlaceholders(isRTL);
 
   useEffect(() => {
     fetchData()
@@ -150,7 +157,10 @@ const StudentExerciseList: React.FC<StudentExerciseListProps> = ({
 
   if (loading) {
     return (
-      <div className="student-exercise-list">
+      <div 
+        className={`student-exercise-list ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="loading">Loading exercises...</div>
       </div>
     )
@@ -159,7 +169,10 @@ const StudentExerciseList: React.FC<StudentExerciseListProps> = ({
   const subscriptionStatus = getSubscriptionStatus()
 
   return (
-    <div className="student-exercise-list">
+    <div 
+      className={`student-exercise-list ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="student-exercise-list__header">
         <h2>Available Exercises</h2>
         
@@ -181,7 +194,7 @@ const StudentExerciseList: React.FC<StudentExerciseListProps> = ({
         <div className="search-box">
           <input
             type="text"
-            placeholder="Search exercises..."
+            placeholder={placeholders.searchExercisesSimple}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

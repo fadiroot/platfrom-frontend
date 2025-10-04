@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getSubjects, createSubject, updateSubject, deleteSubject, type SubjectWithLevels } from '@/lib/api/subjects'
 import { getLevels } from '@/lib/api/levels'
 import type { Tables } from '@/lib/supabase'
 import CustomSelect from '../../shared/components/CustomSelect/CustomSelect'
+import { getDashboardPlaceholders } from '../../../utils/rtlUtils'
 import './SubjectManagement.scss'
 
 type Level = Tables<'levels'>
@@ -36,6 +38,7 @@ interface SubjectFormData {
 }
 
 const SubjectManagement: React.FC = () => {
+  const { i18n } = useTranslation();
   const [subjects, setSubjects] = useState<SubjectWithLevels[]>([])
   const [levels, setLevels] = useState<Level[]>([])
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null)
@@ -49,6 +52,10 @@ const SubjectManagement: React.FC = () => {
     image_url: null,
     selected_icon: null
   })
+  
+  // RTL support
+  const isRTL = i18n?.language === 'ar';
+  const placeholders = getDashboardPlaceholders(isRTL);
   const [submitting, setSubmitting] = useState(false)
   
   // Ref to track if component is mounted
@@ -252,14 +259,20 @@ const SubjectManagement: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="subject-management">
+      <div 
+        className={`subject-management ${isRTL ? 'rtl' : 'ltr'}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+      >
         <div className="loading">Chargement des matières...</div>
       </div>
     )
   }
 
   return (
-    <div className="subject-management">
+    <div 
+      className={`subject-management ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="management-header">
         <h1>📚 Gestion des Matières</h1>
         <div className="header-controls">
@@ -276,7 +289,7 @@ const SubjectManagement: React.FC = () => {
               value={selectedLevel || ''}
               onChange={(value) => setSelectedLevel(value || null)}
               onBlur={() => {}}
-              placeholder="Tous les niveaux"
+              placeholder={placeholders.allLevels}
             />
           </div>
           <button 
@@ -315,7 +328,7 @@ const SubjectManagement: React.FC = () => {
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  placeholder="Ex: Algorithmique et Programmation"
+                  placeholder={placeholders.subjectTitle}
                   required
                 />
               </div>
@@ -357,7 +370,7 @@ const SubjectManagement: React.FC = () => {
                   id="description"
                   value={formData.description || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Description de la matière..."
+                  placeholder={placeholders.subjectDescription}
                   rows={4}
                 />
               </div>
@@ -393,7 +406,7 @@ const SubjectManagement: React.FC = () => {
                       id="custom_image_url"
                       value={formData.image_url || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                      placeholder="https://example.com/image.jpg"
+                      placeholder={placeholders.imageUrl}
                     />
                   </div>
                 )}

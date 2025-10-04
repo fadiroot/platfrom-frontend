@@ -6,7 +6,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { Eye, EyeOff, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react'
+import SimpleLoader from '../../../shared/components/SimpleLoader/SimpleLoader'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch } from '../../../../modules/shared/store'
 import { login, loginWithGoogle } from '../../data/authThunk'
@@ -68,7 +69,11 @@ const Input = ({
           value={formik.values[name]}
           onChange={formik.handleChange}
           onBlur={handleBlur}
-          className="input"
+          className="input force-ltr-placeholder"
+          style={{
+            '--placeholder-direction': 'ltr',
+            '--placeholder-text-align': 'left'
+          } as React.CSSProperties}
         />
         <div className="input-icons">
           {isInvalid && <AlertCircle size={16} className="error-icon" />}
@@ -106,7 +111,7 @@ const Button = ({ type = 'button', label, loading, children }: ButtonProps) => {
     <button type={type} className="Button-component" disabled={loading}>
       {loading ? (
         <>
-          <Loader2 size={18} className="spinner" />
+          <SimpleLoader size={18} />
           {label || children}
         </>
       ) : (
@@ -130,8 +135,9 @@ const LoginComponent = () => {
   const [errorMessage, setErrorMessage] = useState('')
   const { t, i18n } = useTranslation()
 
-  // Add Arabic font class when Arabic language is selected
+  // Add Arabic font class and RTL direction when Arabic language is selected
   const isArabic = i18n?.language === 'ar'
+  const isRTL = isArabic
 
   const formik = useFormik({
     initialValues,
@@ -196,7 +202,10 @@ const LoginComponent = () => {
   }
 
   return (
-    <div className={`login-module ${isArabic ? 'arabic-fonts' : ''}`}>
+    <div 
+      className={`login-module ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       <div className="language-selector-container">
         <LanguageSelector />
       </div>
@@ -249,7 +258,7 @@ const LoginComponent = () => {
           disabled={googleSubmitting}
         >
           {googleSubmitting ? (
-            <Loader2 size={18} className="spinner" />
+            <SimpleLoader size={18} />
           ) : (
             <svg className="google-icon" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

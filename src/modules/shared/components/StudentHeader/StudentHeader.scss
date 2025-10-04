@@ -231,7 +231,7 @@
         }
 
         &.active {
-          background: var(--header-bg);
+          background: var(--header-bg); // Same blue as header background
           color: var(--header-text-primary);
 
           .language-name {
@@ -271,14 +271,17 @@
     padding: 0.75rem 1rem;
     box-shadow: 0 2px 0px 0px var(--header-border);
 
+    &__container {
+      gap: 0.75rem;
+    }
+
     &__brand {
       gap: 0.5rem;
       padding: 0.25rem;
     }
 
     &__logo {
-      width: 32px;
-      height: 32px;
+      display: none; // Hide logo on mobile
     }
 
     &__brand-text {
@@ -291,6 +294,27 @@
 
     &__actions {
       gap: 0.5rem;
+    }
+
+    // Make user info text smaller on mobile
+    .user-info {
+      margin-right: 0.5rem;
+      
+      .user-name {
+        font-size: 0.75rem; // Smaller text on mobile
+        max-width: 120px; // Limit width to prevent overflow
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .user-level {
+        font-size: 0.65rem; // Smaller level text on mobile
+        max-width: 120px; // Limit width to prevent overflow
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
 
     &__logout {
@@ -307,15 +331,157 @@
       .language-selector {
         padding: 0.25rem 0.5rem;
         box-shadow: 1px 1px 0px 0px rgba(255, 255, 255, 0.1);
+        min-height: 32px; // Touch-friendly height
+        touch-action: manipulation;
+        border-radius: 6px; // Slightly more rounded for mobile
 
         &:hover {
           box-shadow: 2px 2px 0px 0px rgba(255, 255, 255, 0.15);
         }
+
+        .current-flag {
+          width: 20px;
+          height: 15px;
+          font-size: 14px;
+        }
       }
 
       .language-dropdown {
-        box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.1);
+        position: fixed; // Fixed positioning for mobile
+        top: 80px; // Position below the header
+        left: 20px;
+        right: 20px;
+        margin-top: 0;
+        min-width: auto;
+        width: auto;
+        max-width: 300px;
+        margin: 0 auto;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        animation: slideDown 0.3s ease; // Change animation to slideDown
+
+        .language-item {
+          min-height: 44px; // Larger touch targets for mobile
+          touch-action: manipulation;
+          padding: 12px 16px;
+          font-size: 14px;
+          border-radius: 8px;
+          margin: 4px 8px;
+
+          .language-flag {
+            width: 24px;
+            height: 18px;
+            font-size: 18px;
+          }
+
+          .language-name {
+            font-weight: 500;
+          }
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+          }
+
+          &.active {
+            background: var(--header-bg); // Same blue as header background
+            color: var(--header-text-primary);
+            transform: translateY(-1px);
+          }
+        }
       }
     }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.5rem 0.75rem;
+
+    &__container {
+      gap: 0.5rem;
+    }
+
+    &__brand {
+      gap: 0.25rem;
+      padding: 0.125rem;
+    }
+
+    &__logo {
+      display: none; // Hide logo on small mobile
+    }
+
+    &__actions {
+      gap: 0.25rem;
+    }
+
+    &__logout {
+      width: 28px;
+      height: 28px;
+    }
+
+    // Make user info even smaller on small mobile
+    .user-info {
+      margin-right: 0.25rem;
+      
+      .user-name {
+        font-size: 0.7rem; // Even smaller text on small mobile
+        max-width: 100px; // Smaller max width
+      }
+      
+      .user-level {
+        font-size: 0.6rem; // Even smaller level text on small mobile
+        max-width: 100px; // Smaller max width
+      }
+    }
+
+    &__language-switcher {
+      .language-selector {
+        padding: 0.2rem 0.4rem;
+        min-height: 28px; // Touch-friendly height for small screens
+        touch-action: manipulation;
+        border-radius: 4px;
+        
+        .current-flag {
+          width: 18px;
+          height: 14px;
+          font-size: 14px;
+        }
+      }
+
+      .language-dropdown {
+        top: 70px; // Position below the header for small mobile
+        left: 16px;
+        right: 16px;
+        border-radius: 10px;
+        z-index: 1001;
+        animation: slideDown 0.3s ease;
+
+        .language-item {
+          min-height: 40px; // Maintain good touch targets
+          touch-action: manipulation;
+          padding: 10px 14px;
+          font-size: 13px;
+          margin: 3px 6px;
+
+          .language-flag {
+            width: 22px;
+            height: 17px;
+            font-size: 16px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animation for mobile language dropdown
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

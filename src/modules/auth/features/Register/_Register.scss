@@ -6,12 +6,64 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
   position: relative;
+  font-family: var(--student-font-primary);
+
+  // Arabic font support
+  &.arabic-fonts {
+    font-family: var(--student-font-arabic);
+  }
+
+  // RTL support
+  &.rtl {
+    direction: rtl;
+    text-align: right;
+
+    .language-selector-container {
+      right: auto;
+      left: 20px;
+    }
+
+    .input-icons {
+      right: auto;
+      left: 12px;
+    }
+
+    .error-message::before {
+      left: auto;
+      right: 16px;
+    }
+
+    .form-row {
+      direction: rtl;
+    }
+  }
+
+  // LTR support (explicit)
+  &.ltr {
+    direction: ltr;
+    text-align: left;
+  }
 
   .language-selector-container {
     position: absolute;
     top: 20px;
     right: 20px;
     z-index: 100;
+    
+    // Ensure language selector stays at top on mobile
+    @media (max-width: 768px) {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      left: auto;
+      bottom: auto;
+      z-index: 1000;
+    }
+    
+    @media (max-width: 480px) {
+      top: 16px;
+      right: 16px;
+    }
   }
 
   .register-card-container {
@@ -139,6 +191,16 @@
           transform: translate(-1px, -1px);
           box-shadow: 3px 3px 0px 0px #667eea;
         }
+
+        // Force placeholder text to be LTR with maximum specificity
+        &::placeholder,
+        &::-webkit-input-placeholder,
+        &::-moz-placeholder,
+        &:-ms-input-placeholder {
+          direction: ltr !important;
+          text-align: left !important;
+          unicode-bidi: normal !important;
+        }
       }
 
       .input-icons {
@@ -164,17 +226,31 @@
           background: none;
           border: none;
           cursor: pointer;
-          color: #666666;
-          padding: 4px;
+          color: #333333;
+          padding: 6px;
           border-radius: 4px;
           transition: all 0.2s ease;
           pointer-events: auto;
+          opacity: 0.8;
           
           &:hover {
             color: #000000;
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: rgba(0, 0, 0, 0.08);
+            opacity: 1;
+            transform: scale(1.05);
+          }
+          
+          &:active {
+            transform: scale(0.95);
           }
         }
+      }
+
+      // RTL support for Arabic language - position password icon on the left
+      html[lang="ar"] & .input-icons,
+      body[dir="rtl"] & .input-icons {
+        right: auto;
+        left: 12px;
       }
 
       .error-message {
@@ -391,6 +467,20 @@
 }
 
 // Responsive design
+@media (max-width: 768px) {
+  .register-module {
+    // Ensure language selector container is properly positioned
+    .language-selector-container {
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      left: auto !important;
+      bottom: auto !important;
+      z-index: 1000 !important;
+    }
+  }
+}
+
 @media (max-width: 700px) {
   .register-module {
     padding: 16px;
@@ -413,8 +503,12 @@
     }
 
     .language-selector-container {
-      top: 16px;
-      right: 16px;
+      position: fixed !important;
+      top: 16px !important;
+      right: 16px !important;
+      left: auto !important;
+      bottom: auto !important;
+      z-index: 1000 !important;
     }
   }
 }

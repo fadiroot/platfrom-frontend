@@ -1,13 +1,11 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IoArrowBack, IoBookOutline, IoShieldCheckmarkOutline } from 'react-icons/io5'
-import { getSecureExerciseFiles, getSecureFileUrl } from '@/lib/api/exercises'
-import { supabase } from '@/lib/supabase'
+import { getSecureExerciseFiles } from '@/lib/api/exercises'
 import { ExerciseViewerProps, Exercise } from './types'
 import Loader from '../../../shared/components/Loader/Loader'
-import WebPDFViewer from './WebPDFViewer'
 
 import './ExerciseViewer.scss'
 
@@ -15,24 +13,15 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
   const { t, i18n } = useTranslation()
   const [activeTab, setActiveTab] = useState<'exercise' | 'solution'>('exercise')
   
-  // Always use LTR direction for all languages
-  const isRTL = false
+  // Add Arabic font class and RTL direction when Arabic language is selected
+  const isArabic = i18n?.language === 'ar';
+  const isRTL = isArabic;
   const [selectedFileIdx, setSelectedFileIdx] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [secureExerciseFiles, setSecureExerciseFiles] = useState<string[]>([])
   const [secureCorrectionFiles, setSecureCorrectionFiles] = useState<string[]>([])
   const [hasAccess, setHasAccess] = useState(false)
   const [loadingFiles, setLoadingFiles] = useState(true)
-  const [isTestMode, setIsTestMode] = useState(false)
-  const preloadedFiles = useRef(new Set<string>())
-  
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const correctionIframeRef = useRef<HTMLIFrameElement>(null)
-  const [preloadedTabs, setPreloadedTabs] = useState<Set<string>>(new Set())
-
-  // Preload PDFs for better performance
-
-
   // Load secure files when component mounts
   useEffect(() => {
     const loadSecureFiles = async () => {
@@ -69,52 +58,6 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
     loadSecureFiles()
   }, [exercise.id, exerciseIndex])
 
-  // Preload both tabs for instant switching
-  useEffect(() => {
-    if (!hasAccess || loadingFiles) return
-    
-    const exerciseFiles = secureExerciseFiles
-    const correctionFiles = secureCorrectionFiles
-    
-    // Preload both exercise and correction files
-    const preloadTab = (files: string[], tabName: string) => {
-      if (files.length > 0 && selectedFileIdx < files.length) {
-        const fileUrl = files[selectedFileIdx]
-        if (fileUrl && !preloadedTabs.has(`${tabName}-${selectedFileIdx}`)) {
-          // Mark as preloaded
-          setPreloadedTabs(prev => new Set([...prev, `${tabName}-${selectedFileIdx}`]))
-        }
-      }
-    }
-    
-    // Preload current file index for both tabs
-    preloadTab(exerciseFiles, 'exercise')
-    preloadTab(correctionFiles, 'correction')
-    
-  }, [selectedFileIdx, hasAccess, loadingFiles, secureExerciseFiles, secureCorrectionFiles, preloadedTabs])
-
-  // Update iframe sources when file index changes
-  useEffect(() => {
-    if (!hasAccess || loadingFiles) return
-
-    // Update exercise iframe
-    if (iframeRef.current && secureExerciseFiles.length > 0 && selectedFileIdx < secureExerciseFiles.length) {
-      const exerciseUrl = secureExerciseFiles[selectedFileIdx]
-      const newSrc = `https://docs.google.com/gview?url=${encodeURIComponent(exerciseUrl)}&embedded=true&rm=minimal`
-      if (iframeRef.current.src !== newSrc) {
-        iframeRef.current.src = newSrc
-      }
-    }
-
-    // Update correction iframe
-    if (correctionIframeRef.current && secureCorrectionFiles.length > 0 && selectedFileIdx < secureCorrectionFiles.length) {
-      const correctionUrl = secureCorrectionFiles[selectedFileIdx]
-      const newSrc = `https://docs.google.com/gview?url=${encodeURIComponent(correctionUrl)}&embedded=true&rm=minimal`
-      if (correctionIframeRef.current.src !== newSrc) {
-        correctionIframeRef.current.src = newSrc
-      }
-    }
-  }, [selectedFileIdx, secureExerciseFiles, secureCorrectionFiles, hasAccess, loadingFiles])
 
   // Get current files based on active tab
   const getCurrentFiles = () => {
@@ -226,14 +169,42 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
   }
 
   return (
-    <div className="exercise-viewer-modern">
+    <div 
+      className={`exercise-viewer-modern ${isArabic ? 'arabic-fonts' : ''} ${isRTL ? 'rtl' : 'ltr'}`}
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
       {/* Header */}
       <div className="header-modern">
         <div className="header-left">
-        <button className="back-btn-modern" onClick={onBack}>
-          <IoArrowBack onClick={onBack} />
-          <span>{t('exercises.backToExercises')}</span>
-        </button>
+          {/* Conditionally render based on language */}
+          {isRTL ? (
+            // Arabic: Tab switcher on left
+            <div 
+              className={`tab-switcher-header ${activeTab === 'exercise' ? 'exercise-active' : 'solution-active'} ${isRTL ? 'rtl' : 'ltr'}`}
+              dir={isRTL ? 'rtl' : 'ltr'}
+            >
+              <div 
+                className={`tab-btn-header ${activeTab === 'exercise' ? 'active' : ''}`}
+                onClick={() => setActiveTab('exercise')}
+              >
+                <IoBookOutline style={{ strokeWidth: '2.5px' }} />
+                <span>{t('exerciseViewer.exerciseTab')}</span>
+              </div>
+              <div 
+                className={`tab-btn-header ${activeTab === 'solution' ? 'active' : ''}`}
+                onClick={() => setActiveTab('solution')}
+              >
+                <IoShieldCheckmarkOutline style={{ strokeWidth: '2.5px' }} />
+                <span>{t('exerciseViewer.correctionTab')}</span>
+              </div>
+            </div>
+          ) : (
+            // LTR: Back button on left
+            <button className="back-btn-modern" onClick={onBack}>
+              <IoArrowBack onClick={onBack} />
+              <span>{t('exercises.backToExercises')}</span>
+            </button>
+          )}
         </div>
         
         <div className="header-center">
@@ -248,26 +219,35 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
           </div>
           
         <div className="header-right">
-          {/* Tab Switcher in Header */}
-          <div 
-            className={`tab-switcher-header ${activeTab === 'exercise' ? 'exercise-active' : 'solution-active'} ${isRTL ? 'rtl' : 'ltr'}`}
-            dir={isRTL ? 'rtl' : 'ltr'}
-          >
+          {/* Conditionally render based on language */}
+          {isRTL ? (
+            // Arabic: Back button on right
+            <button className="back-btn-modern" onClick={onBack}>
+              <IoArrowBack onClick={onBack} />
+              <span>{t('exercises.backToExercises')}</span>
+            </button>
+          ) : (
+            // LTR: Tab switcher on right
             <div 
-              className={`tab-btn-header ${activeTab === 'exercise' ? 'active' : ''}`}
-              onClick={() => setActiveTab('exercise')}
+              className={`tab-switcher-header ${activeTab === 'exercise' ? 'exercise-active' : 'solution-active'} ${isRTL ? 'rtl' : 'ltr'}`}
+              dir={isRTL ? 'rtl' : 'ltr'}
             >
-              <IoBookOutline style={{ strokeWidth: '2.5px' }} />
-              <span>{t('exerciseViewer.exerciseTab')}</span>
+              <div 
+                className={`tab-btn-header ${activeTab === 'exercise' ? 'active' : ''}`}
+                onClick={() => setActiveTab('exercise')}
+              >
+                <IoBookOutline style={{ strokeWidth: '2.5px' }} />
+                <span>{t('exerciseViewer.exerciseTab')}</span>
+              </div>
+              <div 
+                className={`tab-btn-header ${activeTab === 'solution' ? 'active' : ''}`}
+                onClick={() => setActiveTab('solution')}
+              >
+                <IoShieldCheckmarkOutline style={{ strokeWidth: '2.5px' }} />
+                <span>{t('exerciseViewer.correctionTab')}</span>
+              </div>
             </div>
-            <div 
-              className={`tab-btn-header ${activeTab === 'solution' ? 'active' : ''}`}
-              onClick={() => setActiveTab('solution')}
-            >
-              <IoShieldCheckmarkOutline style={{ strokeWidth: '2.5px' }} />
-              <span>{t('exerciseViewer.correctionTab')}</span>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -316,18 +296,21 @@ const ExerciseViewer: React.FC<ExerciseViewerProps> = ({ exercise, onBack, exerc
           </div>
         )}
 
-        {/* Web PDF Viewer */}
+        {/* Direct Google PDF Viewer */}
         <div className="modern-pdf-viewer">
           {getCurrentPDFUrl() ? (
-            <WebPDFViewer
-              url={getCurrentPDFUrl()}
-              onLoad={() => {
-                console.log('PDF loaded successfully');
-              }}
-              onError={(error) => {
-                console.error('PDF loading error:', error);
-                setError(error);
-              }}
+            <iframe
+              src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(getCurrentPDFUrl()!)}`}
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              title={isRTL ? 'عارض PDF' : 'PDF Viewer'}
+              className="pdf-iframe"
+              allowFullScreen
+              style={{ border: 'none' }}
+              sandbox="allow-same-origin allow-scripts allow-forms"
+              onContextMenu={(e) => e.preventDefault()}
+              onDragStart={(e) => e.preventDefault()}
             />
           ) : (
             <div className="no-document-state">

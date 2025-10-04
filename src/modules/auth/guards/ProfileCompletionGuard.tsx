@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAppSelector } from '../../shared/store'
 import { supabase } from '../../../lib/supabase'
 import { PATH } from '../routes/paths'
-import { Loader2 } from 'lucide-react'
+import SimpleLoader from '../../shared/components/SimpleLoader/SimpleLoader'
 
 interface ProfileCompletionGuardProps {
   children: React.ReactNode
@@ -113,7 +113,7 @@ const ProfileCompletionGuard = ({ children }: ProfileCompletionGuardProps) => {
     console.log('🔍 ProfileCompletionGuard: Showing loading state')
     return (
       <div className="profile-completion-guard-loading">
-        <Loader2 size={32} className="spinner" />
+        <SimpleLoader size={32} />
         <p>Checking profile...</p>
       </div>
     )
